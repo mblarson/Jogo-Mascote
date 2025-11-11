@@ -454,8 +454,13 @@
         const player = {
             x: 100,
             y: 0,
-            width: 70,  // Aumentado de 50 para 70
-            height: 80, // Aumentado de 70 para 80
+            width: 70,  // Largura visual do personagem
+            height: 80, // Altura visual do personagem
+            // Hitbox menor que o sprite para dar margem de erro
+            hitboxWidth: 50,  // 70% da largura visual
+            hitboxHeight: 60, // 75% da altura visual
+            hitboxOffsetX: 10, // (70 - 50) / 2 = 10px de cada lado
+            hitboxOffsetY: 10, // (80 - 60) / 2 = 10px em cima e embaixo
             velocityY: 0,
             jumpPower: 16, // Aumentado um pouco o pulo
             grounded: false,
@@ -793,11 +798,18 @@
             for (let i = 0; i < obstacles.length; i++) {
                 const obstacle = obstacles[i];
                 
+                // Calcular as coordenadas do hitbox do jogador
+                const playerHitboxX = player.x + player.hitboxOffsetX;
+                const playerHitboxY = player.y + player.hitboxOffsetY;
+                const playerHitboxWidth = player.hitboxWidth;
+                const playerHitboxHeight = player.hitboxHeight;
+                
+                // Verificar colisão usando o hitbox menor
                 if (
-                    player.x < obstacle.x + obstacle.width &&
-                    player.x + player.width > obstacle.x &&
-                    player.y < obstacle.y + obstacle.height &&
-                    player.y + player.height > obstacle.y
+                    playerHitboxX < obstacle.x + obstacle.width &&
+                    playerHitboxX + playerHitboxWidth > obstacle.x &&
+                    playerHitboxY < obstacle.y + obstacle.height &&
+                    playerHitboxY + playerHitboxHeight > obstacle.y
                 ) {
                     // Colisão detectada
                     gameOver();
@@ -942,6 +954,18 @@
             // Desenhar a imagem do personagem apenas se estiver carregada
             if (player.loaded) {
                 ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
+                
+                // Opcional: Desenhar o hitbox para debug (remover em produção)
+                /*
+                ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(
+                    player.x + player.hitboxOffsetX, 
+                    player.y + player.hitboxOffsetY, 
+                    player.hitboxWidth, 
+                    player.hitboxHeight
+                );
+                */
             } else {
                 // Desenhar um placeholder enquanto a imagem não carrega
                 ctx.fillStyle = '#FFA500';
