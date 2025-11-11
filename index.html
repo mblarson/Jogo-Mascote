@@ -421,9 +421,16 @@
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
             const obstacleSize = 35 + Math.random() * 10; // Tamanho variável entre 35px e 45px
             
+            // Se for o primeiro obstáculo, garantir que não fique muito próximo do jogador
+            let xPosition = canvas.width / (window.devicePixelRatio || 1);
+            if (obstacles.length === 0 && firstObstacleCreated) {
+                // Garantir que o primeiro obstáculo fique a pelo menos 300px de distância do jogador
+                xPosition = Math.max(canvas.width / (window.devicePixelRatio || 1), player.x + 300);
+            }
+            
             // Pedras no chão - apenas um tipo agora
             obstacles.push({
-                x: canvas.width / (window.devicePixelRatio || 1),
+                x: xPosition,
                 y: canvasHeight - groundHeight - obstacleSize, // Posicionar no chão
                 width: obstacleSize,
                 height: obstacleSize,
@@ -534,11 +541,35 @@
             }
             
             // Criar novos obstáculos
-            if (firstObstacleCreated && (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width / (window.devicePixelRatio || 1) - 300)) {
-                // Aumentar a frequência de obstáculos conforme o nível aumenta
-                const obstacleChance = 0.01 + (level - 1) * 0.005;
-                if (Math.random() < obstacleChance) {
+            if (firstObstacleCreated) {
+                // Se não há obstáculos ou o último obstáculo está a uma distância segura
+                if (obstacles.length === 0) {
                     createObstacle();
+                } else {
+                    // Obter o último obstáculo
+                    const lastObstacle = obstacles[obstacles.length - 1];
+                    
+                    // Calcular a distância do último obstáculo até a borda direita
+                    const distanceToRight = canvas.width / (window.devicePixelRatio || 1) - lastObstacle.x;
+                    
+                    // Definir distâncias mínima e máxima entre obstáculos
+                    let minDistance = 200;
+                    let maxDistance = 500;
+                    
+                    // Ajustar as distâncias conforme o nível (tornando o jogo mais difícil)
+                    minDistance = Math.max(150, minDistance - (level - 1) * 10);
+                    maxDistance = Math.max(300, maxDistance - (level - 1) * 20);
+                    
+                    // Se a distância do último obstáculo até a borda direita for maior que a distância mínima
+                    if (distanceToRight > minDistance) {
+                        // Calcular a chance de criar um novo obstáculo
+                        // A chance aumenta linearmente de 0.01 (quando está na minDistance) até 0.05 (quando está na maxDistance)
+                        const chance = 0.01 + (distanceToRight - minDistance) / (maxDistance - minDistance) * 0.04;
+                        
+                        if (Math.random() < chance) {
+                            createObstacle();
+                        }
+                    }
                 }
             }
             
