@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AS AVENTURAS DE ZÉO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-image: url('./imagens/backgournd.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            touch-action: none;
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            max-height: 500px;
+            background: rgba(135, 206, 235, 0.7); /* Fundo semi-transparente para o container */
+            overflow: hidden;
+            border: 3px solid #FFA500;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
+        }
+        
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: transparent; /* Fundo transparente para mostrar o fundo do container */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        #gameInfo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 18px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            z-index: 10;
+        }
+        
+        #gameMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            display: none;
+            z-index: 20;
+        }
+        
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        #gameLogo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 15px;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        #startScreen h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #FFA500;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        #startScreen p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        /* Estilo do botão neo-pop-tilted-button */
+        .neo-pop-tilted-button {
+          border: 0.1px;
+          padding-bottom: 6px;
+          box-shadow: 1px 5px 7px #494a4b;
+          position: relative;
+          overflow: hidden;
+          background-color: #b7a81d;
+          color: #000000;
+          font-size: 1.25rem;
+          font-weight: 600;
+          cursor: pointer;
+          transform: perspective(180px) rotateX(30deg) translateY(2px);
+          transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .neo-pop-tilted-button::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 60%;
+          width: 35%;
+          height: 100%;
+          background: linear-gradient(
+            to right,
+            rgba(196, 196, 196, 0.8) 5px,
+            rgba(196, 196, 196, 0) 5px,
+            rgba(196, 196, 196, 0) 10px,
+            rgba(196, 196, 196, 0.8) 2px
+          );
+          animation: shimmer 5.5s infinite linear;
+        }
+
+        .neo-pop-tilted-button span::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 60%;
+          width: 35%;
+          height: 100%;
+          background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 1) 5px,
+            rgba(255, 255, 255, 0) 5px,
+            rgba(255, 255, 255, 0) 10px,
+            rgba(255, 255, 255, 1) 2px
+          );
+          animation: shimmer 5.5s infinite linear;
+        }
+
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-1950%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+
+        .neo-pop-tilted-button span {
+          background: #ffeb34;
+          padding: 1rem 2.5rem;
+          position: relative;
+          z-index: 1;
+          display: block;
+          border-radius: 0px;
+          border: 1px solid #494a4b;
+        }
+
+        .neo-pop-tilted-button:focus {
+          outline: none;
+        }
+
+        .neo-pop-tilted-button:focus-visible {
+          box-shadow: 0 0 0 3px rgba(255, 235, 52, 0.5);
+        }
+
+        .neo-pop-tilted-button:active {
+          transform: perspective(170px) rotateX(36deg) translateY(5px);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="gameInfo">
+            <div>Pontos: <span id="score">0</span></div>
+            <div>Recorde: <span id="highScore">0</span></div>
+        </div>
+        
+        <div id="gameMessage"></div>
+        
+        <div id="startScreen">
+            <img id="gameLogo" src="./imagens/mascoteuma.png" alt="Logo do Jogo">
+            <h1>AS AVENTURAS DE ZÉO</h1>
+            <p>Toque na tela para fazer o Zéo pular e desviar dos obstáculos!</p>
+            <p>Quanto mais tempo você sobreviver, mais pontos você fará.</p>
+            <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do jogo
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameContainer = document.getElementById('gameContainer');
+        const startScreen = document.getElementById('startScreen');
+        const startBtn = document.getElementById('startBtn');
+        const gameMessage = document.getElementById('gameMessage');
+        const scoreDisplay = document.getElementById('score');
+        const highScoreDisplay = document.getElementById('highScore');
+        
+        // Configurar tamanho do canvas com suporte para alta densidade de pixels
+        function resizeCanvas() {
+            const containerWidth = gameContainer.clientWidth;
+            const containerHeight = gameContainer.clientHeight;
+            
+            // Obter a densidade de pixels do dispositivo
+            const dpr = window.devicePixelRatio || 1;
+            
+            // Definir o tamanho do canvas considerando a densidade de pixels
+            canvas.width = containerWidth * dpr;
+            canvas.height = containerHeight * dpr;
+            
+            // Escalar o contexto para corresponder à densidade de pixels
+            ctx.scale(dpr, dpr);
+            
+            // Definir o tamanho de exibição do canvas
+            canvas.style.width = containerWidth + 'px';
+            canvas.style.height = containerHeight + 'px';
+            
+            // Habilitar suavização de imagem
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Variáveis do jogo
+        let gameRunning = false;
+        let gameStarted = false;
+        let score = 0;
+        let highScore = localStorage.getItem('zeoHighScore') || 0;
+        let gameSpeed = 5;
+        let gravity = 0.8;
+        let gameLoopId;
+        
+        // Altura do chão
+        const groundHeight = 50;
+        
+        // Atualizar recorde na tela
+        highScoreDisplay.textContent = highScore;
+        
+        // Personagem principal - ajustado para ficar mais gordinho
+        const player = {
+            x: 100,
+            y: 0,
+            width: 70,  // Aumentado de 50 para 70
+            height: 80, // Aumentado de 70 para 80
+            velocityY: 0,
+            jumpPower: 15,
+            grounded: false,
+            image: new Image(),
+            loaded: false
+        };
+        
+        // Carregar imagem do mascote com tratamento de erro
+        player.image.onload = function() {
+            player.loaded = true;
+            console.log("Imagem do personagem carregada com sucesso");
+        };
+        
+        player.image.onerror = function() {
+            console.error("Erro ao carregar a imagem do personagem");
+        };
+        
+        player.image.src = "./imagens/mascote.png";
+        
+        // Objetos do jogo
+        let obstacles = [];
+        let clouds = [];
+        let groundPosition = 0;
+        
+        // Configuração inicial do jogo
+        function initGame() {
+            score = 0;
+            gameSpeed = 5;
+            // Posicionar o jogador no chão
+            player.y = canvas.height / (window.devicePixelRatio || 1) - groundHeight - player.height;
+            player.velocityY = 0;
+            player.grounded = true;
+            obstacles = [];
+            clouds = [];
+            groundPosition = 0;
+            
+            updateUI();
+            
+            // Criar nuvens iniciais
+            for (let i = 0; i < 5; i++) {
+                createCloud();
+            }
+        }
+        
+        // Criar nuvens
+        function createCloud() {
+            clouds.push({
+                x: canvas.width / (window.devicePixelRatio || 1) + Math.random() * 200,
+                y: Math.random() * (canvas.height / (window.devicePixelRatio || 1) / 3),
+                width: 60 + Math.random() * 40,
+                height: 30 + Math.random() * 20,
+                speed: 1 + Math.random() * 2
+            });
+        }
+        
+        // Criar obstáculos
+        function createObstacle() {
+            const types = ['cactus', 'bird'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            
+            if (type === 'cactus') {
+                obstacles.push({
+                    x: canvas.width / (window.devicePixelRatio || 1),
+                    y: canvasHeight - groundHeight - 50, // Posicionar no chão
+                    width: 30,
+                    height: 50 + Math.random() * 30,
+                    type: 'cactus'
+                });
+            } else {
+                obstacles.push({
+                    x: canvas.width / (window.devicePixelRatio || 1),
+                    y: canvasHeight - groundHeight - 180 - Math.random() * 100, // Voando acima do chão
+                    width: 40,
+                    height: 30,
+                    type: 'bird',
+                    flap: 0
+                });
+            }
+        }
+        
+        // Atualizar UI
+        function updateUI() {
+            scoreDisplay.textContent = score;
+        }
+        
+        // Mostrar mensagem
+        function showMessage(text, duration = 3000) {
+            gameMessage.textContent = text;
+            gameMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                gameMessage.style.display = 'none';
+            }, duration);
+        }
+        
+        // Controles do jogo
+        function jump() {
+            if (player.grounded && gameRunning) {
+                player.velocityY = -player.jumpPower;
+                player.grounded = false;
+            }
+        }
+        
+        // Eventos de toque
+        canvas.addEventListener('touchstart', jump);
+        canvas.addEventListener('mousedown', jump);
+        
+        // Iniciar jogo
+        startBtn.addEventListener('click', startGame);
+        
+        function startGame() {
+            startScreen.style.display = 'none';
+            initGame();
+            gameRunning = true;
+            gameStarted = true;
+            gameLoop();
+        }
+        
+        // Função principal do jogo
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            // Limpar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Atualizar elementos do jogo
+            updatePlayer();
+            updateObstacles();
+            updateClouds();
+            updateGround();
+            
+            // Verificar colisões
+            checkCollisions();
+            
+            // Renderizar elementos
+            renderClouds();
+            renderGround();
+            renderPlayer();
+            renderObstacles();
+            
+            // Aumentar pontuação
+            score++;
+            updateUI();
+            
+            // Aumentar dificuldade gradualmente
+            if (score % 500 === 0) {
+                gameSpeed += 0.5;
+            }
+            
+            // Continuar loop
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+        
+        // Atualizar jogador
+        function updatePlayer() {
+            // Aplicar gravidade
+            player.velocityY += gravity;
+            
+            // Atualizar posição
+            player.y += player.velocityY;
+            
+            // Verificar se está no chão
+            const groundY = canvas.height / (window.devicePixelRatio || 1) - groundHeight - player.height;
+            if (player.y > groundY) {
+                player.y = groundY;
+                player.velocityY = 0;
+                player.grounded = true;
+            }
+        }
+        
+        // Atualizar obstáculos
+        function updateObstacles() {
+            // Criar novos obstáculos
+            if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width / (window.devicePixelRatio || 1) - 300) {
+                if (Math.random() < 0.02) {
+                    createObstacle();
+                }
+            }
+            
+            // Atualizar posição dos obstáculos
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= gameSpeed;
+                
+                // Remover obstáculos fora da tela
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                }
+                
+                // Animar pássaros
+                if (obstacles[i] && obstacles[i].type === 'bird') {
+                    obstacles[i].flap += 0.2;
+                    obstacles[i].y += Math.sin(obstacles[i].flap) * 2;
+                }
+            }
+        }
+        
+        // Atualizar nuvens
+        function updateClouds() {
+            // Criar novas nuvens
+            if (clouds.length < 5 && Math.random() < 0.01) {
+                createCloud();
+            }
+            
+            // Atualizar posição das nuvens
+            for (let i = clouds.length - 1; i >= 0; i--) {
+                clouds[i].x -= clouds[i].speed;
+                
+                // Remover nuvens fora da tela
+                if (clouds[i].x + clouds[i].width < 0) {
+                    clouds.splice(i, 1);
+                }
+            }
+        }
+        
+        // Atualizar chão
+        function updateGround() {
+            groundPosition -= gameSpeed;
+            if (groundPosition <= -20) {
+                groundPosition = 0;
+            }
+        }
+        
+        // Verificar colisões
+        function checkCollisions() {
+            for (let i = 0; i < obstacles.length; i++) {
+                const obstacle = obstacles[i];
+                
+                if (
+                    player.x < obstacle.x + obstacle.width &&
+                    player.x + player.width > obstacle.x &&
+                    player.y < obstacle.y + obstacle.height &&
+                    player.y + player.height > obstacle.y
+                ) {
+                    // Colisão detectada
+                    gameOver();
+                    return;
+                }
+            }
+        }
+        
+        // Fim de jogo
+        function gameOver() {
+            gameRunning = false;
+            cancelAnimationFrame(gameLoopId);
+            
+            // Verificar se é um novo recorde
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('zeoHighScore', highScore);
+                highScoreDisplay.textContent = highScore;
+                showMessage(`Novo Recorde! ${score} pontos!`, 3000);
+            } else {
+                showMessage(`Game Over! Pontuação: ${score}`, 3000);
+            }
+            
+            // Mostrar botão de reiniciar após um tempo
+            setTimeout(() => {
+                // Limpar a mensagem atual
+                gameMessage.innerHTML = '';
+                
+                // Adicionar mensagem e botão
+                gameMessage.innerHTML = `
+                    <div>Game Over! Pontuação: ${score}</div>
+                    <button id="restartBtn" class="neo-pop-tilted-button" style="margin-top: 15px;"><span>Jogar Novamente</span></button>
+                `;
+                
+                // Mostrar a mensagem
+                gameMessage.style.display = 'block';
+                
+                // Adicionar evento ao botão
+                const restartBtn = document.getElementById('restartBtn');
+                restartBtn.addEventListener('click', restartGame);
+            }, 1000);
+        }
+        
+        // Função para reiniciar o jogo
+        function restartGame() {
+            // Esconder a mensagem de game over
+            gameMessage.style.display = 'none';
+            
+            // Reinicializar o jogo
+            initGame();
+            gameRunning = true;
+            gameLoop();
+        }
+        
+        // Renderizar chão
+        function renderGround() {
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            
+            // Desenhar chão
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, canvasHeight - groundHeight, canvas.width / (window.devicePixelRatio || 1), groundHeight);
+            
+            // Detalhe do chão
+            ctx.fillStyle = '#A0522D';
+            ctx.fillRect(0, canvasHeight - groundHeight, canvas.width / (window.devicePixelRatio || 1), 5);
+            
+            // Linhas de movimento no chão
+            ctx.strokeStyle = '#A0522D';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            for (let i = groundPosition; i < canvas.width / (window.devicePixelRatio || 1); i += 20) {
+                ctx.moveTo(i, canvasHeight - groundHeight/2);
+                ctx.lineTo(i + 10, canvasHeight - groundHeight/2);
+            }
+            
+            ctx.stroke();
+        }
+        
+        // Renderizar nuvens
+        function renderClouds() {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            
+            clouds.forEach(cloud => {
+                // Desenhar nuvem com círculos
+                ctx.beginPath();
+                ctx.arc(cloud.x, cloud.y, cloud.height / 2, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.width * 0.25, cloud.y - cloud.height * 0.2, cloud.height * 0.6, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.width * 0.5, cloud.y, cloud.height * 0.7, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.width * 0.75, cloud.y - cloud.height * 0.1, cloud.height * 0.5, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.width, cloud.y, cloud.height / 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+        
+        // Renderizar jogador
+        function renderPlayer() {
+            // Desenhar o personagem com melhor qualidade
+            ctx.save();
+            
+            // Configurar suavização de imagem
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            // Adicionar um leve brilho ao redor do personagem
+            ctx.shadowColor = '#FFA500';
+            ctx.shadowBlur = 10;
+            
+            // Desenhar a imagem do personagem apenas se estiver carregada
+            if (player.loaded) {
+                ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
+            } else {
+                // Desenhar um placeholder enquanto a imagem não carrega
+                ctx.fillStyle = '#FFA500';
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+                ctx.fillStyle = 'white';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Zéo', player.x + player.width/2, player.y + player.height/2);
+            }
+            
+            ctx.restore();
+        }
+        
+        // Renderizar obstáculos
+        function renderObstacles() {
+            obstacles.forEach(obstacle => {
+                if (obstacle.type === 'cactus') {
+                    // Desenhar cacto
+                    ctx.fillStyle = '#2E8B57';
+                    
+                    // Corpo principal
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                    
+                    // Braços do cacto
+                    ctx.fillRect(obstacle.x - 10, obstacle.y + 10, 10, obstacle.height * 0.4);
+                    ctx.fillRect(obstacle.x + obstacle.width, obstacle.y + 20, 10, obstacle.height * 0.3);
+                    
+                    // Detalhes do cacto
+                    ctx.fillStyle = '#3CB371';
+                    ctx.fillRect(obstacle.x + 5, obstacle.y + 5, 5, 5);
+                    ctx.fillRect(obstacle.x + obstacle.width - 10, obstacle.y + 15, 5, 5);
+                    ctx.fillRect(obstacle.x + 10, obstacle.y + obstacle.height - 10, 5, 5);
+                } else if (obstacle.type === 'bird') {
+                    // Desenhar pássaro
+                    ctx.fillStyle = '#8B4513';
+                    
+                    // Corpo
+                    ctx.beginPath();
+                    ctx.ellipse(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, obstacle.width/2, obstacle.height/2, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Asas
+                    const wingFlap = Math.sin(obstacle.flap) * 5;
+                    ctx.beginPath();
+                    ctx.ellipse(obstacle.x + obstacle.width/4, obstacle.y + obstacle.height/2 + wingFlap, obstacle.width/3, obstacle.height/3, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.ellipse(obstacle.x + 3*obstacle.width/4, obstacle.y + obstacle.height/2 - wingFlap, obstacle.width/3, obstacle.height/3, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Bico
+                    ctx.fillStyle = '#FFA500';
+                    ctx.beginPath();
+                    ctx.moveTo(obstacle.x + obstacle.width, obstacle.y + obstacle.height/2);
+                    ctx.lineTo(obstacle.x + obstacle.width + 10, obstacle.y + obstacle.height/2 - 3);
+                    ctx.lineTo(obstacle.x + obstacle.width + 10, obstacle.y + obstacle.height/2 + 3);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Olho
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(obstacle.x + obstacle.width * 0.7, obstacle.y + obstacle.height * 0.4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'black';
+                    ctx.beginPath();
+                    ctx.arc(obstacle.x + obstacle.width * 0.7, obstacle.y + obstacle.height * 0.4, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
