@@ -34,30 +34,29 @@
             max-height: 500px;
             background: rgba(135, 206, 235, 0.7); /* Fundo semi-transparente para o container */
             overflow: hidden;
-            border: 3px solid #FFA500;
+            border: 3px solid #FF0000; /* Alterado para vermelho */
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
-            /* Adicionando efeito de brilho na borda */
+            /* Adicionando efeito de brilho na borda com cor vermelha */
             box-shadow: 
-                0 0 20px rgba(255, 165, 0, 0.5),
-                0 0 40px rgba(255, 165, 0, 0.3),
-                inset 0 0 20px rgba(255, 165, 0, 0.2);
-            /* Animação de pulsação para a borda */
+                0 0 20px rgba(255, 0, 0, 0.5),
+                0 0 40px rgba(255, 0, 0, 0.3),
+                inset 0 0 20px rgba(255, 0, 0, 0.2);
+            /* Animação de pulsação para a borda com cor vermelha */
             animation: pulseBorder 2s infinite alternate;
         }
         
         @keyframes pulseBorder {
             from {
                 box-shadow: 
-                    0 0 20px rgba(255, 165, 0, 0.5),
-                    0 0 40px rgba(255, 165, 0, 0.3),
-                    inset 0 0 20px rgba(255, 165, 0, 0.2);
+                    0 0 20px rgba(255, 0, 0, 0.5),
+                    0 0 40px rgba(255, 0, 0, 0.3),
+                    inset 0 0 20px rgba(255, 0, 0, 0.2);
             }
             to {
                 box-shadow: 
-                    0 0 30px rgba(255, 165, 0, 0.8),
-                    0 0 60px rgba(255, 165, 0, 0.5),
-                    inset 0 0 30px rgba(255, 165, 0, 0.3);
+                    0 0 30px rgba(255, 0, 0, 0.8),
+                    0 0 60px rgba(255, 0, 0, 0.5),
+                    inset 0 0 30px rgba(255, 0, 0, 0.3);
             }
         }
         
@@ -133,8 +132,8 @@
         #countdown {
             font-size: 80px;
             font-weight: bold;
-            color: #FFA500;
-            text-shadow: 0 0 10px rgba(255, 165, 0, 0.8);
+            color: #FF0000; /* Alterado para vermelho */
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); /* Alterado para vermelho */
             margin: 20px 0;
         }
         
@@ -157,7 +156,7 @@
         #startScreen h1 {
             font-size: 28px;
             margin-bottom: 15px;
-            color: #FFA500;
+            color: #FF0000; /* Alterado para vermelho */
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             line-height: 1.2;
         }
@@ -343,7 +342,7 @@
             <div id="countdown">3</div>
             <div id="countdownMessage">
                 <p>Atenção: Toque apenas dentro da área iluminada do jogo para fazer o Zéo pular!</p>
-                <p>Toques na borda laranja não funcionarão.</p>
+                <p>Toques na borda vermelha não funcionarão.</p>
             </div>
         </div>
     </div>
@@ -640,7 +639,7 @@
             
             // Criar novos obstáculos
             if (firstObstacleCreated) {
-                // Se não há obstáculos ou o último obstáculo está a uma distância segura
+                // Se não há obstáculos
                 if (obstacles.length === 0) {
                     createObstacle();
                 } else {
@@ -650,13 +649,19 @@
                     // Calcular a distância do último obstáculo até a borda direita
                     const distanceToRight = canvas.width / (window.devicePixelRatio || 1) - lastObstacle.x;
                     
+                    // Calcular o espaço mínimo necessário para o jogador pousar e pular novamente
+                    // Considerando a largura do jogador e a distância mínima de pouso
+                    const minLandingSpace = player.width * 2.5; // Espaço mínimo para pousar
+                    
                     // Definir distâncias mínima e máxima entre obstáculos
-                    let minDistance = 200;
+                    // Aumentamos a distância mínima para garantir espaço suficiente
+                    let minDistance = 250; // Aumentado de 200 para 250
                     let maxDistance = 500;
                     
                     // Ajustar as distâncias conforme o nível (tornando o jogo mais difícil)
-                    minDistance = Math.max(150, minDistance - (level - 1) * 10);
-                    maxDistance = Math.max(300, maxDistance - (level - 1) * 20);
+                    // Reduzimos a taxa de diminuição para não tornar o jogo impossível
+                    minDistance = Math.max(200, minDistance - (level - 1) * 5); // Reduzido de 10 para 5
+                    maxDistance = Math.max(350, maxDistance - (level - 1) * 10); // Reduzido de 20 para 10
                     
                     // Se a distância do último obstáculo até a borda direita for maior que a distância mínima
                     if (distanceToRight > minDistance) {
@@ -665,7 +670,11 @@
                         const chance = 0.01 + (distanceToRight - minDistance) / (maxDistance - minDistance) * 0.04;
                         
                         if (Math.random() < chance) {
-                            createObstacle();
+                            // Verificar se há espaço suficiente antes de criar o obstáculo
+                            if (obstacles.length === 0 || 
+                                (canvas.width / (window.devicePixelRatio || 1) - lastObstacle.x) > minLandingSpace) {
+                                createObstacle();
+                            }
                         }
                     }
                 }
@@ -722,7 +731,8 @@
             if (score >= nextLevelScore) {
                 level++;
                 nextLevelScore += 500; // Próximo nível a cada 500 pontos
-                gameSpeed += 0.8; // Aumentar velocidade do jogo
+                // Reduzimos o aumento de velocidade para não tornar o jogo impossível
+                gameSpeed += 0.5; // Reduzido de 0.8 para 0.5
                 showMessage(`Nível ${level}!`, 2000);
             }
         }
