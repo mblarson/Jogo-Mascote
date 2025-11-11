@@ -703,18 +703,26 @@
                     // Considerando a largura do jogador e a distância mínima de pouso
                     const minLandingSpace = player.width * 3;
                     
-                    // Definir distâncias mínima e máxima entre obstáculos
-                    let minDistance = 300;
-                    let maxDistance = 550;
+                    // Definir distâncias mínima e máxima entre obstáculos com mais variação
+                    // Aumentamos a diferença entre min e max para criar mais variação
+                    let minDistance = 250;
+                    let maxDistance = 600; // Aumentado de 550 para 600
                     
                     // Ajustar as distâncias conforme o nível (tornando o jogo mais difícil)
-                    minDistance = Math.max(250, minDistance - (level - 1) * 5);
-                    maxDistance = Math.max(400, maxDistance - (level - 1) * 10);
+                    // Reduzimos a taxa de diminuição para manter mais variação
+                    minDistance = Math.max(200, minDistance - (level - 1) * 3); // Reduzido de 5 para 3
+                    maxDistance = Math.max(350, maxDistance - (level - 1) * 8); // Reduzido de 10 para 8
                     
                     // Se a distância do último obstáculo até a borda direita for maior que a distância mínima
                     if (distanceToRight > minDistance) {
                         // Calcular a chance de criar um novo obstáculo
-                        const chance = 0.008 + (distanceToRight - minDistance) / (maxDistance - minDistance) * 0.03;
+                        // Aumentamos a variação da chance para criar mais imprevisibilidade
+                        const normalizedDistance = (distanceToRight - minDistance) / (maxDistance - minDistance);
+                        
+                        // Usar uma função seno para criar variação mais natural na chance
+                        const chanceVariation = Math.sin(Date.now() / 1000) * 0.02; // Variação de ±0.02
+                        const baseChance = 0.005 + normalizedDistance * 0.025; // Chance base entre 0.005 e 0.03
+                        const chance = Math.max(0.005, Math.min(0.03, baseChance + chanceVariation));
                         
                         if (Math.random() < chance) {
                             // Verificar se há espaço suficiente antes de criar o obstáculo
