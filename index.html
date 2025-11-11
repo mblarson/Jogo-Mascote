@@ -208,7 +208,7 @@
         <div id="startScreen">
             <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo">
             <h1>AS AVENTURAS DE ZÉO</h1>
-            <p>Toque na tela para fazer o Zéo pular e desviar dos obstáculos!</p>
+            <p>Toque na tela para fazer o Zéo pular e desviar das pedras!</p>
             <p>Quanto mais tempo você sobreviver, mais pontos você fará.</p>
             <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
         </div>
@@ -292,6 +292,24 @@
         
         player.image.src = "./mascote.png";
         
+        // Imagem de fundo do jogo
+        const backgroundImage = new Image();
+        backgroundImage.loaded = false;
+        backgroundImage.onload = function() {
+            backgroundImage.loaded = true;
+            console.log("Imagem de fundo do jogo carregada com sucesso");
+        };
+        
+        backgroundImage.onerror = function() {
+            console.error("Erro ao carregar a imagem de fundo do jogo");
+        };
+        
+        // Usando imagem local
+        backgroundImage.src = "./cenario.png";
+        
+        // Posição do fundo para efeito de movimento
+        let backgroundPosition = 0;
+        
         // Objetos do jogo
         let obstacles = [];
         let clouds = [];
@@ -308,6 +326,7 @@
             obstacles = [];
             clouds = [];
             groundPosition = 0;
+            backgroundPosition = 0;
             
             updateUI();
             
@@ -328,28 +347,34 @@
             });
         }
         
-        // Criar obstáculos
+        // Criar obstáculos (pedras)
         function createObstacle() {
-            const types = ['cactus', 'bird'];
+            const types = ['ground', 'floating']; // Tipos de pedras: no chão ou flutuando
             const type = types[Math.floor(Math.random() * types.length)];
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
             
-            if (type === 'cactus') {
+            if (type === 'ground') {
+                // Pedras no chão
+                const size = 30 + Math.random() * 40; // Tamanho variável
                 obstacles.push({
                     x: canvas.width / (window.devicePixelRatio || 1),
-                    y: canvasHeight - groundHeight - 50, // Posicionar no chão
-                    width: 30,
-                    height: 50 + Math.random() * 30,
-                    type: 'cactus'
+                    y: canvasHeight - groundHeight - size, // Posicionar no chão
+                    width: size,
+                    height: size,
+                    type: 'ground',
+                    rotation: Math.random() * Math.PI * 2 // Rotação aleatória
                 });
             } else {
+                // Pedras flutuando
+                const size = 25 + Math.random() * 30; // Tamanho variável
                 obstacles.push({
                     x: canvas.width / (window.devicePixelRatio || 1),
-                    y: canvasHeight - groundHeight - 180 - Math.random() * 100, // Voando acima do chão
-                    width: 40,
-                    height: 30,
-                    type: 'bird',
-                    flap: 0
+                    y: canvasHeight - groundHeight - 150 - Math.random() * 100, // Voando acima do chão
+                    width: size,
+                    height: size,
+                    type: 'floating',
+                    rotation: Math.random() * Math.PI * 2, // Rotação aleatória
+                    floatOffset: Math.random() * Math.PI * 2 // Para animação de flutuação
                 });
             }
         }
@@ -404,11 +429,13 @@
             updateObstacles();
             updateClouds();
             updateGround();
+            updateBackground();
             
             // Verificar colisões
             checkCollisions();
             
             // Renderizar elementos
+            renderBackground();
             renderClouds();
             renderGround();
             renderPlayer();
@@ -462,10 +489,10 @@
                     obstacles.splice(i, 1);
                 }
                 
-                // Animar pássaros
-                if (obstacles[i] && obstacles[i].type === 'bird') {
-                    obstacles[i].flap += 0.2;
-                    obstacles[i].y += Math.sin(obstacles[i].flap) * 2;
+                // Animar pedras flutuantes
+                if (obstacles[i] && obstacles[i].type === 'floating') {
+                    obstacles[i].floatOffset += 0.05;
+                    obstacles[i].y += Math.sin(obstacles[i].floatOffset) * 1.5;
                 }
             }
         }
@@ -493,6 +520,14 @@
             groundPosition -= gameSpeed;
             if (groundPosition <= -20) {
                 groundPosition = 0;
+            }
+        }
+        
+        // Atualizar posição do fundo
+        function updateBackground() {
+            backgroundPosition -= gameSpeed * 0.5; // Movimento mais lento para dar sensação de profundidade
+            if (backgroundPosition <= -canvas.width / (window.devicePixelRatio || 1)) {
+                backgroundPosition = 0;
             }
         }
         
@@ -558,6 +593,25 @@
             initGame();
             gameRunning = true;
             gameLoop();
+        }
+        
+        // Renderizar fundo do jogo
+        function renderBackground() {
+            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            
+            if (backgroundImage.loaded) {
+                // Desenhar a imagem de fundo duas vezes para criar um efeito de repetição infinita
+                ctx.drawImage(backgroundImage, backgroundPosition, 0, canvasWidth, canvasHeight);
+                ctx.drawImage(backgroundImage, backgroundPosition + canvasWidth, 0, canvasWidth, canvasHeight);
+            } else {
+                // Fallback: gradiente azul caso a imagem não carregue
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
+                gradient.addColorStop(0, '#87CEEB');
+                gradient.addColorStop(1, '#1E90FF');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            }
         }
         
         // Renderizar chão
@@ -630,64 +684,49 @@
             ctx.restore();
         }
         
-        // Renderizar obstáculos
+        // Renderizar obstáculos (pedras)
         function renderObstacles() {
             obstacles.forEach(obstacle => {
-                if (obstacle.type === 'cactus') {
-                    // Desenhar cacto
-                    ctx.fillStyle = '#2E8B57';
-                    
-                    // Corpo principal
-                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-                    
-                    // Braços do cacto
-                    ctx.fillRect(obstacle.x - 10, obstacle.y + 10, 10, obstacle.height * 0.4);
-                    ctx.fillRect(obstacle.x + obstacle.width, obstacle.y + 20, 10, obstacle.height * 0.3);
-                    
-                    // Detalhes do cacto
-                    ctx.fillStyle = '#3CB371';
-                    ctx.fillRect(obstacle.x + 5, obstacle.y + 5, 5, 5);
-                    ctx.fillRect(obstacle.x + obstacle.width - 10, obstacle.y + 15, 5, 5);
-                    ctx.fillRect(obstacle.x + 10, obstacle.y + obstacle.height - 10, 5, 5);
-                } else if (obstacle.type === 'bird') {
-                    // Desenhar pássaro
-                    ctx.fillStyle = '#8B4513';
-                    
-                    // Corpo
-                    ctx.beginPath();
-                    ctx.ellipse(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, obstacle.width/2, obstacle.height/2, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Asas
-                    const wingFlap = Math.sin(obstacle.flap) * 5;
-                    ctx.beginPath();
-                    ctx.ellipse(obstacle.x + obstacle.width/4, obstacle.y + obstacle.height/2 + wingFlap, obstacle.width/3, obstacle.height/3, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    ctx.beginPath();
-                    ctx.ellipse(obstacle.x + 3*obstacle.width/4, obstacle.y + obstacle.height/2 - wingFlap, obstacle.width/3, obstacle.height/3, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Bico
-                    ctx.fillStyle = '#FFA500';
-                    ctx.beginPath();
-                    ctx.moveTo(obstacle.x + obstacle.width, obstacle.y + obstacle.height/2);
-                    ctx.lineTo(obstacle.x + obstacle.width + 10, obstacle.y + obstacle.height/2 - 3);
-                    ctx.lineTo(obstacle.x + obstacle.width + 10, obstacle.y + obstacle.height/2 + 3);
-                    ctx.closePath();
-                    ctx.fill();
-                    
-                    // Olho
-                    ctx.fillStyle = 'white';
-                    ctx.beginPath();
-                    ctx.arc(obstacle.x + obstacle.width * 0.7, obstacle.y + obstacle.height * 0.4, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    ctx.fillStyle = 'black';
-                    ctx.beginPath();
-                    ctx.arc(obstacle.x + obstacle.width * 0.7, obstacle.y + obstacle.height * 0.4, 1.5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
+                ctx.save();
+                
+                // Mover o contexto para a posição da pedra
+                ctx.translate(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2);
+                
+                // Rotacionar a pedra
+                ctx.rotate(obstacle.rotation);
+                
+                // Desenhar a pedra
+                ctx.fillStyle = '#808080'; // Cor cinza para a pedra
+                
+                // Desenhar uma forma irregular para parecer uma pedra
+                ctx.beginPath();
+                ctx.moveTo(-obstacle.width/2, -obstacle.height/3);
+                ctx.lineTo(-obstacle.width/3, -obstacle.height/2);
+                ctx.lineTo(obstacle.width/4, -obstacle.height/2.5);
+                ctx.lineTo(obstacle.width/2, -obstacle.height/4);
+                ctx.lineTo(obstacle.width/2.2, obstacle.height/6);
+                ctx.lineTo(obstacle.width/3, obstacle.height/2.5);
+                ctx.lineTo(0, obstacle.height/2);
+                ctx.lineTo(-obstacle.width/3, obstacle.height/3);
+                ctx.lineTo(-obstacle.width/2.2, obstacle.height/8);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Adicionar textura à pedra
+                ctx.fillStyle = '#696969'; // Tom mais escuro para textura
+                ctx.beginPath();
+                ctx.arc(-obstacle.width/4, -obstacle.height/6, obstacle.width/8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(obstacle.width/5, obstacle.height/8, obstacle.width/10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(-obstacle.width/6, obstacle.height/5, obstacle.width/12, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
             });
         }
     </script>
