@@ -34,7 +34,7 @@
             max-height: 500px;
             background: rgba(135, 206, 235, 0.7); /* Fundo semi-transparente para o container */
             overflow: hidden;
-            border: 3px solid #FF0000; /* Alterado para vermelho */
+            border: 3px solid #FF0000; /* Vermelho */
             border-radius: 10px;
             /* Adicionando efeito de brilho na borda com cor vermelha */
             box-shadow: 
@@ -79,6 +79,21 @@
             z-index: 10;
         }
         
+        #gameInfo div {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            display: inline-block;
+        }
+        
+        #gameInfo span {
+            font-weight: bold;
+            color: #FFD700;
+        }
+        
         #gameMessage {
             position: absolute;
             top: 50%;
@@ -92,6 +107,8 @@
             text-align: center;
             display: none;
             z-index: 20;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
         }
         
         #startScreen {
@@ -132,8 +149,8 @@
         #countdown {
             font-size: 80px;
             font-weight: bold;
-            color: #FF0000; /* Alterado para vermelho */
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); /* Alterado para vermelho */
+            color: #FF0000; /* Vermelho */
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); /* Vermelho */
             margin: 20px 0;
         }
         
@@ -145,7 +162,7 @@
         }
         
         #gameLogo {
-            width: 150px;
+            width: 200px; /* Aumentado de 150px para 200px */
             height: auto;
             margin-bottom: 15px;
             image-rendering: -webkit-optimize-contrast;
@@ -156,7 +173,7 @@
         #startScreen h1 {
             font-size: 28px;
             margin-bottom: 15px;
-            color: #FF0000; /* Alterado para vermelho */
+            color: #FFA500; /* LARANJA */
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             line-height: 1.2;
         }
@@ -262,7 +279,7 @@
             }
             
             #gameLogo {
-                width: 120px;
+                width: 160px; /* Ajustado para telas menores */
             }
             
             #startScreen h1 {
@@ -304,7 +321,7 @@
             }
             
             #gameLogo {
-                width: 100px;
+                width: 140px; /* Ajustado para telas com altura menor */
                 margin-bottom: 10px;
             }
             
@@ -393,11 +410,14 @@
         let gameStarted = false;
         let score = 0;
         let highScore = localStorage.getItem('zeoHighScore') || 0;
-        let gameSpeed = 5;
+        let gameSpeed = 4; // Velocidade inicial
         let gravity = 0.8;
         let gameLoopId;
         let level = 1;
         let nextLevelScore = 500; // Pontuação para subir de nível
+        
+        // Velocidade máxima do jogo (velocidade do nível 3)
+        const maxGameSpeed = 4.6; // 4 + 0.2 * 3 = 4.6
         
         // Altura do chão
         const groundHeight = 50;
@@ -460,7 +480,7 @@
         // Configuração inicial do jogo
         function initGame() {
             score = 0;
-            gameSpeed = 5;
+            gameSpeed = 4; // Velocidade inicial
             level = 1;
             nextLevelScore = 500;
             // Posicionar o jogador no chão
@@ -628,11 +648,11 @@
         
         // Atualizar obstáculos
         function updateObstacles() {
-            // Verificar se já se passaram 2 segundos desde o início do jogo
+            // Verificar se já se passaram 3 segundos desde o início do jogo
             const elapsedTime = (Date.now() - gameStartTime) / 1000; // em segundos
             
-            // Criar o primeiro obstáculo após 2 segundos
-            if (!firstObstacleCreated && elapsedTime >= 2) {
+            // Criar o primeiro obstáculo após 3 segundos
+            if (!firstObstacleCreated && elapsedTime >= 3) {
                 createObstacle();
                 firstObstacleCreated = true;
             }
@@ -651,23 +671,20 @@
                     
                     // Calcular o espaço mínimo necessário para o jogador pousar e pular novamente
                     // Considerando a largura do jogador e a distância mínima de pouso
-                    const minLandingSpace = player.width * 2.5; // Espaço mínimo para pousar
+                    const minLandingSpace = player.width * 3;
                     
                     // Definir distâncias mínima e máxima entre obstáculos
-                    // Aumentamos a distância mínima para garantir espaço suficiente
-                    let minDistance = 250; // Aumentado de 200 para 250
-                    let maxDistance = 500;
+                    let minDistance = 300;
+                    let maxDistance = 550;
                     
                     // Ajustar as distâncias conforme o nível (tornando o jogo mais difícil)
-                    // Reduzimos a taxa de diminuição para não tornar o jogo impossível
-                    minDistance = Math.max(200, minDistance - (level - 1) * 5); // Reduzido de 10 para 5
-                    maxDistance = Math.max(350, maxDistance - (level - 1) * 10); // Reduzido de 20 para 10
+                    minDistance = Math.max(250, minDistance - (level - 1) * 5);
+                    maxDistance = Math.max(400, maxDistance - (level - 1) * 10);
                     
                     // Se a distância do último obstáculo até a borda direita for maior que a distância mínima
                     if (distanceToRight > minDistance) {
                         // Calcular a chance de criar um novo obstáculo
-                        // A chance aumenta linearmente de 0.01 (quando está na minDistance) até 0.05 (quando está na maxDistance)
-                        const chance = 0.01 + (distanceToRight - minDistance) / (maxDistance - minDistance) * 0.04;
+                        const chance = 0.008 + (distanceToRight - minDistance) / (maxDistance - minDistance) * 0.03;
                         
                         if (Math.random() < chance) {
                             // Verificar se há espaço suficiente antes de criar o obstáculo
@@ -712,7 +729,7 @@
         // Atualizar chão
         function updateGround() {
             groundPosition -= gameSpeed;
-            if (groundPosition <= -40) { // Aumentado para 40 para acomodar as faixas amarelas
+            if (groundPosition <= -40) {
                 groundPosition = 0;
             }
         }
@@ -731,8 +748,17 @@
             if (score >= nextLevelScore) {
                 level++;
                 nextLevelScore += 500; // Próximo nível a cada 500 pontos
-                // Reduzimos o aumento de velocidade para não tornar o jogo impossível
-                gameSpeed += 0.5; // Reduzido de 0.8 para 0.5
+                
+                // Aumentar velocidade apenas se ainda não atingimos a velocidade máxima
+                if (gameSpeed < maxGameSpeed) {
+                    gameSpeed += 0.2;
+                    
+                    // Garantir que não ultrapasse a velocidade máxima
+                    if (gameSpeed > maxGameSpeed) {
+                        gameSpeed = maxGameSpeed;
+                    }
+                }
+                
                 showMessage(`Nível ${level}!`, 2000);
             }
         }
@@ -761,33 +787,35 @@
             cancelAnimationFrame(gameLoopId);
             
             // Verificar se é um novo recorde
+            let isHighScore = false;
             if (score > highScore) {
                 highScore = score;
                 localStorage.setItem('zeoHighScore', highScore);
                 highScoreDisplay.textContent = highScore;
-                showMessage(`Novo Recorde! ${score} pontos!`, 3000);
-            } else {
-                showMessage(`Game Over! Pontuação: ${score}`, 3000);
+                isHighScore = true;
             }
             
-            // Mostrar botão de reiniciar após um tempo
+            // Mostrar mensagem de game over com a pontuação e botão de reiniciar
+            const messageHTML = `
+                <div style="font-size: 28px; font-weight: bold; margin-bottom: 15px;">Pontuação</div>
+                <div style="font-size: 24px; margin-bottom: 20px;">${score} pontos</div>
+                ${isHighScore ? '<div style="font-size: 18px; color: #FFD700; margin-bottom: 15px;">NOVO RECORDE!</div>' : ''}
+                <button id="restartBtn" class="neo-pop-tilted-button"><span>Jogar Novamente</span></button>
+            `;
+            
+            // Definir o conteúdo e mostrar a mensagem
+            gameMessage.innerHTML = messageHTML;
+            gameMessage.style.display = 'block';
+            
+            // Adicionar evento ao botão após um pequeno delay para garantir que o DOM foi atualizado
             setTimeout(() => {
-                // Limpar a mensagem atual
-                gameMessage.innerHTML = '';
-                
-                // Adicionar mensagem e botão
-                gameMessage.innerHTML = `
-                    <div>Game Over! Pontuação: ${score}</div>
-                    <button id="restartBtn" class="neo-pop-tilted-button" style="margin-top: 15px;"><span>Jogar Novamente</span></button>
-                `;
-                
-                // Mostrar a mensagem
-                gameMessage.style.display = 'block';
-                
-                // Adicionar evento ao botão
                 const restartBtn = document.getElementById('restartBtn');
-                restartBtn.addEventListener('click', restartGame);
-            }, 1000);
+                if (restartBtn) {
+                    restartBtn.addEventListener('click', restartGame);
+                } else {
+                    console.error("Botão de reiniciar não encontrado");
+                }
+            }, 100);
         }
         
         // Função para reiniciar o jogo
