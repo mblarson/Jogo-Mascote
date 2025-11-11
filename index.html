@@ -53,7 +53,7 @@
             top: 10px;
             left: 10px;
             color: white;
-            font-size: 18px;
+            font-size: 16px;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
             z-index: 10;
         }
@@ -88,28 +88,31 @@
             color: white;
             text-align: center;
             padding: 20px;
+            overflow-y: auto;
         }
         
         #gameLogo {
-            width: 180px;
+            width: 150px;
             height: auto;
             margin-bottom: 15px;
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
+            max-width: 80%;
         }
         
         #startScreen h1 {
-            font-size: 36px;
-            margin-bottom: 20px;
+            font-size: 28px;
+            margin-bottom: 15px;
             color: #FFA500;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            line-height: 1.2;
         }
         
         #startScreen p {
-            font-size: 18px;
-            margin-bottom: 30px;
-            max-width: 80%;
-            line-height: 1.5;
+            font-size: 16px;
+            margin-bottom: 20px;
+            max-width: 90%;
+            line-height: 1.4;
         }
         
         /* Estilo do botão neo-pop-tilted-button */
@@ -121,11 +124,12 @@
           overflow: hidden;
           background-color: #b7a81d;
           color: #000000;
-          font-size: 1.25rem;
+          font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
           transform: perspective(180px) rotateX(30deg) translateY(2px);
           transition: transform 0.3s ease, background-color 0.3s ease;
+          margin-top: 10px;
         }
 
         .neo-pop-tilted-button::before {
@@ -173,7 +177,7 @@
 
         .neo-pop-tilted-button span {
           background: #ffeb34;
-          padding: 1rem 2.5rem;
+          padding: 0.8rem 2rem;
           position: relative;
           z-index: 1;
           display: block;
@@ -191,6 +195,57 @@
 
         .neo-pop-tilted-button:active {
           transform: perspective(170px) rotateX(36deg) translateY(5px);
+        }
+        
+        /* Media queries para responsividade */
+        @media (max-width: 480px) {
+            #gameInfo {
+                font-size: 14px;
+            }
+            
+            #gameMessage {
+                font-size: 20px;
+                padding: 15px 25px;
+            }
+            
+            #gameLogo {
+                width: 120px;
+            }
+            
+            #startScreen h1 {
+                font-size: 24px;
+            }
+            
+            #startScreen p {
+                font-size: 14px;
+                margin-bottom: 15px;
+            }
+            
+            .neo-pop-tilted-button {
+                font-size: 0.9rem;
+            }
+            
+            .neo-pop-tilted-button span {
+                padding: 0.7rem 1.5rem;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            #startScreen h1 {
+                font-size: 22px;
+                margin-bottom: 10px;
+            }
+            
+            #startScreen p {
+                font-size: 14px;
+                margin-bottom: 15px;
+                max-width: 95%;
+            }
+            
+            #gameLogo {
+                width: 100px;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -278,7 +333,7 @@
             width: 70,  // Aumentado de 50 para 70
             height: 80, // Aumentado de 70 para 80
             velocityY: 0,
-            jumpPower: 15,
+            jumpPower: 16, // Aumentado um pouco o pulo
             grounded: false,
             image: new Image(),
             loaded: false
@@ -319,6 +374,10 @@
         let clouds = [];
         let groundPosition = 0;
         
+        // Controle de tempo para o primeiro obstáculo
+        let gameStartTime = 0;
+        let firstObstacleCreated = false;
+        
         // Configuração inicial do jogo
         function initGame() {
             score = 0;
@@ -333,6 +392,10 @@
             clouds = [];
             groundPosition = 0;
             backgroundPosition = 0;
+            
+            // Resetar controle de tempo
+            gameStartTime = Date.now();
+            firstObstacleCreated = false;
             
             updateUI();
             
@@ -353,17 +416,17 @@
             });
         }
         
-        // Criar obstáculos (pedras brilhantes)
+        // Criar obstáculos (pedras brilhantes) - tamanho variável entre 35px e 45px
         function createObstacle() {
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            const obstacleSize = 35 + Math.random() * 10; // Tamanho variável entre 35px e 45px
             
             // Pedras no chão - apenas um tipo agora
-            const size = 30 + Math.random() * 40; // Tamanho variável
             obstacles.push({
                 x: canvas.width / (window.devicePixelRatio || 1),
-                y: canvasHeight - groundHeight - size, // Posicionar no chão
-                width: size,
-                height: size,
+                y: canvasHeight - groundHeight - obstacleSize, // Posicionar no chão
+                width: obstacleSize,
+                height: obstacleSize,
                 type: 'ground',
                 rotation: Math.random() * Math.PI * 2, // Rotação aleatória
                 glowIntensity: 0.5 + Math.random() * 0.5 // Intensidade do brilho
@@ -461,8 +524,17 @@
         
         // Atualizar obstáculos
         function updateObstacles() {
+            // Verificar se já se passaram 2 segundos desde o início do jogo
+            const elapsedTime = (Date.now() - gameStartTime) / 1000; // em segundos
+            
+            // Criar o primeiro obstáculo após 2 segundos
+            if (!firstObstacleCreated && elapsedTime >= 2) {
+                createObstacle();
+                firstObstacleCreated = true;
+            }
+            
             // Criar novos obstáculos
-            if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width / (window.devicePixelRatio || 1) - 300) {
+            if (firstObstacleCreated && (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width / (window.devicePixelRatio || 1) - 300)) {
                 // Aumentar a frequência de obstáculos conforme o nível aumenta
                 const obstacleChance = 0.01 + (level - 1) * 0.005;
                 if (Math.random() < obstacleChance) {
@@ -584,10 +656,13 @@
             // Esconder a mensagem de game over
             gameMessage.style.display = 'none';
             
-            // Reinicializar o jogo
-            initGame();
-            gameRunning = true;
-            gameLoop();
+            // Pequeno atraso para garantir que o botão seja renderizado corretamente
+            setTimeout(() => {
+                // Reinicializar o jogo
+                initGame();
+                gameRunning = true;
+                gameLoop();
+            }, 100);
         }
         
         // Renderizar fundo do jogo
@@ -684,7 +759,7 @@
             ctx.restore();
         }
         
-        // Renderizar obstáculos (pedras brilhantes)
+        // Renderizar obstáculos (pedras brilhantes) - tamanho variável entre 35px e 45px
         function renderObstacles() {
             obstacles.forEach(obstacle => {
                 ctx.save();
