@@ -111,6 +111,24 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
         }
         
+        #gameOverMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 25px 40px;
+            border-radius: 15px;
+            font-size: 24px;
+            text-align: center;
+            display: none;
+            z-index: 100; /* Z-index mais alto para garantir que fique sobre tudo */
+            border: 3px solid rgba(255, 165, 0, 0.5);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+            min-width: 300px;
+        }
+        
         #startScreen {
             position: absolute;
             top: 0;
@@ -278,6 +296,11 @@
                 padding: 15px 25px;
             }
             
+            #gameOverMessage {
+                font-size: 20px;
+                padding: 20px 30px;
+            }
+            
             #gameLogo {
                 width: 160px; /* Ajustado para telas menores */
             }
@@ -346,6 +369,7 @@
         </div>
         
         <div id="gameMessage"></div>
+        <div id="gameOverMessage"></div>
         
         <div id="startScreen">
             <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo">
@@ -374,6 +398,7 @@
         const countdownElement = document.getElementById('countdown');
         const startBtn = document.getElementById('startBtn');
         const gameMessage = document.getElementById('gameMessage');
+        const gameOverMessage = document.getElementById('gameOverMessage');
         const scoreDisplay = document.getElementById('score');
         const highScoreDisplay = document.getElementById('highScore');
         const levelDisplay = document.getElementById('level');
@@ -795,33 +820,37 @@
                 isHighScore = true;
             }
             
-            // Mostrar mensagem de game over com a pontuação e botão de reiniciar
+            // Garantir que outras mensagens não interfiram
+            gameMessage.style.display = 'none';
+            
+            // Criar a mensagem de game over
             const messageHTML = `
-                <div style="font-size: 28px; font-weight: bold; margin-bottom: 15px;">Pontuação</div>
+                <div style="font-size: 28px; font-weight: bold; margin-bottom: 15px; color: #FFA500;">Pontuação</div>
                 <div style="font-size: 24px; margin-bottom: 20px;">${score} pontos</div>
-                ${isHighScore ? '<div style="font-size: 18px; color: #FFD700; margin-bottom: 15px;">NOVO RECORDE!</div>' : ''}
-                <button id="restartBtn" class="neo-pop-tilted-button"><span>Jogar Novamente</span></button>
+                ${isHighScore ? '<div style="font-size: 18px; color: #FFD700; margin-bottom: 15px; font-weight: bold;">NOVO RECORDE!</div>' : ''}
+                <button id="restartBtn" class="neo-pop-tilted-button" style="margin-top: 10px;"><span>Jogar Novamente</span></button>
             `;
             
             // Definir o conteúdo e mostrar a mensagem
-            gameMessage.innerHTML = messageHTML;
-            gameMessage.style.display = 'block';
+            gameOverMessage.innerHTML = messageHTML;
+            gameOverMessage.style.display = 'block';
             
-            // Adicionar evento ao botão após um pequeno delay para garantir que o DOM foi atualizado
-            setTimeout(() => {
-                const restartBtn = document.getElementById('restartBtn');
-                if (restartBtn) {
-                    restartBtn.addEventListener('click', restartGame);
-                } else {
-                    console.error("Botão de reiniciar não encontrado");
-                }
-            }, 100);
+            // Adicionar evento ao botão
+            const restartBtn = document.getElementById('restartBtn');
+            if (restartBtn) {
+                // Remover eventos anteriores para evitar duplicação
+                restartBtn.removeEventListener('click', restartGame);
+                // Adicionar novo evento
+                restartBtn.addEventListener('click', restartGame);
+            } else {
+                console.error("Botão de reiniciar não encontrado");
+            }
         }
         
         // Função para reiniciar o jogo
         function restartGame() {
             // Esconder a mensagem de game over
-            gameMessage.style.display = 'none';
+            gameOverMessage.style.display = 'none';
             
             // Pequeno atraso para garantir que o botão seja renderizado corretamente
             setTimeout(() => {
