@@ -201,6 +201,7 @@
         <div id="gameInfo">
             <div>Pontos: <span id="score">0</span></div>
             <div>Recorde: <span id="highScore">0</span></div>
+            <div>Nível: <span id="level">1</span></div>
         </div>
         
         <div id="gameMessage"></div>
@@ -208,8 +209,8 @@
         <div id="startScreen">
             <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo">
             <h1>AS AVENTURAS DE ZÉO</h1>
-            <p>Toque na tela para fazer o Zéo pular e desviar das pedras!</p>
-            <p>Quanto mais tempo você sobreviver, mais pontos você fará.</p>
+            <p>Toque na tela para fazer o Zéo pular e desviar das pedras brilhantes!</p>
+            <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
             <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
         </div>
     </div>
@@ -224,6 +225,7 @@
         const gameMessage = document.getElementById('gameMessage');
         const scoreDisplay = document.getElementById('score');
         const highScoreDisplay = document.getElementById('highScore');
+        const levelDisplay = document.getElementById('level');
         
         // Configurar tamanho do canvas com suporte para alta densidade de pixels
         function resizeCanvas() {
@@ -260,6 +262,8 @@
         let gameSpeed = 5;
         let gravity = 0.8;
         let gameLoopId;
+        let level = 1;
+        let nextLevelScore = 500; // Pontuação para subir de nível
         
         // Altura do chão
         const groundHeight = 50;
@@ -319,6 +323,8 @@
         function initGame() {
             score = 0;
             gameSpeed = 5;
+            level = 1;
+            nextLevelScore = 500;
             // Posicionar o jogador no chão
             player.y = canvas.height / (window.devicePixelRatio || 1) - groundHeight - player.height;
             player.velocityY = 0;
@@ -347,41 +353,27 @@
             });
         }
         
-        // Criar obstáculos (pedras)
+        // Criar obstáculos (pedras brilhantes)
         function createObstacle() {
-            const types = ['ground', 'floating']; // Tipos de pedras: no chão ou flutuando
-            const type = types[Math.floor(Math.random() * types.length)];
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
             
-            if (type === 'ground') {
-                // Pedras no chão
-                const size = 30 + Math.random() * 40; // Tamanho variável
-                obstacles.push({
-                    x: canvas.width / (window.devicePixelRatio || 1),
-                    y: canvasHeight - groundHeight - size, // Posicionar no chão
-                    width: size,
-                    height: size,
-                    type: 'ground',
-                    rotation: Math.random() * Math.PI * 2 // Rotação aleatória
-                });
-            } else {
-                // Pedras flutuando
-                const size = 25 + Math.random() * 30; // Tamanho variável
-                obstacles.push({
-                    x: canvas.width / (window.devicePixelRatio || 1),
-                    y: canvasHeight - groundHeight - 150 - Math.random() * 100, // Voando acima do chão
-                    width: size,
-                    height: size,
-                    type: 'floating',
-                    rotation: Math.random() * Math.PI * 2, // Rotação aleatória
-                    floatOffset: Math.random() * Math.PI * 2 // Para animação de flutuação
-                });
-            }
+            // Pedras no chão - apenas um tipo agora
+            const size = 30 + Math.random() * 40; // Tamanho variável
+            obstacles.push({
+                x: canvas.width / (window.devicePixelRatio || 1),
+                y: canvasHeight - groundHeight - size, // Posicionar no chão
+                width: size,
+                height: size,
+                type: 'ground',
+                rotation: Math.random() * Math.PI * 2, // Rotação aleatória
+                glowIntensity: 0.5 + Math.random() * 0.5 // Intensidade do brilho
+            });
         }
         
         // Atualizar UI
         function updateUI() {
             scoreDisplay.textContent = score;
+            levelDisplay.textContent = level;
         }
         
         // Mostrar mensagem
@@ -430,6 +422,7 @@
             updateClouds();
             updateGround();
             updateBackground();
+            updateDifficulty();
             
             // Verificar colisões
             checkCollisions();
@@ -444,11 +437,6 @@
             // Aumentar pontuação
             score++;
             updateUI();
-            
-            // Aumentar dificuldade gradualmente
-            if (score % 500 === 0) {
-                gameSpeed += 0.5;
-            }
             
             // Continuar loop
             gameLoopId = requestAnimationFrame(gameLoop);
@@ -475,7 +463,9 @@
         function updateObstacles() {
             // Criar novos obstáculos
             if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width / (window.devicePixelRatio || 1) - 300) {
-                if (Math.random() < 0.02) {
+                // Aumentar a frequência de obstáculos conforme o nível aumenta
+                const obstacleChance = 0.01 + (level - 1) * 0.005;
+                if (Math.random() < obstacleChance) {
                     createObstacle();
                 }
             }
@@ -487,12 +477,6 @@
                 // Remover obstáculos fora da tela
                 if (obstacles[i].x + obstacles[i].width < 0) {
                     obstacles.splice(i, 1);
-                }
-                
-                // Animar pedras flutuantes
-                if (obstacles[i] && obstacles[i].type === 'floating') {
-                    obstacles[i].floatOffset += 0.05;
-                    obstacles[i].y += Math.sin(obstacles[i].floatOffset) * 1.5;
                 }
             }
         }
@@ -518,7 +502,7 @@
         // Atualizar chão
         function updateGround() {
             groundPosition -= gameSpeed;
-            if (groundPosition <= -20) {
+            if (groundPosition <= -40) { // Aumentado para 40 para acomodar as faixas amarelas
                 groundPosition = 0;
             }
         }
@@ -528,6 +512,17 @@
             backgroundPosition -= gameSpeed * 0.5; // Movimento mais lento para dar sensação de profundidade
             if (backgroundPosition <= -canvas.width / (window.devicePixelRatio || 1)) {
                 backgroundPosition = 0;
+            }
+        }
+        
+        // Atualizar dificuldade
+        function updateDifficulty() {
+            // Verificar se é hora de subir de nível
+            if (score >= nextLevelScore) {
+                level++;
+                nextLevelScore += 500; // Próximo nível a cada 500 pontos
+                gameSpeed += 0.8; // Aumentar velocidade do jogo
+                showMessage(`Nível ${level}!`, 2000);
             }
         }
         
@@ -614,20 +609,25 @@
             }
         }
         
-        // Renderizar chão
+        // Renderizar chão (rua com faixas amarelas)
         function renderGround() {
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
             
-            // Desenhar chão
-            ctx.fillStyle = '#8B4513';
+            // Desenhar asfalto
+            ctx.fillStyle = '#333333';
             ctx.fillRect(0, canvasHeight - groundHeight, canvas.width / (window.devicePixelRatio || 1), groundHeight);
             
-            // Detalhe do chão
-            ctx.fillStyle = '#A0522D';
-            ctx.fillRect(0, canvasHeight - groundHeight, canvas.width / (window.devicePixelRatio || 1), 5);
+            // Desenhar faixas amarelas
+            ctx.fillStyle = '#FFD700';
+            const stripeWidth = 20;
+            const stripeHeight = 5;
+            
+            for (let i = groundPosition; i < canvas.width / (window.devicePixelRatio || 1); i += 40) {
+                ctx.fillRect(i, canvasHeight - groundHeight + 10, stripeWidth, stripeHeight);
+            }
             
             // Linhas de movimento no chão
-            ctx.strokeStyle = '#A0522D';
+            ctx.strokeStyle = '#555555';
             ctx.lineWidth = 2;
             ctx.beginPath();
             
@@ -684,7 +684,7 @@
             ctx.restore();
         }
         
-        // Renderizar obstáculos (pedras)
+        // Renderizar obstáculos (pedras brilhantes)
         function renderObstacles() {
             obstacles.forEach(obstacle => {
                 ctx.save();
@@ -695,8 +695,12 @@
                 // Rotacionar a pedra
                 ctx.rotate(obstacle.rotation);
                 
+                // Adicionar brilho à pedra
+                ctx.shadowColor = '#FFD700';
+                ctx.shadowBlur = 15 * obstacle.glowIntensity;
+                
                 // Desenhar a pedra
-                ctx.fillStyle = '#808080'; // Cor cinza para a pedra
+                ctx.fillStyle = '#C0C0C0'; // Cor prateada para a pedra
                 
                 // Desenhar uma forma irregular para parecer uma pedra
                 ctx.beginPath();
@@ -713,7 +717,7 @@
                 ctx.fill();
                 
                 // Adicionar textura à pedra
-                ctx.fillStyle = '#696969'; // Tom mais escuro para textura
+                ctx.fillStyle = '#A9A9A9'; // Tom mais escuro para textura
                 ctx.beginPath();
                 ctx.arc(-obstacle.width/4, -obstacle.height/6, obstacle.width/8, 0, Math.PI * 2);
                 ctx.fill();
@@ -724,6 +728,20 @@
                 
                 ctx.beginPath();
                 ctx.arc(-obstacle.width/6, obstacle.height/5, obstacle.width/12, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Adicionar pontos de brilho
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(-obstacle.width/5, -obstacle.height/4, obstacle.width/15, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(obstacle.width/6, -obstacle.height/5, obstacle.width/18, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(0, -obstacle.height/6, obstacle.width/20, 0, Math.PI * 2);
                 ctx.fill();
                 
                 ctx.restore();
