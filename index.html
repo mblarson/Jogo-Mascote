@@ -589,22 +589,21 @@
         highScoreDisplay.textContent = highScore;
         
         // Personagem principal - ajustado para ficar mais gordinho
+     // Personagem principal - ajustado para ficar mais gordinho
         const player = {
-            x: 50, // VALOR ALTERADO: Posição inicial agora é 50 pixels da esquerda.
+            x: 30,
             y: 0,
             width: 70,  // Largura visual do personagem
             height: 80, // Altura visual do personagem
             // Hitbox menor que o sprite para dar margem de erro
-            hitboxWidth: 50,  // 70% da largura visual
-            hitboxHeight: 60, // 75% da altura visual
-            hitboxOffsetX: 10, // (70 - 50) / 2 = 10px de cada lado
-            hitboxOffsetY: 10, // (80 - 60) / 2 = 10px em cima e embaixo
+            hitboxWidth: 30,  // [AJUSTE SUGERIDO: 30] Redução drástica
+            hitboxHeight: 40, // [AJUSTE SUGERIDO: 40] Redução drástica
+            hitboxOffsetX: 20, // (70 - 30) / 2 = 20px de cada lado
+            hitboxOffsetY: 30, // (80 - 40) / 2 = 20px (Topo/Base). Subindo para 30px para focar mais na base do personagem, longe da cabeça.
             velocityY: 0,
-            jumpPower: 16, // Aumentado um pouco o pulo
+            jumpPower: 16,
             grounded: false,
-            image: new Image(),
-            loaded: false
-        };
+// ...
         
         // Carregar imagem do mascote com tratamento de erro
         player.image.onload = function() {
