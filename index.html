@@ -130,6 +130,109 @@
             min-width: 300px;
         }
         
+        /* NOVO: TELA DE INTRODUÇÃO (VÍDEO) */
+        #introScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50; /* Acima da startScreen */
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #introVideo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            object-fit: cover; 
+            filter: brightness(0.7); /* Escurece um pouco o vídeo */
+        }
+        
+        #introContent {
+            position: relative;
+            z-index: 2; /* Acima do vídeo */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Conteúdo no fundo */
+            align-items: flex-start; /* Alinhamento à esquerda */
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+        
+        /* NOVO ESTILO DO BOTÃO JOGAR AGORA */
+        .button {
+          /* in scss with just one variable i can change opacity with rgba(variable, opacity) but in css it's not possible so i have used three seperate variables */
+          /* com hue-rotate a cor pode ser alterada */
+          --main-color: rgb(46, 213, 115);
+          --main-bg-color: rgba(46, 213, 116, 0.36);
+          --pattern-color: rgba(46, 213, 116, 0.073);
+
+          /* change this rotation value */
+          filter: hue-rotate(0deg);
+
+          cursor: pointer;
+          text-transform: uppercase;
+          letter-spacing: 0.5rem;
+          background: radial-gradient(
+              circle,
+              var(--main-bg-color) 0%,
+              rgba(0, 0, 0, 0) 95%
+            ),
+            linear-gradient(var(--pattern-color) 1px, transparent 1px),
+            linear-gradient(to right, var(--pattern-color) 1px, transparent 1px);
+          background-size:
+            cover,
+            15px 15px,
+            15px 15px;
+          background-position:
+            center center,
+            center center,
+            center center;
+          border-image: radial-gradient(
+              circle,
+              var(--main-color) 0%,
+              rgba(0, 0, 0, 0) 100%
+            )
+            1;
+          border-width: 1px 0 1px 0;
+          color: var(--main-color);
+          padding: 1rem 3rem;
+          font-weight: 700;
+          font-size: 1.5rem;
+          transition: background-size 0.2s ease-in-out;
+          
+          /* Posicionamento para ficar à esquerda (substituindo o margin auto) */
+          margin-top: 20px;
+          margin-left: 20px; /* Ajuste para não colar na borda */
+        }
+
+        .button:hover {
+          background-size:
+            cover,
+            10px 10px,
+            10px 10px;
+        }
+        .button:active {
+          filter: hue-rotate(250deg);
+        }
+
+
+        /* TELA START SCREEN (Antiga) */
         #startScreen {
             position: absolute;
             top: 0;
@@ -146,6 +249,8 @@
             text-align: center;
             padding: 20px;
             overflow-y: auto;
+            /* Inicia escondido no desktop se o introScreen não for exibido */
+            display: none; 
         }
         
         #countdownScreen {
@@ -204,7 +309,7 @@
             line-height: 1.4;
         }
         
-        /* Estilo do botão neo-pop-tilted-button */
+        /* Estilo do botão neo-pop-tilted-button - Mantido para o botão Iniciar Jogo */
         .neo-pop-tilted-button {
           border: 0.1px;
           padding-bottom: 6px;
@@ -330,6 +435,14 @@
             #countdownMessage {
                 font-size: 16px;
             }
+
+            /* NOVO: Ajuste do botão Jogar Agora no Mobile para ser maior e responsivo */
+            .button {
+              font-size: 1.1rem;
+              letter-spacing: 0.3rem;
+              padding: 0.8rem 2rem;
+              margin-left: 0; /* Centraliza no mobile se necessário, mas mantemos o alinhamento à esquerda se a regra do container prevalecer */
+            }
         }
         
         @media (max-height: 600px) {
@@ -357,6 +470,17 @@
                 font-size: 14px;
             }
         }
+
+        /* Esconde a tela de introdução por padrão no desktop */
+        @media (min-width: 1024px) {
+            #introScreen {
+                display: none !important;
+            }
+            #startScreen {
+                display: flex; /* Garante que a tela de início seja exibida no desktop por padrão */
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -372,6 +496,30 @@
         <div id="gameMessage"></div>
         <div id="gameOverMessage"></div>
         
+        <!-- NOVO: TELA DE INTRODUÇÃO (VÍDEO) - Visível apenas em Mobile/Tablet (< 1024px) -->
+        <div id="introScreen">
+            <video id="introVideo" autoplay loop muted playsinline>
+                <source src="https://raw.githubusercontent.com/mblarson/jogo-mascote/main/aberturajogo.mp4" type="video/mp4">
+                Seu navegador não suporta a tag de vídeo.
+            </video>
+            
+            <!-- Conteúdo da introdução (Botão e textos sobrepostos) -->
+            <div id="introContent">
+                <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
+                    <!-- Texto de chamada opcional aqui, se desejar -->
+                    <h1 style="font-size: 3rem; text-align: left; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">Jornada do Zéo</h1>
+                    <p style="font-size: 1rem; text-align: left; margin-bottom: 20px; max-width: 80%; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);">Prepare-se para desviar dos obstáculos e alcançar a pontuação máxima!</p>
+
+                    <!-- Botão JOGAR AGORA - Alinhado à esquerda -->
+                    <button id="introStartBtn" class="button">
+                        JOGAR AGORA
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- FIM TELA DE INTRODUÇÃO -->
+
+
         <div id="startScreen">
             <!-- Adicionada verificação de erro para o logo inicial. 
                  Se a imagem falhar, um SVG simples será exibido como placeholder. -->
@@ -397,6 +545,9 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const gameContainer = document.getElementById('gameContainer');
+        const introScreen = document.getElementById('introScreen');
+        const introVideo = document.getElementById('introVideo');
+        const introStartBtn = document.getElementById('introStartBtn');
         const startScreen = document.getElementById('startScreen');
         const countdownScreen = document.getElementById('countdownScreen');
         const countdownElement = document.getElementById('countdown');
@@ -471,15 +622,15 @@
         
         // Personagem principal - ajustado para ficar mais gordinho
         const player = {
-            x: 30, // <--- VALOR ALTERADO: Posição inicial agora é 50 pixels da esquerda.
+            x: 50, // VALOR ALTERADO: Posição inicial agora é 50 pixels da esquerda.
             y: 0,
             width: 70,  // Largura visual do personagem
             height: 80, // Altura visual do personagem
             // Hitbox menor que o sprite para dar margem de erro
-            hitboxWidth: 40,  // 70% da largura visual
-            hitboxHeight: 50, // 75% da altura visual
-            hitboxOffsetX: 9, // (70 - 50) / 2 = 10px de cada lado
-            hitboxOffsetY: 9, // (80 - 60) / 2 = 10px em cima e embaixo
+            hitboxWidth: 50,  // 70% da largura visual
+            hitboxHeight: 60, // 75% da altura visual
+            hitboxOffsetX: 10, // (70 - 50) / 2 = 10px de cada lado
+            hitboxOffsetY: 10, // (80 - 60) / 2 = 10px em cima e embaixo
             velocityY: 0,
             jumpPower: 16, // Aumentado um pouco o pulo
             grounded: false,
@@ -620,9 +771,47 @@
         canvas.addEventListener('touchstart', jump);
         canvas.addEventListener('mousedown', jump);
         
-        // Iniciar jogo
+        // Lógica de inicialização principal
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verifica se deve mostrar a tela de introdução do vídeo
+            if (window.innerWidth < 1024) {
+                checkAndShowIntro();
+            } else {
+                // Se for desktop, pula a introdução e mostra a tela inicial padrão
+                introScreen.style.display = 'none';
+                startScreen.style.display = 'flex';
+            }
+        });
+        
+        // Evento do botão "JOGAR AGORA" da tela de introdução
+        introStartBtn.addEventListener('click', () => {
+            introScreen.style.display = 'none';
+            startScreen.style.display = 'flex';
+            // Garante que o vídeo pare ao sair
+            if (introVideo) introVideo.pause(); 
+        });
+
+
+        // Iniciar jogo (na tela startScreen)
         startBtn.addEventListener('click', startCountdown);
         
+        // NOVO: Função para verificar se exibe a tela de introdução
+        function checkAndShowIntro() {
+            // Dispositivos Mobile/Tablet (largura menor que 1024px)
+            if (window.innerWidth < 1024) {
+                introScreen.style.display = 'flex';
+                startScreen.style.display = 'none';
+                if (introVideo) {
+                    // Tenta iniciar o vídeo (pode ser bloqueado pelo navegador)
+                    introVideo.play().catch(e => console.log('Video auto-play blocked:', e));
+                }
+            } else {
+                // Desktop: Pula introdução e vai direto para a tela inicial
+                introScreen.style.display = 'none';
+                startScreen.style.display = 'flex';
+            }
+        }
+
         function startCountdown() {
             startScreen.style.display = 'none';
             countdownScreen.style.display = 'flex';
@@ -813,8 +1002,8 @@
                 
                 // Encontrar a velocidade máxima permitida para o NOVO nível.
                 // Usa o limite do nível, ou o limite máximo mapeado se o nível for muito alto.
-                const currentLevelMaxSpeed = levelSpeedLimits[level] || 
-                                             levelSpeedLimits[Math.max(...Object.keys(levelSpeedLimits).map(Number))];
+                const maxLevel = Math.max(...Object.keys(levelSpeedLimits).map(Number));
+                const currentLevelMaxSpeed = levelSpeedLimits[level] || levelSpeedLimits[maxLevel];
                 
                 // Aumentar a velocidade em 0.2, mas garantir que não ultrapasse o limite máximo do nível atual
                 if (gameSpeed < currentLevelMaxSpeed) {
