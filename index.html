@@ -434,7 +434,7 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
         
-        // NOVO: Mapa de velocidades máximas por nível, conforme solicitado.
+        // NOVO: Mapa de velocidades máximas por nível, com os ajustes solicitados.
         // A velocidade do jogo (gameSpeed) não deve ultrapassar estes valores ao atingir cada nível.
         const levelSpeedLimits = {
             1: 4.0, // Velocidade inicial
@@ -444,10 +444,10 @@
             5: 4.8, // Nível 5: 4.8
             6: 4.9, // Nível 6: 4.9
             7: 5.0, // Nível 7: 5.0
-            // Níveis acima de 7 manterão a velocidade máxima de 5.0
-            8: 5.0,
-            9: 5.0,
-            10: 5.0,
+            8: 5.2, // Nível 8: 5.2 (Novo valor)
+            9: 5.4, // Nível 9: 5.4 (Novo valor)
+            10: 5.5, // Nível 10: 5.5 (Novo valor)
+            // Níveis acima de 10 manterão a velocidade máxima de 5.5
         };
 
         // Variáveis do jogo
@@ -471,7 +471,7 @@
         
         // Personagem principal - ajustado para ficar mais gordinho
         const player = {
-            x: 100,
+            x: 50, // <--- VALOR ALTERADO: Posição inicial agora é 50 pixels da esquerda.
             y: 0,
             width: 70,  // Largura visual do personagem
             height: 80, // Altura visual do personagem
