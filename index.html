@@ -606,6 +606,8 @@
 // ...
         
         // Carregar imagem do mascote com tratamento de erro
+        player.image = new Image();
+        player.loaded = false;
         player.image.onload = function() {
             player.loaded = true;
             console.log("Imagem do personagem carregada com sucesso");
@@ -740,6 +742,23 @@
         
         // Lógica de inicialização principal
         document.addEventListener('DOMContentLoaded', () => {
+            // --- INÍCIO DA CORREÇÃO ---
+            
+            // Evento do botão "JOGUE AGORA" da tela de introdução (CORRIGIDO: Movido para dentro do DOMContentLoaded)
+            if (introStartBtn) {
+                introStartBtn.addEventListener('click', () => {
+                    introScreen.style.display = 'none';
+                    startScreen.style.display = 'flex';
+                    // Garante que o vídeo pare ao sair
+                    if (introVideo) introVideo.pause(); 
+                });
+            }
+
+            // Iniciar jogo (na tela startScreen)
+            startBtn.addEventListener('click', startCountdown);
+            
+            // --- FIM DA CORREÇÃO ---
+            
             // Verifica se deve mostrar a tela de introdução do vídeo
             if (window.innerWidth < 1024) {
                 checkAndShowIntro();
@@ -749,18 +768,6 @@
                 startScreen.style.display = 'flex';
             }
         });
-        
-        // Evento do botão "JOGUE AGORA" da tela de introdução
-        introStartBtn.addEventListener('click', () => {
-            introScreen.style.display = 'none';
-            startScreen.style.display = 'flex';
-            // Garante que o vídeo pare ao sair
-            if (introVideo) introVideo.pause(); 
-        });
-
-
-        // Iniciar jogo (na tela startScreen)
-        startBtn.addEventListener('click', startCountdown);
         
         // NOVO: Função para verificar se exibe a tela de introdução
         function checkAndShowIntro() {
