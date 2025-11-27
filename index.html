@@ -471,15 +471,15 @@
         
         // Personagem principal - ajustado para ficar mais gordinho
         const player = {
-            x: 50, // <--- VALOR ALTERADO: Posição inicial agora é 50 pixels da esquerda.
+            x: 30, // <--- VALOR ALTERADO: Posição inicial agora é 50 pixels da esquerda.
             y: 0,
             width: 70,  // Largura visual do personagem
             height: 80, // Altura visual do personagem
             // Hitbox menor que o sprite para dar margem de erro
-            hitboxWidth: 50,  // 70% da largura visual
-            hitboxHeight: 60, // 75% da altura visual
-            hitboxOffsetX: 10, // (70 - 50) / 2 = 10px de cada lado
-            hitboxOffsetY: 10, // (80 - 60) / 2 = 10px em cima e embaixo
+            hitboxWidth: 40,  // 70% da largura visual
+            hitboxHeight: 50, // 75% da altura visual
+            hitboxOffsetX: 9, // (70 - 50) / 2 = 10px de cada lado
+            hitboxOffsetY: 9, // (80 - 60) / 2 = 10px em cima e embaixo
             velocityY: 0,
             jumpPower: 16, // Aumentado um pouco o pulo
             grounded: false,
