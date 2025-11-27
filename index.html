@@ -162,18 +162,7 @@
             height: 100%;
             transform: translate(-50%, -50%);
             z-index: 1;
-            /* object-fit: contain; // Usar contain para que o vídeo não corte (mantendo a proporção)
-            object-fit: cover; // Usar cover para preencher, cortando o que for necessário. Mantendo cover, mas com novo max-width/height */
-
-            /* Ajuste para simular dimensão de Story (9:16) ou 100% do viewport, 
-               mas contido dentro do introScreen fixed. */
-            max-width: 500px; /* Limite de largura para formato vertical (Story-like) */
-            max-height: 90vh; /* Limite de altura */
             
-            /* Usar object-fit: contain para mostrar o vídeo inteiro na proporção */
-            object-fit: contain; 
-            background-color: black; /* Fundo preto para as áreas que o vídeo não preencher */
-
             /* Revertendo para o cover para preencher a tela inteira (como estava antes, mas contido) */
             min-width: 100%;
             min-height: 100%;
@@ -194,64 +183,7 @@
             padding: 20px;
         }
         
-        /* NOVO ESTILO DO BOTÃO JOGAR AGORA */
-        .button {
-          /* in scss with just one variable i can change opacity with rgba(variable, opacity) but in css it's not possible so i have used three seperate variables */
-          /* com hue-rotate a cor pode ser alterada */
-          --main-color: rgb(46, 213, 115);
-          --main-bg-color: rgba(46, 213, 116, 0.36);
-          --pattern-color: rgba(46, 213, 116, 0.073);
-
-          /* change this rotation value */
-          filter: hue-rotate(0deg);
-
-          cursor: pointer;
-          text-transform: uppercase;
-          letter-spacing: 0.5rem;
-          background: radial-gradient(
-              circle,
-              var(--main-bg-color) 0%,
-              rgba(0, 0, 0, 0) 95%
-            ),
-            linear-gradient(var(--pattern-color) 1px, transparent 1px),
-            linear-gradient(to right, var(--pattern-color) 1px, transparent 1px);
-          background-size:
-            cover,
-            15px 15px,
-            15px 15px;
-          background-position:
-            center center,
-            center center,
-            center center;
-          border-image: radial-gradient(
-              circle,
-              var(--main-color) 0%,
-              rgba(0, 0, 0, 0) 100%
-            )
-            1;
-          border-width: 1px 0 1px 0;
-          color: var(--main-color);
-          padding: 1rem 3rem;
-          font-weight: 700;
-          font-size: 1.5rem;
-          transition: background-size 0.2s ease-in-out;
-          
-          /* Posicionamento para ficar centralizado horizontalmente no #introContent */
-          margin-top: 20px;
-          /* Centralizando para afastar do mascote na startScreen */
-          margin-left: 0; /* Removendo alinhamento à esquerda forçado */
-
-        }
-
-        .button:hover {
-          background-size:
-            cover,
-            10px 10px,
-            10px 10px;
-        }
-        .button:active {
-          filter: hue-rotate(250deg);
-        }
+        /* ESTILO REMOVIDO: O estilo .button anterior foi removido pois usaremos neo-pop-tilted-button */
 
 
         /* TELA START SCREEN (Antiga) */
@@ -331,7 +263,7 @@
             line-height: 1.4;
         }
         
-        /* Estilo do botão neo-pop-tilted-button - Mantido para o botão Iniciar Jogo */
+        /* Estilo do botão neo-pop-tilted-button - Usado para os dois botões */
         .neo-pop-tilted-button {
           border: 0.1px;
           padding-bottom: 6px;
@@ -413,6 +345,14 @@
           transform: perspective(170px) rotateX(36deg) translateY(5px);
         }
         
+        /* NOVO: Estilo para alinhar o botão "JOGUE AGORA" à esquerda na introScreen */
+        #introContent .neo-pop-tilted-button {
+            margin-left: 0; /* Garante alinhamento à esquerda */
+            /* Ajusta a largura máxima para o alinhamento */
+            max-width: 250px; 
+            align-self: flex-start; /* Alinha o botão à esquerda dentro do flex container */
+        }
+
         /* Media queries para responsividade */
         @media (max-width: 480px) {
             #gameInfo {
@@ -459,10 +399,14 @@
             }
 
             /* NOVO: Ajuste do botão Jogar Agora no Mobile para ser maior e responsivo */
-            .button {
+            #introContent .neo-pop-tilted-button {
               font-size: 1.1rem;
-              letter-spacing: 0.3rem;
-              padding: 0.8rem 2rem;
+              letter-spacing: 0.1rem;
+              padding: 0; /* Remove padding externo para ajuste fino */
+            }
+            
+            #introContent .neo-pop-tilted-button span {
+                padding: 0.8rem 2rem;
             }
         }
         
@@ -526,13 +470,14 @@
             
             <!-- Conteúdo da introdução (Botão e textos sobrepostos) -->
             <div id="introContent">
-                    <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: -10px; margin-bottom: 100px;">
-                    <!-- Textos removidos conforme solicitado -->
-
-                    <!-- Botão JOGAR AGORA - Centralizado horizontalmente -->
-                    <button id="introStartBtn" class="button">
-                        JOGAR
-                        AGORA
+                <!-- Alterado: Adicionado align-items: flex-start para alinhar à esquerda -->
+                <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 100px;">
+                    
+                    <!-- Botão JOGUE AGORA - Agora com a classe neo-pop-tilted-button e quebra de linha -->
+                    <button id="introStartBtn" class="neo-pop-tilted-button">
+                        <span>
+                            JOGUE<br>AGORA
+                        </span>
                     </button>
                 </div>
             </div>
@@ -629,7 +574,7 @@
         let gameStarted = false;
         let score = 0;
         let highScore = localStorage.getItem('zeoHighScore') || 0;
-        let gameSpeed = levelSpeedLimits[1]; // Velocidade inicial do Nível 1
+        let gameSpeed = levelSpeedLimits[1]; // Velocidade inicial definida pelo mapa
         let gravity = 0.8;
         let gameLoopId;
         let level = 1;
@@ -806,7 +751,7 @@
             }
         });
         
-        // Evento do botão "JOGAR AGORA" da tela de introdução
+        // Evento do botão "JOGUE AGORA" da tela de introdução
         introStartBtn.addEventListener('click', () => {
             introScreen.style.display = 'none';
             startScreen.style.display = 'flex';
