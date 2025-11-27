@@ -132,14 +132,14 @@
         
         /* NOVO: TELA DE INTRODUÇÃO (VÍDEO) */
         #introScreen {
-            /* ALTERADO PARA FIXED E INSET 0 PARA OCUPAR TODO O VIEWPORT */
+            /* USA FIXED PARA OCUPAR TODO O VIEWPORT */
             position: fixed; 
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            width: 100vw; /* Garante largura total da tela */
-            height: 100vh; /* Garante altura total da tela */
+            width: 100vw; 
+            height: 100vh; 
             
             background: rgba(0, 0, 0, 0.9);
             display: flex;
@@ -153,27 +153,42 @@
         }
 
         #introVideo {
-            /* Garante que o vídeo preencha a área, cortando o que for necessário */
+            /* ALTERADO: Garante que o vídeo seja contido no viewport (cover) */
             position: absolute;
             top: 50%;
             left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
+            /* Removido min-width/min-height 100% para evitar que o vídeo "vaze" além do viewport */
+            width: 100%;
+            height: 100%;
             transform: translate(-50%, -50%);
             z-index: 1;
-            object-fit: cover; 
+            /* object-fit: contain; // Usar contain para que o vídeo não corte (mantendo a proporção)
+            object-fit: cover; // Usar cover para preencher, cortando o que for necessário. Mantendo cover, mas com novo max-width/height */
+
+            /* Ajuste para simular dimensão de Story (9:16) ou 100% do viewport, 
+               mas contido dentro do introScreen fixed. */
+            max-width: 500px; /* Limite de largura para formato vertical (Story-like) */
+            max-height: 90vh; /* Limite de altura */
+            
+            /* Usar object-fit: contain para mostrar o vídeo inteiro na proporção */
+            object-fit: contain; 
+            background-color: black; /* Fundo preto para as áreas que o vídeo não preencher */
+
+            /* Revertendo para o cover para preencher a tela inteira (como estava antes, mas contido) */
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
             filter: brightness(0.7); /* Escurece um pouco o vídeo */
         }
-        
+
+        /* Ajuste do container para centralizar o botão na parte inferior */
         #introContent {
             position: relative;
             z-index: 2; /* Acima do vídeo */
             display: flex;
             flex-direction: column;
             justify-content: flex-end; /* Conteúdo no fundo */
-            align-items: flex-start; /* Alinhamento à esquerda */
+            align-items: center; /* Centralizar o botão horizontalmente */
             width: 100%;
             height: 100%;
             padding: 20px;
@@ -221,9 +236,11 @@
           font-size: 1.5rem;
           transition: background-size 0.2s ease-in-out;
           
-          /* Posicionamento para ficar à esquerda (substituindo o margin auto) */
+          /* Posicionamento para ficar centralizado horizontalmente no #introContent */
           margin-top: 20px;
-          margin-left: 20px; /* Ajuste para não colar na borda */
+          /* Centralizando para afastar do mascote na startScreen */
+          margin-left: 0; /* Removendo alinhamento à esquerda forçado */
+
         }
 
         .button:hover {
@@ -446,7 +463,6 @@
               font-size: 1.1rem;
               letter-spacing: 0.3rem;
               padding: 0.8rem 2rem;
-              margin-left: 0; /* Centraliza no mobile se necessário, mas mantemos o alinhamento à esquerda se a regra do container prevalecer */
             }
         }
         
@@ -510,12 +526,10 @@
             
             <!-- Conteúdo da introdução (Botão e textos sobrepostos) -->
             <div id="introContent">
-                <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
-                    <!-- Texto de chamada opcional aqui, se desejar -->
-                    <h1 style="font-size: 3rem; text-align: left; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">Jornada do Zéo</h1>
-                    <p style="font-size: 1rem; text-align: left; margin-bottom: 20px; max-width: 80%; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);">Prepare-se para desviar dos obstáculos e alcançar a pontuação máxima!</p>
+                <div style="margin-top: auto; display: flex; flex-direction: column; align-items: center; width: 100%;">
+                    <!-- Textos removidos conforme solicitado -->
 
-                    <!-- Botão JOGAR AGORA - Alinhado à esquerda -->
+                    <!-- Botão JOGAR AGORA - Centralizado horizontalmente -->
                     <button id="introStartBtn" class="button">
                         JOGAR AGORA
                     </button>
