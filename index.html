@@ -130,7 +130,7 @@
             min-width: 300px;
         }
         
-        /* TELA DE INTRODUÇÃO (AGORA COM IMAGEM E EFEITO NEO-POP) */
+        /* TELA DE INTRODUÇÃO - Container principal em tamanho total */
         #introScreen {
             position: fixed; 
             top: 0;
@@ -148,17 +148,34 @@
             z-index: 50; 
             color: white;
             text-align: center;
-            padding: 20px;
+            padding: 0; /* Removido padding para que o subcontainer ocupe 100% da tela */
+            overflow: hidden;
             
-            /* NOVO: Estilos para imitar o neo-pop-tilted-button */
+            /* REMOVIDO: transform, box-shadow e shimmer daqui */
+            box-shadow: none;
+            transform: none;
+        }
+        
+        /* NOVO: Wrapper para aplicar o efeito Neo-Pop TILT na imagem e no conteúdo */
+        #introWrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            
+            /* APLICANDO OS ESTILOS NEO-POP (TILT e SHADOW) AQUI */
             box-shadow: 1px 5px 7px #494a4b;
             transform: perspective(180px) rotateX(30deg) translateY(2px);
             transition: transform 0.3s ease;
-            overflow: hidden; /* Garantir que a imagem de fundo não vaze */
+            overflow: hidden;
+            
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
-        /* Fundo da tela de introdução agora é a imagem */
-        #introScreen::before {
+        /* Fundo da tela de introdução (IMAGEM) */
+        #introWrapper::before {
             content: "";
             position: absolute;
             top: 0;
@@ -174,7 +191,7 @@
         }
         
         /* EFEITO DE BRILHO SHIMMER (copiado do .neo-pop-tilted-button) */
-        #introScreen::after {
+        #introWrapper::after {
           content: "";
           position: absolute;
           top: 0;
@@ -192,7 +209,7 @@
           z-index: 1; /* Acima da imagem de fundo */
         }
 
-        #introVideo { /* REMOVIDO */
+        #introVideo { /* Removido */
             display: none;
         }
 
@@ -469,7 +486,7 @@
                 transform: none;
             }
             /* Garante que o fundo da introScreen não seja exibido no desktop */
-            #introScreen::before, #introScreen::after {
+            #introWrapper::before, #introWrapper::after {
                 content: none;
             }
             #startScreen {
@@ -494,24 +511,26 @@
         
         <!-- TELA DE INTRODUÇÃO (AGORA COM IMAGEM DE FUNDO E EFEITO NEO-POP) -->
         <div id="introScreen">
-            <!-- O vídeo foi removido. A imagem de fundo agora está no CSS (#introScreen::before) -->
             
-            <!-- Conteúdo da introdução (Botão e textos sobrepostos) -->
-            <div id="introContent">
-                <!-- A margem inferior foi aumentada para evitar que o botão fique muito colado na borda (devido à inclinação) -->
-                <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
-                    
-                    <!-- Adicionado um título para o contexto (ZÉO AVENTURAS) -->
-                    <h1 style="color: white; text-shadow: 2px 2px 5px #000; font-size: 32px; margin-bottom: 10px; opacity: 1;">
-                        AS AVENTURAS DE ZÉO
-                    </h1>
-                    
-                    <!-- Botão JOGUE AGORA -->
-                    <button id="introStartBtn" class="neo-pop-tilted-button">
-                        <span>
-                            JOGUE<br>AGORA
-                        </span>
-                    </button>
+            <!-- NOVO: Wrapper para aplicar o efeito neo-pop em toda a área visível -->
+            <div id="introWrapper">
+                <!-- Conteúdo da introdução (Botão e textos sobrepostos) -->
+                <div id="introContent">
+                    <!-- A margem inferior foi aumentada para evitar que o botão fique muito colado na borda (devido à inclinação) -->
+                    <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
+                        
+                        <!-- Adicionado um título para o contexto (ZÉO AVENTURAS) -->
+                        <h1 style="color: white; text-shadow: 2px 2px 5px #000; font-size: 32px; margin-bottom: 10px; opacity: 1;">
+                            AS AVENTURAS DE ZÉO
+                        </h1>
+                        
+                        <!-- Botão JOGUE AGORA -->
+                        <button id="introStartBtn" class="neo-pop-tilted-button">
+                            <span>
+                                JOGUE<br>AGORA
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -775,23 +794,18 @@
         
         // Lógica de inicialização principal
         document.addEventListener('DOMContentLoaded', () => {
-            // --- INÍCIO DA CORREÇÃO ---
-            
-            // Evento do botão "JOGUE AGORA" da tela de introdução (CORRIGIDO: Movido para dentro do DOMContentLoaded)
+            // Evento do botão "JOGUE AGORA" da tela de introdução
             if (introStartBtn) {
                 introStartBtn.addEventListener('click', () => {
                     introScreen.style.display = 'none';
                     startScreen.style.display = 'flex';
-                    // Já que não há vídeo, a pausa é ignorada.
                 });
             }
 
             // Iniciar jogo (na tela startScreen)
             startBtn.addEventListener('click', startCountdown);
             
-            // --- FIM DA CORREÇÃO ---
-            
-            // Verifica se deve mostrar a tela de introdução do vídeo
+            // Verifica se deve mostrar a tela de introdução
             if (window.innerWidth < 1024) {
                 checkAndShowIntro();
             } else {
@@ -801,13 +815,12 @@
             }
         });
         
-        // NOVO: Função para verificar se exibe a tela de introdução
+        // Função para verificar se exibe a tela de introdução
         function checkAndShowIntro() {
             // Dispositivos Mobile/Tablet (largura menor que 1024px)
             if (window.innerWidth < 1024) {
                 introScreen.style.display = 'flex';
                 startScreen.style.display = 'none';
-                // Não há mais vídeo para dar play
             } else {
                 // Desktop: Pula introdução e vai direto para a tela inicial
                 introScreen.style.display = 'none';
