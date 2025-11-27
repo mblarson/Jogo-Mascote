@@ -12,6 +12,7 @@
         }
         
         body {
+            /* Alterei a URL para o caminho do arquivo local. */
             background-image: url('./backgournd.png');
             background-size: cover;
             background-position: center;
@@ -372,7 +373,8 @@
         <div id="gameOverMessage"></div>
         
         <div id="startScreen">
-            <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo">
+            <!-- Adicionado fallback de imagem para o logo -->
+            <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>ZÉO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
             <h1>AS AVENTURAS DE ZÉO</h1>
             <p>Toque na tela para fazer o Zéo pular e desviar das pedras brilhantes!</p>
             <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
@@ -430,19 +432,32 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
         
+        // NOVO: Mapa de velocidades máximas por nível, conforme solicitado.
+        // A velocidade do jogo (gameSpeed) não deve ultrapassar estes valores ao atingir cada nível.
+        const levelSpeedLimits = {
+            1: 4.0, // Velocidade inicial
+            2: 4.2, 
+            3: 4.4, 
+            4: 4.7, // Nível 4: 4.7
+            5: 4.8, // Nível 5: 4.8
+            6: 4.9, // Nível 6: 4.9
+            7: 5.0, // Nível 7: 5.0
+            // Níveis acima de 7 manterão a velocidade máxima de 5.0
+            8: 5.0,
+            9: 5.0,
+            10: 5.0,
+        };
+
         // Variáveis do jogo
         let gameRunning = false;
         let gameStarted = false;
         let score = 0;
         let highScore = localStorage.getItem('zeoHighScore') || 0;
-        let gameSpeed = 4; // Velocidade inicial
+        let gameSpeed = levelSpeedLimits[1]; // Velocidade inicial do Nível 1
         let gravity = 0.8;
         let gameLoopId;
         let level = 1;
         let nextLevelScore = 500; // Pontuação para subir de nível
-        
-        // Velocidade máxima do jogo (velocidade do nível 3)
-        const maxGameSpeed = 4.6; // 4 + 0.2 * 3 = 4.6
         
         // Altura do chão
         const groundHeight = 50;
@@ -475,6 +490,8 @@
         };
         
         player.image.onerror = function() {
+            // Em caso de erro, define loaded como false e garante que o fallback de desenho será usado
+            player.loaded = false;
             console.error("Erro ao carregar a imagem do personagem");
         };
         
@@ -489,6 +506,8 @@
         };
         
         backgroundImage.onerror = function() {
+            // Em caso de erro, define loaded como false e garante que o fallback de desenho será usado
+            backgroundImage.loaded = false;
             console.error("Erro ao carregar a imagem de fundo do jogo");
         };
         
@@ -510,7 +529,7 @@
         // Configuração inicial do jogo
         function initGame() {
             score = 0;
-            gameSpeed = 4; // Velocidade inicial
+            gameSpeed = levelSpeedLimits[1]; // Velocidade inicial definida pelo mapa
             level = 1;
             nextLevelScore = 500;
             // Posicionar o jogador no chão
@@ -719,337 +738,4 @@
                         // Aumentamos a variação da chance para criar mais imprevisibilidade
                         const normalizedDistance = (distanceToRight - minDistance) / (maxDistance - minDistance);
                         
-                        // Usar uma função seno para criar variação mais natural na chance
-                        const chanceVariation = Math.sin(Date.now() / 1000) * 0.02; // Variação de ±0.02
-                        const baseChance = 0.005 + normalizedDistance * 0.025; // Chance base entre 0.005 e 0.03
-                        const chance = Math.max(0.005, Math.min(0.03, baseChance + chanceVariation));
-                        
-                        if (Math.random() < chance) {
-                            // Verificar se há espaço suficiente antes de criar o obstáculo
-                            if (obstacles.length === 0 || 
-                                (canvas.width / (window.devicePixelRatio || 1) - lastObstacle.x) > minLandingSpace) {
-                                createObstacle();
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Atualizar posição dos obstáculos
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].x -= gameSpeed;
-                
-                // Remover obstáculos fora da tela
-                if (obstacles[i].x + obstacles[i].width < 0) {
-                    obstacles.splice(i, 1);
-                }
-            }
-        }
-        
-        // Atualizar nuvens
-        function updateClouds() {
-            // Criar novas nuvens
-            if (clouds.length < 5 && Math.random() < 0.01) {
-                createCloud();
-            }
-            
-            // Atualizar posição das nuvens
-            for (let i = clouds.length - 1; i >= 0; i--) {
-                clouds[i].x -= clouds[i].speed;
-                
-                // Remover nuvens fora da tela
-                if (clouds[i].x + clouds[i].width < 0) {
-                    clouds.splice(i, 1);
-                }
-            }
-        }
-        
-        // Atualizar chão
-        function updateGround() {
-            groundPosition -= gameSpeed;
-            if (groundPosition <= -40) {
-                groundPosition = 0;
-            }
-        }
-        
-        // Atualizar posição do fundo
-        function updateBackground() {
-            backgroundPosition -= gameSpeed * 0.5; // Movimento mais lento para dar sensação de profundidade
-            if (backgroundPosition <= -canvas.width / (window.devicePixelRatio || 1)) {
-                backgroundPosition = 0;
-            }
-        }
-        
-        // Atualizar dificuldade
-        function updateDifficulty() {
-            // Verificar se é hora de subir de nível
-            if (score >= nextLevelScore) {
-                level++;
-                nextLevelScore += 500; // Próximo nível a cada 500 pontos
-                
-                // Aumentar velocidade apenas se ainda não atingimos a velocidade máxima
-                if (gameSpeed < maxGameSpeed) {
-                    gameSpeed += 0.2;
-                    
-                    // Garantir que não ultrapasse a velocidade máxima
-                    if (gameSpeed > maxGameSpeed) {
-                        gameSpeed = maxGameSpeed;
-                    }
-                }
-                
-                showMessage(`Nível ${level}!`, 2000);
-            }
-        }
-        
-        // Verificar colisões
-        function checkCollisions() {
-            for (let i = 0; i < obstacles.length; i++) {
-                const obstacle = obstacles[i];
-                
-                // Calcular as coordenadas do hitbox do jogador
-                const playerHitboxX = player.x + player.hitboxOffsetX;
-                const playerHitboxY = player.y + player.hitboxOffsetY;
-                const playerHitboxWidth = player.hitboxWidth;
-                const playerHitboxHeight = player.hitboxHeight;
-                
-                // Verificar colisão usando o hitbox menor
-                if (
-                    playerHitboxX < obstacle.x + obstacle.width &&
-                    playerHitboxX + playerHitboxWidth > obstacle.x &&
-                    playerHitboxY < obstacle.y + obstacle.height &&
-                    playerHitboxY + playerHitboxHeight > obstacle.y
-                ) {
-                    // Colisão detectada
-                    gameOver();
-                    return;
-                }
-            }
-        }
-        
-        // Fim de jogo
-        function gameOver() {
-            gameRunning = false;
-            cancelAnimationFrame(gameLoopId);
-            
-            // Verificar se é um novo recorde
-            let isHighScore = false;
-            if (score > highScore) {
-                highScore = score;
-                localStorage.setItem('zeoHighScore', highScore);
-                highScoreDisplay.textContent = highScore;
-                isHighScore = true;
-            }
-            
-            // Garantir que outras mensagens não interfiram
-            gameMessage.style.display = 'none';
-            
-            // Criar a mensagem de game over
-            const messageHTML = `
-                <div style="font-size: 28px; font-weight: bold; margin-bottom: 15px; color: #FFA500;">Pontuação</div>
-                <div style="font-size: 24px; margin-bottom: 20px;">${score} pontos</div>
-                ${isHighScore ? '<div style="font-size: 18px; color: #FFD700; margin-bottom: 15px; font-weight: bold;">NOVO RECORDE!</div>' : ''}
-                <button id="restartBtn" class="neo-pop-tilted-button" style="margin-top: 10px;"><span>Jogar Novamente</span></button>
-            `;
-            
-            // Definir o conteúdo e mostrar a mensagem
-            gameOverMessage.innerHTML = messageHTML;
-            gameOverMessage.style.display = 'block';
-            
-            // Adicionar evento ao botão
-            const restartBtn = document.getElementById('restartBtn');
-            if (restartBtn) {
-                // Remover eventos anteriores para evitar duplicação
-                restartBtn.removeEventListener('click', restartGame);
-                // Adicionar novo evento
-                restartBtn.addEventListener('click', restartGame);
-            } else {
-                console.error("Botão de reiniciar não encontrado");
-            }
-        }
-        
-        // Função para reiniciar o jogo
-        function restartGame() {
-            // Esconder a mensagem de game over
-            gameOverMessage.style.display = 'none';
-            
-            // Pequeno atraso para garantir que o botão seja renderizado corretamente
-            setTimeout(() => {
-                // Reinicializar o jogo
-                initGame();
-                gameRunning = true;
-                gameLoop();
-            }, 100);
-        }
-        
-        // Renderizar fundo do jogo
-        function renderBackground() {
-            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
-            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
-            
-            if (backgroundImage.loaded) {
-                // Desenhar a imagem de fundo duas vezes para criar um efeito de repetição infinita
-                ctx.drawImage(backgroundImage, backgroundPosition, 0, canvasWidth, canvasHeight);
-                ctx.drawImage(backgroundImage, backgroundPosition + canvasWidth, 0, canvasWidth, canvasHeight);
-            } else {
-                // Fallback: gradiente azul caso a imagem não carregue
-                const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
-                gradient.addColorStop(0, '#87CEEB');
-                gradient.addColorStop(1, '#1E90FF');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-            }
-        }
-        
-        // Renderizar chão (rua com faixas amarelas)
-        function renderGround() {
-            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
-            
-            // Desenhar asfalto
-            ctx.fillStyle = '#333333';
-            ctx.fillRect(0, canvasHeight - groundHeight, canvas.width / (window.devicePixelRatio || 1), groundHeight);
-            
-            // Desenhar faixas amarelas
-            ctx.fillStyle = '#FFD700';
-            const stripeWidth = 20;
-            const stripeHeight = 5;
-            
-            for (let i = groundPosition; i < canvas.width / (window.devicePixelRatio || 1); i += 40) {
-                ctx.fillRect(i, canvasHeight - groundHeight + 10, stripeWidth, stripeHeight);
-            }
-            
-            // Linhas de movimento no chão
-            ctx.strokeStyle = '#555555';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            
-            for (let i = groundPosition; i < canvas.width / (window.devicePixelRatio || 1); i += 20) {
-                ctx.moveTo(i, canvasHeight - groundHeight/2);
-                ctx.lineTo(i + 10, canvasHeight - groundHeight/2);
-            }
-            
-            ctx.stroke();
-        }
-        
-        // Renderizar nuvens
-        function renderClouds() {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            
-            clouds.forEach(cloud => {
-                // Desenhar nuvem com círculos
-                ctx.beginPath();
-                ctx.arc(cloud.x, cloud.y, cloud.height / 2, 0, Math.PI * 2);
-                ctx.arc(cloud.x + cloud.width * 0.25, cloud.y - cloud.height * 0.2, cloud.height * 0.6, 0, Math.PI * 2);
-                ctx.arc(cloud.x + cloud.width * 0.5, cloud.y, cloud.height * 0.7, 0, Math.PI * 2);
-                ctx.arc(cloud.x + cloud.width * 0.75, cloud.y - cloud.height * 0.1, cloud.height * 0.5, 0, Math.PI * 2);
-                ctx.arc(cloud.x + cloud.width, cloud.y, cloud.height / 2, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        }
-        
-        // Renderizar jogador
-        function renderPlayer() {
-            // Desenhar o personagem com melhor qualidade
-            ctx.save();
-            
-            // Configurar suavização de imagem
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            
-            // Adicionar um leve brilho ao redor do personagem
-            ctx.shadowColor = '#FFA500';
-            ctx.shadowBlur = 10;
-            
-            // Desenhar a imagem do personagem apenas se estiver carregada
-            if (player.loaded) {
-                ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
-                
-                // Opcional: Desenhar o hitbox para debug (remover em produção)
-                /*
-                ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(
-                    player.x + player.hitboxOffsetX, 
-                    player.y + player.hitboxOffsetY, 
-                    player.hitboxWidth, 
-                    player.hitboxHeight
-                );
-                */
-            } else {
-                // Desenhar um placeholder enquanto a imagem não carrega
-                ctx.fillStyle = '#FFA500';
-                ctx.fillRect(player.x, player.y, player.width, player.height);
-                ctx.fillStyle = 'white';
-                ctx.font = '16px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('Zéo', player.x + player.width/2, player.y + player.height/2);
-            }
-            
-            ctx.restore();
-        }
-        
-        // Renderizar obstáculos (pedras brilhantes) - tamanho variável entre 35px e 45px
-        function renderObstacles() {
-            obstacles.forEach(obstacle => {
-                ctx.save();
-                
-                // Mover o contexto para a posição da pedra
-                ctx.translate(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2);
-                
-                // Rotacionar a pedra
-                ctx.rotate(obstacle.rotation);
-                
-                // Adicionar brilho à pedra
-                ctx.shadowColor = '#FFD700';
-                ctx.shadowBlur = 15 * obstacle.glowIntensity;
-                
-                // Desenhar a pedra
-                ctx.fillStyle = '#C0C0C0'; // Cor prateada para a pedra
-                
-                // Desenhar uma forma irregular para parecer uma pedra
-                ctx.beginPath();
-                ctx.moveTo(-obstacle.width/2, -obstacle.height/3);
-                ctx.lineTo(-obstacle.width/3, -obstacle.height/2);
-                ctx.lineTo(obstacle.width/4, -obstacle.height/2.5);
-                ctx.lineTo(obstacle.width/2, -obstacle.height/4);
-                ctx.lineTo(obstacle.width/2.2, obstacle.height/6);
-                ctx.lineTo(obstacle.width/3, obstacle.height/2.5);
-                ctx.lineTo(0, obstacle.height/2);
-                ctx.lineTo(-obstacle.width/3, obstacle.height/3);
-                ctx.lineTo(-obstacle.width/2.2, obstacle.height/8);
-                ctx.closePath();
-                ctx.fill();
-                
-                // Adicionar textura à pedra
-                ctx.fillStyle = '#A9A9A9'; // Tom mais escuro para textura
-                ctx.beginPath();
-                ctx.arc(-obstacle.width/4, -obstacle.height/6, obstacle.width/8, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.arc(obstacle.width/5, obstacle.height/8, obstacle.width/10, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.arc(-obstacle.width/6, obstacle.height/5, obstacle.width/12, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Adicionar pontos de brilho
-                ctx.fillStyle = '#FFFFFF';
-                ctx.beginPath();
-                ctx.arc(-obstacle.width/5, -obstacle.height/4, obstacle.width/15, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.arc(obstacle.width/6, -obstacle.height/5, obstacle.width/18, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.arc(0, -obstacle.height/6, obstacle.width/20, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.restore();
-            });
-        }
-    </script>
-</body>
-</html>
+                        // Usar uma função seno para criar variação mais
