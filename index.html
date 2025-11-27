@@ -603,10 +603,10 @@
             velocityY: 0,
             jumpPower: 16,
             grounded: false,
-// ...
+        }; // FECHAMENTO DO OBJETO player
         
         // Carregar imagem do mascote com tratamento de erro
-        player.image = new Image();
+        player.image = new Image(); // CORRIGIDO: player.image era declarado antes
         player.loaded = false;
         player.image.onload = function() {
             player.loaded = true;
