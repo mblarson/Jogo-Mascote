@@ -148,25 +148,21 @@
             z-index: 50; 
             color: white;
             text-align: center;
-            padding: 0; /* Removido padding para que o subcontainer ocupe 100% da tela */
+            padding: 0; 
             overflow: hidden;
             
-            /* REMOVIDO: transform, box-shadow e shimmer daqui */
             box-shadow: none;
             transform: none;
         }
         
-        /* NOVO: Wrapper para aplicar o efeito Neo-Pop TILT na imagem e no conteúdo */
+        /* Wrapper para a imagem e o brilho - SEM INCLINAÇÃO */
         #introWrapper {
             width: 100%;
             height: 100%;
             position: relative;
             
-            /* APLICANDO OS ESTILOS NEO-POP (TILT e SHADOW) AQUI */
-            box-shadow: 1px 5px 7px #494a4b;
-            transform: perspective(180px) rotateX(30deg) translateY(2px);
-            transition: transform 0.3s ease;
-            overflow: hidden;
+            box-shadow: none; /* Sem sombra e sem inclinação */
+            transform: none;
             
             display: flex;
             flex-direction: column;
@@ -190,7 +186,7 @@
             z-index: 0;
         }
         
-        /* EFEITO DE BRILHO SHIMMER (copiado do .neo-pop-tilted-button) */
+        /* EFEITO DE BRILHO SHIMMER (Aplicado SOMENTE na imagem) */
         #introWrapper::after {
           content: "";
           position: absolute;
@@ -315,7 +311,7 @@
           font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
-          transform: perspective(180px) rotateX(30deg) translateY(2px);
+          transform: perspective(180px) rotateX(30deg) translateY(2px); /* A inclinação está aqui */
           transition: transform 0.3s ease, background-color 0.3s ease;
           margin-top: 10px;
         }
@@ -509,23 +505,17 @@
         <div id="gameMessage"></div>
         <div id="gameOverMessage"></div>
         
-        <!-- TELA DE INTRODUÇÃO (AGORA COM IMAGEM DE FUNDO E EFEITO NEO-POP) -->
-        <div id="introScreen">
+        <!-- TELA DE INTRODUÇÃO (AGORA COM IMAGEM DE FUNDO E APENAS BRILHO) --><div id="introScreen">
             
-            <!-- NOVO: Wrapper para aplicar o efeito neo-pop em toda a área visível -->
-            <div id="introWrapper">
-                <!-- Conteúdo da introdução (Botão e textos sobrepostos) -->
-                <div id="introContent">
-                    <!-- A margem inferior foi aumentada para evitar que o botão fique muito colado na borda (devido à inclinação) -->
-                    <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
+            <!-- Wrapper agora sem inclinação, apenas a imagem de fundo e o brilho shimmer --><div id="introWrapper">
+                <!-- Conteúdo da introdução (Botão e textos sobrepostos) --><div id="introContent">
+                    <!-- A margem inferior foi aumentada para evitar que o botão fique muito colado na borda (devido à inclinação) --><div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
                         
-                        <!-- Adicionado um título para o contexto (ZÉO AVENTURAS) -->
-                        <h1 style="color: white; text-shadow: 2px 2px 5px #000; font-size: 32px; margin-bottom: 10px; opacity: 1;">
+                        <!-- Adicionado um título para o contexto (ZÉO AVENTURAS) --><h1 style="color: white; text-shadow: 2px 2px 5px #000; font-size: 32px; margin-bottom: 10px; opacity: 1;">
                             AS AVENTURAS DE ZÉO
                         </h1>
                         
-                        <!-- Botão JOGUE AGORA -->
-                        <button id="introStartBtn" class="neo-pop-tilted-button">
+                        <!-- Botão JOGUE AGORA --><button id="introStartBtn" class="neo-pop-tilted-button">
                             <span>
                                 JOGUE<br>AGORA
                             </span>
@@ -534,13 +524,9 @@
                 </div>
             </div>
         </div>
-        <!-- FIM TELA DE INTRODUÇÃO -->
-
-
-        <div id="startScreen">
+        <!-- FIM TELA DE INTRODUÇÃO --><div id="startScreen">
             <!-- Adicionada verificação de erro para o logo inicial. 
-                 Se a imagem falhar, um SVG simples será exibido como placeholder. -->
-            <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
+                 Se a imagem falhar, um SVG simples será exibido como placeholder. --><img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>ZÉO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
             <h1>AS AVENTURAS DE ZÉO</h1>
             <p>Toque na tela para fazer o Zéo pular e desviar das pedras brilhantes!</p>
@@ -794,7 +780,7 @@
         
         // Lógica de inicialização principal
         document.addEventListener('DOMContentLoaded', () => {
-            // Evento do botão "JOGUE AGORA" da tela de introdução
+            // Evento do botão "JOGUE AGORA" (introStartBtn)
             if (introStartBtn) {
                 introStartBtn.addEventListener('click', () => {
                     introScreen.style.display = 'none';
@@ -802,8 +788,10 @@
                 });
             }
 
-            // Iniciar jogo (na tela startScreen)
-            startBtn.addEventListener('click', startCountdown);
+            // CORREÇÃO: Adicionando o listener para o botão "INICIAR JOGO" (startBtn)
+            if (startBtn) {
+                 startBtn.addEventListener('click', startCountdown);
+            }
             
             // Verifica se deve mostrar a tela de introdução
             if (window.innerWidth < 1024) {
