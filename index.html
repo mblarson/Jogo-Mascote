@@ -12,7 +12,6 @@
         }
         
         body {
-            /* Deixei o caminho da imagem no CSS, mas o erro do JS foi tratado no script */
             background-image: url('./backgournd.png');
             background-size: cover;
             background-position: center;
@@ -33,16 +32,14 @@
             max-width: 800px;
             height: 100vh;
             max-height: 500px;
-            background: rgba(135, 206, 235, 0.7); /* Fundo semi-transparente para o container */
+            background: rgba(135, 206, 235, 0.7);
             overflow: hidden;
-            border: 3px solid #FF0000; /* Vermelho */
+            border: 3px solid #FF0000;
             border-radius: 10px;
-            /* Adicionando efeito de brilho na borda com cor vermelha */
             box-shadow: 
                 0 0 20px rgba(255, 0, 0, 0.5),
                 0 0 40px rgba(255, 0, 0, 0.3),
                 inset 0 0 20px rgba(255, 0, 0, 0.2);
-            /* Animação de pulsação para a borda com cor vermelha */
             animation: pulseBorder 2s infinite alternate;
         }
         
@@ -65,7 +62,7 @@
             width: 100%;
             height: 100%;
             display: block;
-            background: transparent; /* Fundo transparente para mostrar o fundo do container */
+            background: transparent;
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
         }
@@ -93,6 +90,19 @@
         #gameInfo span {
             font-weight: bold;
             color: #FFD700;
+        }
+
+        #debugInfo {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: lime;
+            font-family: monospace;
+            font-size: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 5px;
+            z-index: 10;
         }
         
         #gameMessage {
@@ -124,13 +134,12 @@
             font-size: 24px;
             text-align: center;
             display: none;
-            z-index: 100; /* Z-index mais alto para garantir que fique sobre tudo */
+            z-index: 100;
             border: 3px solid rgba(255, 165, 0, 0.5);
             box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
             min-width: 300px;
         }
         
-        /* TELA DE INTRODUÇÃO - Container principal em tamanho total */
         #introScreen {
             position: fixed; 
             top: 0;
@@ -139,7 +148,6 @@
             bottom: 0;
             width: 100vw; 
             height: 100vh; 
-            
             background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
@@ -150,27 +158,22 @@
             text-align: center;
             padding: 0; 
             overflow: hidden;
-            
             box-shadow: none;
             transform: none;
         }
         
-        /* Wrapper para a imagem e o brilho - SEM INCLINAÇÃO */
         #introWrapper {
             width: 100%;
             height: 100%;
             position: relative;
-            
-            box-shadow: none; /* Sem sombra e sem inclinação */
+            box-shadow: none;
             transform: none;
-            
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
         
-        /* Fundo da tela de introdução (IMAGEM) */
         #introWrapper::before {
             content: "";
             position: absolute;
@@ -182,11 +185,10 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: 0.85; /* Opacidade para o conteúdo se destacar */
+            opacity: 0.85;
             z-index: 0;
         }
         
-        /* EFEITO DE BRILHO SHIMMER (Aplicado SOMENTE na imagem) */
         #introWrapper::after {
           content: "";
           position: absolute;
@@ -202,27 +204,21 @@
             rgba(255, 255, 255, 0.8) 2px
           );
           animation: shimmer 5.5s infinite linear;
-          z-index: 1; /* Acima da imagem de fundo */
+          z-index: 1;
         }
 
-        #introVideo { /* Removido */
-            display: none;
-        }
-
-        /* Ajuste do container para centralizar o botão na parte inferior */
         #introContent {
             position: relative;
-            z-index: 2; /* Acima da imagem e do efeito shimmer */
+            z-index: 2;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Conteúdo no fundo */
-            align-items: center; /* Centralizar o botão horizontalmente */
+            justify-content: flex-end;
+            align-items: center;
             width: 100%;
             height: 100%;
             padding: 20px;
         }
         
-        /* TELA START SCREEN (Antiga) */
         #startScreen {
             position: absolute;
             top: 0;
@@ -239,7 +235,6 @@
             text-align: center;
             padding: 20px;
             overflow-y: auto;
-            /* Inicia escondido no desktop se o introScreen não for exibido */
             display: none; 
         }
         
@@ -263,8 +258,8 @@
         #countdown {
             font-size: 80px;
             font-weight: bold;
-            color: #FF0000; /* Vermelho */
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); /* Vermelho */
+            color: #FF0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
             margin: 20px 0;
         }
         
@@ -276,7 +271,7 @@
         }
         
         #gameLogo {
-            width: 200px; /* Aumentado de 150px para 200px */
+            width: 200px;
             height: auto;
             margin-bottom: 15px;
             image-rendering: -webkit-optimize-contrast;
@@ -287,7 +282,7 @@
         #startScreen h1 {
             font-size: 28px;
             margin-bottom: 15px;
-            color: #FFA500; /* LARANJA */
+            color: #FFA500;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             line-height: 1.2;
         }
@@ -299,7 +294,6 @@
             line-height: 1.4;
         }
         
-        /* Estilo do botão neo-pop-tilted-button - Usado para os dois botões */
         .neo-pop-tilted-button {
           border: 0.1px;
           padding-bottom: 6px;
@@ -311,7 +305,7 @@
           font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
-          transform: perspective(180px) rotateX(30deg) translateY(2px); /* A inclinação está aqui */
+          transform: perspective(180px) rotateX(30deg) translateY(2px);
           transition: transform 0.3s ease, background-color 0.3s ease;
           margin-top: 10px;
         }
@@ -351,12 +345,8 @@
         }
 
         @keyframes shimmer {
-          0% {
-            transform: translateX(-1950%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
+          0% { transform: translateX(-1950%); }
+          100% { transform: translateX(100%); }
         }
 
         .neo-pop-tilted-button span {
@@ -369,127 +359,48 @@
           border: 1px solid #494a4b;
         }
 
-        .neo-pop-tilted-button:focus {
-          outline: none;
-        }
-
-        .neo-pop-tilted-button:focus-visible {
-          box-shadow: 0 0 0 3px rgba(255, 235, 52, 0.5);
-        }
-
-        .neo-pop-tilted-button:active {
-          transform: perspective(170px) rotateX(36deg) translateY(5px);
-        }
+        .neo-pop-tilted-button:focus { outline: none; }
+        .neo-pop-tilted-button:focus-visible { box-shadow: 0 0 0 3px rgba(255, 235, 52, 0.5); }
+        .neo-pop-tilted-button:active { transform: perspective(170px) rotateX(36deg) translateY(5px); }
         
-        /* NOVO: Estilo para alinhar o botão "JOGUE AGORA" à esquerda na introScreen */
         #introContent .neo-pop-tilted-button {
-            margin-left: 0; /* Garante alinhamento à esquerda */
-            /* Ajusta a largura máxima para o alinhamento */
+            margin-left: 0;
             max-width: 250px; 
-            align-self: flex-start; /* Alinha o botão à esquerda dentro do flex container */
+            align-self: flex-start;
         }
 
-        /* Media queries para responsividade */
         @media (max-width: 480px) {
-            #gameInfo {
-                font-size: 14px;
-            }
-            
-            #gameMessage {
-                font-size: 20px;
-                padding: 15px 25px;
-            }
-            
-            #gameOverMessage {
-                font-size: 20px;
-                padding: 20px 30px;
-            }
-            
-            #gameLogo {
-                width: 160px; /* Ajustado para telas menores */
-            }
-            
-            #startScreen h1 {
-                font-size: 24px;
-            }
-            
-            #startScreen p {
-                font-size: 14px;
-                margin-bottom: 15px;
-            }
-            
-            .neo-pop-tilted-button {
-                font-size: 0.9rem;
-            }
-            
-            .neo-pop-tilted-button span {
-                padding: 0.7rem 1.5rem;
-            }
-            
-            #countdown {
-                font-size: 60px;
-            }
-            
-            #countdownMessage {
-                font-size: 16px;
-            }
-
-            /* NOVO: Ajuste do botão Jogar Agora no Mobile para ser maior e responsivo */
+            #gameInfo { font-size: 14px; }
+            #gameMessage { font-size: 20px; padding: 15px 25px; }
+            #gameOverMessage { font-size: 20px; padding: 20px 30px; }
+            #gameLogo { width: 160px; }
+            #startScreen h1 { font-size: 24px; }
+            #startScreen p { font-size: 14px; margin-bottom: 15px; }
+            .neo-pop-tilted-button { font-size: 0.9rem; }
+            .neo-pop-tilted-button span { padding: 0.7rem 1.5rem; }
+            #countdown { font-size: 60px; }
+            #countdownMessage { font-size: 16px; }
             #introContent .neo-pop-tilted-button {
               font-size: 1.1rem;
               letter-spacing: 0.1rem;
-              padding: 0; /* Remove padding externo para ajuste fino */
+              padding: 0;
             }
-            
-            #introContent .neo-pop-tilted-button span {
-                padding: 0.8rem 2rem;
-            }
+            #introContent .neo-pop-tilted-button span { padding: 0.8rem 2rem; }
         }
         
         @media (max-height: 600px) {
-            #startScreen h1 {
-                font-size: 22px;
-                margin-bottom: 10px;
-            }
-            
-            #startScreen p {
-                font-size: 14px;
-                margin-bottom: 15px;
-                max-width: 95%;
-            }
-            
-            #gameLogo {
-                width: 140px; /* Ajustado para telas com altura menor */
-                margin-bottom: 10px;
-            }
-            
-            #countdown {
-                font-size: 50px;
-            }
-            
-            #countdownMessage {
-                font-size: 14px;
-            }
+            #startScreen h1 { font-size: 22px; margin-bottom: 10px; }
+            #startScreen p { font-size: 14px; margin-bottom: 15px; max-width: 95%; }
+            #gameLogo { width: 140px; margin-bottom: 10px; }
+            #countdown { font-size: 50px; }
+            #countdownMessage { font-size: 14px; }
         }
 
-        /* Esconde a tela de introdução por padrão no desktop */
         @media (min-width: 1024px) {
-            #introScreen {
-                /* No desktop, a introScreen não precisa da animação, apenas deve ser escondida */
-                display: none !important;
-                /* Resetando estilos de animação para o desktop */
-                box-shadow: none;
-                transform: none;
-            }
-            /* Garante que o fundo da introScreen não seja exibido no desktop */
-            #introWrapper::before, #introWrapper::after {
-                content: none;
-            }
-            #startScreen {
-                display: flex; /* Garante que a tela de início seja exibida no desktop por padrão */
-            }
+            #introScreen { display: none !important; box-shadow: none; transform: none; }
+            #introWrapper::before, #introWrapper::after { content: none; }
+            #startScreen { display: flex; }
         }
-
     </style>
 </head>
 <body>
@@ -502,17 +413,24 @@
             <div>Nível: <span id="level">1</span></div>
         </div>
         
+        <!-- Elemento de áudio para música de fundo (MP3) -->
+        <audio id="bgMusic" loop>
+            <source src="./musica.mp3" type="audio/mpeg">
+            Seu navegador não suporta áudio.
+        </audio>
+        
+        <div id="debugInfo"></div>
+        
         <div id="gameMessage"></div>
         <div id="gameOverMessage"></div>
         
-        <!-- TELA DE INTRODUÇÃO (AGORA COM IMAGEM DE FUNDO E APENAS BRILHO) --><div id="introScreen">
-            
-            <!-- Wrapper agora sem inclinação, apenas a imagem de fundo e o brilho shimmer --><div id="introWrapper">
-                <!-- Conteúdo da introdução (Botão e textos sobrepostos) --><div id="introContent">
-                    <!-- A margem inferior foi aumentada para evitar que o botão fique muito colado na borda (devido à inclinação) --><div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
-                        
-                        <!-- Adicionado um título para o contexto (ZÉO AVENTURAS) -->
-                        <!-- Botão JOGUE AGORA --><button id="introStartBtn" class="neo-pop-tilted-button">
+        <!-- TELA DE INTRODUÇÃO (Aparece apenas em Mobile < 1024px) -->
+        <div id="introScreen">
+            <div id="introWrapper">
+                <div id="introContent">
+                    <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
+                        <!-- O clique neste botão agora inicia a música -->
+                        <button id="introStartBtn" class="neo-pop-tilted-button">
                             <span>
                                 JOGUE<br>AGORA
                             </span>
@@ -521,9 +439,9 @@
                 </div>
             </div>
         </div>
-        <!-- FIM TELA DE INTRODUÇÃO --><div id="startScreen">
-            <!-- Adicionada verificação de erro para o logo inicial. 
-                 Se a imagem falhar, um SVG simples será exibido como placeholder. --><img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
+
+        <div id="startScreen">
+            <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>ZÉO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
             <h1>AS AVENTURAS DE ZÉO</h1>
             <p>Toque na tela para fazer o Zéo pular e desviar das pedras brilhantes!</p>
@@ -541,16 +459,35 @@
     </div>
 
     <script>
-        // Configuração do jogo
+        // --- CONSTANTES DE CONFIGURAÇÃO DE FÍSICA E JOGABILIDADE ---
+        const GRAVITY = 0.8;
+        const JUMP_POWER = 16;
+        const GROUND_HEIGHT = 50;
+        const REACTION_BUFFER_FRAMES = 15; 
+
+        // --- SISTEMA DE PROGRESSÃO ---
+        const LEVEL_CONFIG = {
+            1: { targetSpeed: 4.0, densityFactor: 1.0 },
+            2: { targetSpeed: 4.2, densityFactor: 1.0 },
+            3: { targetSpeed: 4.7, densityFactor: 1.0 },
+            4: { targetSpeed: 4.9, densityFactor: 1.0 },
+            5: { targetSpeed: 4.9, densityFactor: 1.1 },
+            6: { targetSpeed: 5.1, densityFactor: 1.2 },
+            7: { targetSpeed: 5.2, densityFactor: 1.3 },
+            8: { targetSpeed: 5.4, densityFactor: 1.4 },
+            9: { targetSpeed: 5.6, densityFactor: 1.5 },
+            10: { targetSpeed: 5.8, densityFactor: 1.6 }
+        };
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const gameContainer = document.getElementById('gameContainer');
+        const debugInfo = document.getElementById('debugInfo');
         
-        // Elementos da introdução (agora em posição fixa na tela)
+        // Elementos de Áudio e UI
+        const bgMusic = document.getElementById('bgMusic');
         const introScreen = document.getElementById('introScreen');
-        // const introVideo foi removido
         const introStartBtn = document.getElementById('introStartBtn');
-        
         const startScreen = document.getElementById('startScreen');
         const countdownScreen = document.getElementById('countdownScreen');
         const countdownElement = document.getElementById('countdown');
@@ -561,158 +498,223 @@
         const highScoreDisplay = document.getElementById('highScore');
         const levelDisplay = document.getElementById('level');
         
-        // Configurar tamanho do canvas com suporte para alta densidade de pixels
+        // --- SISTEMA DE ÁUDIO WEB AUDIO API ---
+        let audioCtx;
+        let isAudioInitialized = false;
+
+        function initAudio() {
+            // Inicializa Web Audio API (Efeitos sonoros)
+            if (!isAudioInitialized) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                isAudioInitialized = true;
+            }
+            
+            // Tenta tocar música de forma segura
+            playMusicSafe();
+        }
+
+        // --- FUNÇÃO SEGURA PARA TOCAR MÚSICA (CORREÇÃO DO ERRO) ---
+        function playMusicSafe() {
+            if (!bgMusic) return;
+            
+            // Ajusta volume
+            bgMusic.volume = 0.5;
+
+            // Se já estiver tocando, não faz nada
+            if (!bgMusic.paused) return;
+
+            // Tenta reproduzir e captura a promessa
+            var playPromise = bgMusic.play();
+
+            // Em navegadores modernos, play() retorna uma Promise
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Reprodução começou com sucesso
+                })
+                .catch(error => {
+                    // Reprodução falhou ou foi interrompida
+                    // Se for um erro de interrupção (pause logo após play), ignoramos silenciosamente
+                    if (error.name === 'AbortError' || error.message.includes('interrupted')) {
+                       // Silencioso - interrupção normal (ex: game over imediato)
+                    } else {
+                       console.log("Aguardando interação do usuário para áudio.");
+                    }
+                });
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'jump') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.1);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } 
+            else if (type === 'levelup') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.setValueAtTime(800, now + 0.1);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+            else if (type === 'gameover') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.5);
+                gainNode.gain.setValueAtTime(0.5, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+        }
+
+        // --- GERENCIAMENTO DE TELA E CANVAS ---
         function resizeCanvas() {
             const containerWidth = gameContainer.clientWidth;
             const containerHeight = gameContainer.clientHeight;
-            
-            // Obter a densidade de pixels do dispositivo
             const dpr = window.devicePixelRatio || 1;
             
-            // Definir o tamanho do canvas considerando a densidade de pixels
             canvas.width = containerWidth * dpr;
             canvas.height = containerHeight * dpr;
             
-            // Escalar o contexto para corresponder à densidade de pixels
             ctx.scale(dpr, dpr);
             
-            // Definir o tamanho de exibição do canvas
             canvas.style.width = containerWidth + 'px';
             canvas.style.height = containerHeight + 'px';
             
-            // Habilitar suavização de imagem
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
         }
         
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
-        
-        // NOVO: Mapa de velocidades máximas por nível, com os ajustes solicitados.
-        // A velocidade do jogo (gameSpeed) não deve ultrapassar estes valores ao atingir cada nível.
-        const levelSpeedLimits = {
-            1: 4.0, // Velocidade inicial
-            2: 4.2, 
-            3: 4.4, 
-            4: 4.7, // Nível 4: 4.7
-            5: 4.8, // Nível 5: 4.8
-            6: 4.9, // Nível 6: 4.9
-            7: 5.0, // Nível 7: 5.0
-            8: 5.2, // Nível 8: 5.2 (Novo valor)
-            9: 5.4, // Nível 9: 5.4 (Novo valor)
-            10: 5.5, // Nível 10: 5.5 (Novo valor)
-            // Níveis acima de 10 manterão a velocidade máxima de 5.5
-        };
 
-        // Variáveis do jogo
+        // --- VARIÁVEIS DE ESTADO ---
         let gameRunning = false;
-        let gameStarted = false;
         let score = 0;
         let highScore = localStorage.getItem('zeoHighScore') || 0;
-        let gameSpeed = levelSpeedLimits[1]; // Velocidade inicial definida pelo mapa
-        let gravity = 0.8;
+        
+        let currentLevel = 1;
+        let gameSpeed = 4.0; 
+        let nextLevelScore = 500;
+        let deathCount = 0;
+        
+        let currentDensityFactor = 1.0;
+        
         let gameLoopId;
-        let level = 1;
-        let nextLevelScore = 500; // Pontuação para subir de nível
         
-        // A constante maxGameSpeed foi removida e substituída por levelSpeedLimits.
-        
-        // Altura do chão
-        const groundHeight = 50;
-        
-        // Atualizar recorde na tela
         highScoreDisplay.textContent = highScore;
         
-        // Personagem principal - ajustado para ficar mais gordinho
-     // Personagem principal - ajustado para ficar mais gordinho
         const player = {
             x: 20,
             y: 0,
-            width: 70,  // Largura visual do personagem
-            height: 80, // Altura visual do personagem
-            // Hitbox menor que o sprite para dar margem de erro
-            hitboxWidth: 30,  // [AJUSTE SUGERIDO: 30] Redução drástica
-            hitboxHeight: 40, // [AJUSTE SUGERIDO: 40] Redução drástica
-            hitboxOffsetX: 20, // (70 - 30) / 2 = 20px de cada lado
-            hitboxOffsetY: 30, // (80 - 40) / 2 = 20px (Topo/Base). Subindo para 30px para focar mais na base do personagem, longe da cabeça.
+            width: 70,
+            height: 80,
+            hitboxWidth: 30,
+            hitboxHeight: 40,
+            hitboxOffsetX: 20,
+            hitboxOffsetY: 30,
             velocityY: 0,
-            jumpPower: 16,
+            jumpPower: JUMP_POWER,
             grounded: false,
-        }; // FECHAMENTO DO OBJETO player
-        
-        // Carregar imagem do mascote com tratamento de erro
-        player.image = new Image(); // CORRIGIDO: player.image era declarado antes
-        player.loaded = false;
-        player.image.onload = function() {
-            player.loaded = true;
-            console.log("Imagem do personagem carregada com sucesso");
+            image: new Image(),
+            loaded: false
         };
         
-        player.image.onerror = function() {
-            // Em caso de erro, define loaded como false para forçar o desenho do placeholder
-            player.loaded = false; 
-            console.error("Erro ao carregar a imagem do personagem");
-        };
-        
+        player.image.onload = () => { player.loaded = true; };
+        player.image.onerror = () => { player.loaded = false; };
         player.image.src = "./mascote.png";
         
-        // Imagem de fundo do jogo
         const backgroundImage = new Image();
         backgroundImage.loaded = false;
-        backgroundImage.onload = function() {
-            backgroundImage.loaded = true;
-            console.log("Imagem de fundo do jogo carregada com sucesso");
-        };
-        
-        backgroundImage.onerror = function() {
-            // Em caso de erro, define loaded como false para forçar o desenho do fallback no canvas
-            backgroundImage.loaded = false; 
-            console.error("Erro ao carregar a imagem de fundo do jogo");
-        };
-        
-        // Usando imagem local
+        backgroundImage.onload = () => { backgroundImage.loaded = true; };
+        backgroundImage.onerror = () => { backgroundImage.loaded = false; };
         backgroundImage.src = "./cenario.png";
         
-        // Posição do fundo para efeito de movimento
         let backgroundPosition = 0;
-        
-        // Objetos do jogo
         let obstacles = [];
         let clouds = [];
         let groundPosition = 0;
         
-        // Controle de tempo para o primeiro obstáculo
         let gameStartTime = 0;
         let firstObstacleCreated = false;
         
-        // Configuração inicial do jogo
+        // --- LÓGICA CORE ---
+        function calculateSafeGap() {
+            const jumpDurationFrames = (2 * player.jumpPower) / GRAVITY;
+            const jumpDistance = jumpDurationFrames * gameSpeed;
+            const safetyMargin = (REACTION_BUFFER_FRAMES * gameSpeed) + player.width;
+            return jumpDistance + safetyMargin;
+        }
+
+        function calculateDifficultyParams() {
+            const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[10];
+            
+            if (gameSpeed < config.targetSpeed) {
+                gameSpeed += 0.005; 
+            } else {
+                gameSpeed = config.targetSpeed; 
+            }
+
+            let density = config.densityFactor;
+
+            if (deathCount > 3) {
+                density *= 0.8;
+                if (Math.random() < 0.001) deathCount = 0; 
+            }
+
+            currentDensityFactor = density;
+            
+            if(debugInfo) {
+                debugInfo.innerHTML = `Lvl: ${currentLevel} | Spd: ${gameSpeed.toFixed(2)} | Dens: ${currentDensityFactor.toFixed(2)} | SafeGap: ${Math.round(calculateSafeGap())}px`;
+            }
+        }
+
         function initGame() {
             score = 0;
-            gameSpeed = levelSpeedLimits[1]; // Velocidade inicial definida pelo mapa
-            level = 1;
+            currentLevel = 1;
             nextLevelScore = 500;
-            // Posicionar o jogador no chão
-            player.y = canvas.height / (window.devicePixelRatio || 1) - groundHeight - player.height;
+            
+            gameSpeed = LEVEL_CONFIG[1].targetSpeed;
+            currentDensityFactor = LEVEL_CONFIG[1].densityFactor;
+            
+            player.y = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
             player.velocityY = 0;
             player.grounded = true;
+            
             obstacles = [];
             clouds = [];
             groundPosition = 0;
             backgroundPosition = 0;
             
-            // Resetar controle de tempo
             gameStartTime = Date.now();
             firstObstacleCreated = false;
             
             updateUI();
             
-            // Criar nuvens iniciais
             for (let i = 0; i < 5; i++) {
                 createCloud();
             }
+
+            playMusicSafe(); // Usa a função segura ao reiniciar o jogo
         }
         
-        // Criar nuvens
         function createCloud() {
             clouds.push({
                 x: canvas.width / (window.devicePixelRatio || 1) + Math.random() * 200,
@@ -723,96 +725,75 @@
             });
         }
         
-        // Criar obstáculos (pedras brilhantes) - tamanho variável entre 35px e 45px
         function createObstacle() {
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
-            const obstacleSize = 35 + Math.random() * 10; // Tamanho variável entre 35px e 45px
+            const obstacleSize = 35 + Math.random() * 10;
             
-            // Se for o primeiro obstáculo, garantir que não fique muito próximo do jogador
             let xPosition = canvas.width / (window.devicePixelRatio || 1);
+            
             if (obstacles.length === 0 && firstObstacleCreated) {
-                // Garantir que o primeiro obstáculo fique a pelo menos 300px de distância do jogador
-                xPosition = Math.max(canvas.width / (window.devicePixelRatio || 1), player.x + 300);
+                xPosition = Math.max(xPosition, player.x + 400);
             }
             
-            // Pedras no chão - apenas um tipo agora
             obstacles.push({
                 x: xPosition,
-                y: canvasHeight - groundHeight - obstacleSize, // Posicionar no chão
+                y: canvasHeight - GROUND_HEIGHT - obstacleSize,
                 width: obstacleSize,
                 height: obstacleSize,
-                type: 'ground',
-                rotation: Math.random() * Math.PI * 2, // Rotação aleatória
-                glowIntensity: 0.5 + Math.random() * 0.5 // Intensidade do brilho
+                rotation: Math.random() * Math.PI * 2,
+                glowIntensity: 0.5 + Math.random() * 0.5
             });
         }
         
-        // Atualizar UI
         function updateUI() {
             scoreDisplay.textContent = score;
-            levelDisplay.textContent = level;
+            levelDisplay.textContent = currentLevel;
         }
         
-        // Mostrar mensagem
         function showMessage(text, duration = 3000) {
             gameMessage.textContent = text;
             gameMessage.style.display = 'block';
-            
-            setTimeout(() => {
-                gameMessage.style.display = 'none';
-            }, duration);
+            setTimeout(() => { gameMessage.style.display = 'none'; }, duration);
         }
         
-        // Controles do jogo
         function jump() {
             if (player.grounded && gameRunning) {
                 player.velocityY = -player.jumpPower;
                 player.grounded = false;
+                playSound('jump');
             }
         }
         
-        // Eventos de toque
-        canvas.addEventListener('touchstart', jump);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, {passive: false});
         canvas.addEventListener('mousedown', jump);
         
-        // Lógica de inicialização principal
         document.addEventListener('DOMContentLoaded', () => {
-            // Evento do botão "JOGUE AGORA" (introStartBtn)
+            // Lógica para TELA DE INTRODUÇÃO (Mobile)
             if (introStartBtn) {
                 introStartBtn.addEventListener('click', () => {
+                    initAudio(); // INICIA A MÚSICA AQUI
                     introScreen.style.display = 'none';
                     startScreen.style.display = 'flex';
                 });
             }
 
-            // CORREÇÃO: Adicionando o listener para o botão "INICIAR JOGO" (startBtn)
+            // Lógica para TELA DE INÍCIO PADRÃO (Desktop ou após Mobile)
             if (startBtn) {
-                 startBtn.addEventListener('click', startCountdown);
+                 startBtn.addEventListener('click', () => {
+                    initAudio(); // Garante inicialização caso venha direto
+                    startCountdown();
+                 });
             }
             
-            // Verifica se deve mostrar a tela de introdução
             if (window.innerWidth < 1024) {
-                checkAndShowIntro();
+                introScreen.style.display = 'flex';
+                startScreen.style.display = 'none';
             } else {
-                // Se for desktop, pula a introdução e mostra a tela inicial padrão
                 introScreen.style.display = 'none';
                 startScreen.style.display = 'flex';
             }
         });
         
-        // Função para verificar se exibe a tela de introdução
-        function checkAndShowIntro() {
-            // Dispositivos Mobile/Tablet (largura menor que 1024px)
-            if (window.innerWidth < 1024) {
-                introScreen.style.display = 'flex';
-                startScreen.style.display = 'none';
-            } else {
-                // Desktop: Pula introdução e vai direto para a tela inicial
-                introScreen.style.display = 'none';
-                startScreen.style.display = 'flex';
-            }
-        }
-
         function startCountdown() {
             startScreen.style.display = 'none';
             countdownScreen.style.display = 'flex';
@@ -835,53 +816,41 @@
         function startGame() {
             initGame();
             gameRunning = true;
-            gameStarted = true;
             gameLoop();
         }
         
-        // Função principal do jogo
         function gameLoop() {
             if (!gameRunning) return;
             
-            // Limpar canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Atualizar elementos do jogo
+            calculateDifficultyParams();
             updatePlayer();
-            updateObstacles();
+            updateObstacles(); 
             updateClouds();
             updateGround();
             updateBackground();
-            updateDifficulty();
+            checkLevelProgression();
             
-            // Verificar colisões
             checkCollisions();
             
-            // Renderizar elementos
             renderBackground();
             renderClouds();
             renderGround();
             renderPlayer();
             renderObstacles();
             
-            // Aumentar pontuação
             score++;
             updateUI();
             
-            // Continuar loop
             gameLoopId = requestAnimationFrame(gameLoop);
         }
         
-        // Atualizar jogador
         function updatePlayer() {
-            // Aplicar gravidade
-            player.velocityY += gravity;
-            
-            // Atualizar posição
+            player.velocityY += GRAVITY;
             player.y += player.velocityY;
             
-            // Verificar se está no chão
-            const groundY = canvas.height / (window.devicePixelRatio || 1) - groundHeight - player.height;
+            const groundY = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
             if (player.y > groundY) {
                 player.y = groundY;
                 player.velocityY = 0;
@@ -889,168 +858,104 @@
             }
         }
         
-        // Atualizar obstáculos
         function updateObstacles() {
-            // Verificar se já se passaram 3 segundos desde o início do jogo
-            const elapsedTime = (Date.now() - gameStartTime) / 1000; // em segundos
+            const elapsedTime = (Date.now() - gameStartTime) / 1000;
             
-            // Criar o primeiro obstáculo após 3 segundos
             if (!firstObstacleCreated && elapsedTime >= 3) {
                 createObstacle();
                 firstObstacleCreated = true;
             }
             
-            // Criar novos obstáculos
             if (firstObstacleCreated) {
-                // Se não há obstáculos
+                const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+                
                 if (obstacles.length === 0) {
                     createObstacle();
                 } else {
-                    // Obter o último obstáculo
                     const lastObstacle = obstacles[obstacles.length - 1];
+                    const distanceToRight = canvasWidth - lastObstacle.x;
+                    const minSafeGap = calculateSafeGap();
                     
-                    // Calcular a distância do último obstáculo até a borda direita
-                    const distanceToRight = canvas.width / (window.devicePixelRatio || 1) - lastObstacle.x;
+                    let maxGap = Math.max(minSafeGap + 50, 600 / currentDensityFactor);
                     
-                    // Calcular o espaço mínimo necessário para o jogador pousar e pular novamente
-                    // Considerando a largura do jogador e a distância mínima de pouso
-                    const minLandingSpace = player.width * 3;
-                    
-                    // Definir distâncias mínima e máxima entre obstáculos com mais variação
-                    // Aumentamos a diferença entre min e max para criar mais variação
-                    let minDistance = 250;
-                    let maxDistance = 600; // Aumentado de 550 para 600
-                    
-                    // Ajustar as distâncias conforme o nível (tornando o jogo mais difícil)
-                    // Reduzimos a taxa de diminuição para manter mais variação
-                    minDistance = Math.max(200, minDistance - (level - 1) * 3); // Reduzido de 5 para 3
-                    maxDistance = Math.max(350, maxDistance - (level - 1) * 8); // Reduzido de 10 para 8
-                    
-                    // Se a distância do último obstáculo até a borda direita for maior que a distância mínima
-                    if (distanceToRight > minDistance) {
-                        // Calcular a chance de criar um novo obstáculo
-                        // Aumentamos a variação da chance para criar mais imprevisibilidade
-                        const normalizedDistance = (distanceToRight - minDistance) / (maxDistance - minDistance);
-                        
-                        // Usar uma função seno para criar variação mais natural na chance
-                        const chanceVariation = Math.sin(Date.now() / 1000) * 0.02; // Variação de ±0.02
-                        const baseChance = 0.005 + normalizedDistance * 0.025; // Chance base entre 0.005 e 0.03
-                        const chance = Math.max(0.005, Math.min(0.03, baseChance + chanceVariation));
-                        
+                    if (distanceToRight > minSafeGap) {
+                        const gapProgress = (distanceToRight - minSafeGap) / (maxGap - minSafeGap);
+                        let chance = 0.02 + (gapProgress * 0.1); 
+                        if (distanceToRight > maxGap) chance = 1.0;
+
                         if (Math.random() < chance) {
-                            // Verificar se há espaço suficiente antes de criar o obstáculo
-                            if (obstacles.length === 0 || 
-                                (canvas.width / (window.devicePixelRatio || 1) - lastObstacle.x) > minLandingSpace) {
-                                createObstacle();
-                            }
+                            createObstacle();
                         }
                     }
                 }
             }
             
-            // Atualizar posição dos obstáculos
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 obstacles[i].x -= gameSpeed;
-                
-                // Remover obstáculos fora da tela
                 if (obstacles[i].x + obstacles[i].width < 0) {
                     obstacles.splice(i, 1);
                 }
             }
         }
         
-        // Atualizar nuvens
         function updateClouds() {
-            // Criar novas nuvens
-            if (clouds.length < 5 && Math.random() < 0.01) {
-                createCloud();
-            }
-            
-            // Atualizar posição das nuvens
+            if (clouds.length < 5 && Math.random() < 0.01) createCloud();
             for (let i = clouds.length - 1; i >= 0; i--) {
                 clouds[i].x -= clouds[i].speed;
-                
-                // Remover nuvens fora da tela
-                if (clouds[i].x + clouds[i].width < 0) {
-                    clouds.splice(i, 1);
-                }
+                if (clouds[i].x + clouds[i].width < 0) clouds.splice(i, 1);
             }
         }
         
-        // Atualizar chão
         function updateGround() {
             groundPosition -= gameSpeed;
-            if (groundPosition <= -40) {
-                groundPosition = 0;
-            }
+            if (groundPosition <= -40) groundPosition = 0;
         }
         
-        // Atualizar posição do fundo
         function updateBackground() {
-            backgroundPosition -= gameSpeed * 0.5; // Movimento mais lento para dar sensação de profundidade
-            // A renderização real usa backgroundImage.loaded, se for false, o fallback será usado
-            if (backgroundPosition <= -canvas.width / (window.devicePixelRatio || 1)) {
-                backgroundPosition = 0;
-            }
+            backgroundPosition -= gameSpeed * 0.5;
+            const width = canvas.width / (window.devicePixelRatio || 1);
+            if (backgroundPosition <= -width) backgroundPosition = 0;
         }
         
-        // Atualizar dificuldade - Lógica ajustada para usar o mapa de limites de velocidade
-        function updateDifficulty() {
-            // Verificar se é hora de subir de nível
+        function checkLevelProgression() {
             if (score >= nextLevelScore) {
-                level++;
-                nextLevelScore += 500; // Próximo nível a cada 500 pontos
-                
-                // Encontrar a velocidade máxima permitida para o NOVO nível.
-                // Usa o limite do nível, ou o limite máximo mapeado se o nível for muito alto.
-                const maxLevel = Math.max(...Object.keys(levelSpeedLimits).map(Number));
-                const currentLevelMaxSpeed = levelSpeedLimits[level] || levelSpeedLimits[maxLevel];
-                
-                // Aumentar a velocidade em 0.2, mas garantir que não ultrapasse o limite máximo do nível atual
-                if (gameSpeed < currentLevelMaxSpeed) {
-                    gameSpeed += 0.2;
-                    
-                    // Garantir que não ultrapasse o limite do nível
-                    if (gameSpeed > currentLevelMaxSpeed) {
-                        gameSpeed = currentLevelMaxSpeed;
-                    }
-                }
-                
-                showMessage(`Nível ${level}!`, 2000);
+                currentLevel++;
+                nextLevelScore += 500;
+                showMessage(`NÍVEL ${currentLevel}!`, 2000);
+                playSound('levelup');
             }
         }
         
-        // Verificar colisões
         function checkCollisions() {
             for (let i = 0; i < obstacles.length; i++) {
                 const obstacle = obstacles[i];
-                
-                // Calcular as coordenadas do hitbox do jogador
                 const playerHitboxX = player.x + player.hitboxOffsetX;
                 const playerHitboxY = player.y + player.hitboxOffsetY;
-                const playerHitboxWidth = player.hitboxWidth;
-                const playerHitboxHeight = player.hitboxHeight;
                 
-                // Verificar colisão usando o hitbox menor
                 if (
                     playerHitboxX < obstacle.x + obstacle.width &&
-                    playerHitboxX + playerHitboxWidth > obstacle.x &&
+                    playerHitboxX + player.hitboxWidth > obstacle.x &&
                     playerHitboxY < obstacle.y + obstacle.height &&
-                    playerHitboxY + playerHitboxHeight > obstacle.y
+                    playerHitboxY + player.hitboxHeight > obstacle.y
                 ) {
-                    // Colisão detectada
                     gameOver();
                     return;
                 }
             }
         }
         
-        // Fim de jogo
         function gameOver() {
             gameRunning = false;
             cancelAnimationFrame(gameLoopId);
+            deathCount++; 
             
-            // Verificar se é um novo recorde
+            playSound('gameover');
+            
+            // Pausa a música somente se estiver tocando para evitar erro de interrupção
+            if (bgMusic && !bgMusic.paused) {
+                 bgMusic.pause();
+            }
+            
             let isHighScore = false;
             if (score > highScore) {
                 highScore = score;
@@ -1059,103 +964,79 @@
                 isHighScore = true;
             }
             
-            // Garantir que outras mensagens não interfiram
             gameMessage.style.display = 'none';
             
-            // Criar a mensagem de game over
+            // MENSAGEM DE GAME OVER ATUALIZADA
             const messageHTML = `
                 <div style="font-size: 28px; font-weight: bold; margin-bottom: 15px; color: #FFA500;">Pontuação</div>
                 <div style="font-size: 24px; margin-bottom: 20px;">${score} pontos</div>
-                ${isHighScore ? '<div style="font-size: 18px; color: #FFD700; margin-bottom: 15px; font-weight: bold;">NOVO RECORDE!</div>' : ''}
+                
+                <div style="font-size: 16px; color: #FFD700; margin-bottom: 15px; font-weight: bold; text-transform: uppercase;">
+                    COMPARTILHE NO INSTAGRAM E NOS MARQUE @UMADEMATS
+                </div>
+                
                 <button id="restartBtn" class="neo-pop-tilted-button" style="margin-top: 10px;"><span>Jogar Novamente</span></button>
             `;
             
-            // Definir o conteúdo e mostrar a mensagem
             gameOverMessage.innerHTML = messageHTML;
             gameOverMessage.style.display = 'block';
             
-            // Adicionar evento ao botão
             const restartBtn = document.getElementById('restartBtn');
             if (restartBtn) {
-                // Remover eventos anteriores para evitar duplicação
-                restartBtn.removeEventListener('click', restartGame);
-                // Adicionar novo evento
                 restartBtn.addEventListener('click', restartGame);
-            } else {
-                console.error("Botão de reiniciar não encontrado");
             }
         }
         
-        // Função para reiniciar o jogo
         function restartGame() {
-            // Esconder a mensagem de game over
             gameOverMessage.style.display = 'none';
-            
-            // Pequeno atraso para garantir que o botão seja renderizado corretamente
             setTimeout(() => {
-                // Reinicializar o jogo
                 initGame();
                 gameRunning = true;
                 gameLoop();
             }, 100);
         }
         
-        // Renderizar fundo do jogo
         function renderBackground() {
-            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
-            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            const width = canvas.width / (window.devicePixelRatio || 1);
+            const height = canvas.height / (window.devicePixelRatio || 1);
             
-            // Verifica se a imagem carregou
             if (backgroundImage.loaded) {
-                // Desenhar a imagem de fundo duas vezes para criar um efeito de repetição infinita
-                ctx.drawImage(backgroundImage, backgroundPosition, 0, canvasWidth, canvasHeight);
-                ctx.drawImage(backgroundImage, backgroundPosition + canvasWidth, 0, canvasWidth, canvasHeight);
+                ctx.drawImage(backgroundImage, backgroundPosition, 0, width, height);
+                ctx.drawImage(backgroundImage, backgroundPosition + width, 0, width, height);
             } else {
-                // Fallback: gradiente azul caso a imagem não carregue
-                const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
-                gradient.addColorStop(0, '#87CEEB'); // Azul claro
-                gradient.addColorStop(1, '#1E90FF'); // Azul escuro
+                const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                gradient.addColorStop(0, '#87CEEB');
+                gradient.addColorStop(1, '#1E90FF');
                 ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                ctx.fillRect(0, 0, width, height);
             }
         }
         
-        // Renderizar chão (rua com faixas amarelas)
         function renderGround() {
-            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            const height = canvas.height / (window.devicePixelRatio || 1);
+            const width = canvas.width / (window.devicePixelRatio || 1);
             
-            // Desenhar asfalto
             ctx.fillStyle = '#333333';
-            ctx.fillRect(0, canvasHeight - groundHeight, canvas.width / (window.devicePixelRatio || 1), groundHeight);
+            ctx.fillRect(0, height - GROUND_HEIGHT, width, GROUND_HEIGHT);
             
-            // Desenhar faixas amarelas
             ctx.fillStyle = '#FFD700';
-            const stripeWidth = 20;
-            const stripeHeight = 5;
-            
-            for (let i = groundPosition; i < canvas.width / (window.devicePixelRatio || 1); i += 40) {
-                ctx.fillRect(i, canvasHeight - groundHeight + 10, stripeWidth, stripeHeight);
+            for (let i = groundPosition; i < width; i += 40) {
+                ctx.fillRect(i, height - GROUND_HEIGHT + 10, 20, 5);
             }
             
-            // Linhas de movimento no chão
             ctx.strokeStyle = '#555555';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            
-            for (let i = groundPosition; i < canvas.width / (window.devicePixelRatio || 1); i += 20) {
-                ctx.moveTo(i, canvasHeight - groundHeight/2);
-                ctx.lineTo(i + 10, canvasHeight - groundHeight/2);
+            for (let i = groundPosition; i < width; i += 20) {
+                ctx.moveTo(i, height - GROUND_HEIGHT/2);
+                ctx.lineTo(i + 10, height - GROUND_HEIGHT/2);
             }
-            
             ctx.stroke();
         }
         
-        // Renderizar nuvens
         function renderClouds() {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            
             clouds.forEach(cloud => {
-                // Desenhar nuvem com círculos
                 ctx.beginPath();
                 ctx.arc(cloud.x, cloud.y, cloud.height / 2, 0, Math.PI * 2);
                 ctx.arc(cloud.x + cloud.width * 0.25, cloud.y - cloud.height * 0.2, cloud.height * 0.6, 0, Math.PI * 2);
@@ -1166,67 +1047,35 @@
             });
         }
         
-        // Renderizar jogador
         function renderPlayer() {
-            // Desenhar o personagem com melhor qualidade
             ctx.save();
-            
-            // Configurar suavização de imagem
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
-            
-            // Adicionar um leve brilho ao redor do personagem
             ctx.shadowColor = '#FFA500';
             ctx.shadowBlur = 10;
             
-            // Desenhar a imagem do personagem apenas se estiver carregada (loaded = true)
             if (player.loaded) {
                 ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
-                
-                // Opcional: Desenhar o hitbox para debug (remover em produção)
-                /*
-                ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(
-                    player.x + player.hitboxOffsetX, 
-                    player.y + player.hitboxOffsetY, 
-                    player.hitboxWidth, 
-                    player.hitboxHeight
-                );
-                */
             } else {
-                // Desenhar um placeholder/retângulo de cor sólida enquanto a imagem não carrega
-                ctx.fillStyle = '#FFA500'; // Cor laranja
+                ctx.fillStyle = '#FFA500';
                 ctx.fillRect(player.x, player.y, player.width, player.height);
                 ctx.fillStyle = 'white';
                 ctx.font = '16px Arial';
                 ctx.textAlign = 'center';
-                // Desenha "Zéo" no centro do placeholder
                 ctx.fillText('Zéo', player.x + player.width/2, player.y + player.height/2 + 5); 
             }
-            
             ctx.restore();
         }
         
-        // Renderizar obstáculos (pedras brilhantes) - tamanho variável entre 35px e 45px
         function renderObstacles() {
             obstacles.forEach(obstacle => {
                 ctx.save();
-                
-                // Mover o contexto para a posição da pedra
                 ctx.translate(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2);
-                
-                // Rotacionar a pedra
                 ctx.rotate(obstacle.rotation);
-                
-                // Adicionar brilho à pedra
                 ctx.shadowColor = '#FFD700';
                 ctx.shadowBlur = 15 * obstacle.glowIntensity;
                 
-                // Desenhar a pedra
-                ctx.fillStyle = '#C0C0C0'; // Cor prateada para a pedra
-                
-                // Desenhar uma forma irregular para parecer uma pedra
+                ctx.fillStyle = '#C0C0C0';
                 ctx.beginPath();
                 ctx.moveTo(-obstacle.width/2, -obstacle.height/3);
                 ctx.lineTo(-obstacle.width/3, -obstacle.height/2);
@@ -1240,33 +1089,15 @@
                 ctx.closePath();
                 ctx.fill();
                 
-                // Adicionar textura à pedra
-                ctx.fillStyle = '#A9A9A9'; // Tom mais escuro para textura
-                ctx.beginPath();
-                ctx.arc(-obstacle.width/4, -obstacle.height/6, obstacle.width/8, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillStyle = '#A9A9A9';
+                ctx.beginPath(); ctx.arc(-obstacle.width/4, -obstacle.height/6, obstacle.width/8, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(obstacle.width/5, obstacle.height/8, obstacle.width/10, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(-obstacle.width/6, obstacle.height/5, obstacle.width/12, 0, Math.PI * 2); ctx.fill();
                 
-                ctx.beginPath();
-                ctx.arc(obstacle.width/5, obstacle.height/8, obstacle.width/10, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.arc(-obstacle.width/6, obstacle.height/5, obstacle.width/12, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Adicionar pontos de brilho
                 ctx.fillStyle = '#FFFFFF';
-                ctx.beginPath();
-                ctx.arc(-obstacle.width/5, -obstacle.height/4, obstacle.width/15, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.arc(obstacle.width/6, -obstacle.height/5, obstacle.width/18, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.arc(0, -obstacle.height/6, obstacle.width/20, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(-obstacle.width/5, -obstacle.height/4, obstacle.width/15, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(obstacle.width/6, -obstacle.height/5, obstacle.width/18, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(0, -obstacle.height/6, obstacle.width/20, 0, Math.PI * 2); ctx.fill();
                 
                 ctx.restore();
             });
