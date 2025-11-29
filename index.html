@@ -897,7 +897,7 @@
                     
                     if (distanceToRight > minSafeGap) {
                         const gapProgress = (distanceToRight - minSafeGap) / (maxGap - minSafeGap);
-                        let chance = 0.10 + (gapProgress * 0.1); 
+                        let chance = 0.30 + (gapProgress * 0.3); 
                         if (distanceToRight > maxGap) chance = 1.0;
 
                         if (Math.random() < chance) {
