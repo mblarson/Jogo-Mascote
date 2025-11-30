@@ -1,4 +1,4 @@
-l<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,8 @@ l<!DOCTYPE html>
         }
         
         body {
-            background-image: url('./backgournd.png');
+            /* Mantido o nome original 'backgournd.png' caso seja o nome do arquivo real */
+            background-image: url('./backgournd.png'), url('./background.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -26,6 +27,7 @@ l<!DOCTYPE html>
             align-items: center;
             height: 100vh;
             touch-action: none;
+            background-color: #87CEEB; /* Cor de fundo caso a imagem falhe */
         }
         
         #gameContainer {
@@ -213,6 +215,15 @@ l<!DOCTYPE html>
         .ranking-item:nth-child(1) { color: #FFD700; font-weight: bold; font-size: 1.1em; } 
         .ranking-item:nth-child(2) { color: #C0C0C0; } 
         .ranking-item:nth-child(3) { color: #CD7F32; } 
+        
+        /* Destaque para o jogador atual no ranking local */
+        .current-player-rank {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid #FFD700;
+            border-radius: 4px;
+            padding: 2px 5px !important;
+            margin: 2px 0;
+        }
 
         .score-display-big {
             font-size: 28px;
@@ -320,6 +331,7 @@ l<!DOCTYPE html>
             background: rgba(0, 0, 0, 0.8);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto;
+            /* Proteção: Display none por padrão, mas JS controla */
             display: none; 
         }
         
@@ -341,10 +353,10 @@ l<!DOCTYPE html>
         
         /* --- ESTILO DO LOGO AJUSTADO --- */
         #gameLogo {
-            width: 320px; /* Aumentado */
+            width: 320px;
             height: auto; 
-            margin-top: -30px; /* Margem negativa para subir */
-            margin-bottom: -50px; /* Margem negativa agressiva para puxar o texto */
+            margin-top: -30px;
+            margin-bottom: -50px;
             image-rendering: -webkit-optimize-contrast; 
             image-rendering: crisp-edges; 
             max-width: 90%;
@@ -401,7 +413,6 @@ l<!DOCTYPE html>
             #gameInfo { font-size: 14px; }
             #gameMessage { font-size: 20px; padding: 15px 25px; }
             
-            /* Logo mobile ajustado */
             #gameLogo { width: 200px; margin-bottom: -20px; margin-top: -20px; }
             
             #startScreen h1 { font-size: 24px; }
@@ -468,6 +479,9 @@ l<!DOCTYPE html>
                         <div class="score-display-big" id="finalScoreDisplay">0</div>
                         <div style="font-size: 14px; color: #AAA; margin-top: 5px;">PONTOS</div>
                         
+                        <!-- NOVO ELEMENTO: Exibição de Posição (SEMPRE INCLUA ISSO) -->
+                        <div id="playerRankDisplay" style="display: none; margin-top: 10px; color: #FFD700; font-weight: bold; font-size: 1.4em; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px;"></div>
+                        
                         <button id="modalRestartBtn" class="neo-pop-tilted-button" style="margin-top: 20px;">
                             <span>JOGAR NOVAMENTE</span>
                         </button>
@@ -493,7 +507,6 @@ l<!DOCTYPE html>
                 <div id="introContent">
                     <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
                         
-                        <!-- Aviso de Volume -->
                         <div class="volume-warning">
                             <span>🔊</span> AUMENTE O SOM PARA JOGAR
                         </div>
@@ -526,11 +539,23 @@ l<!DOCTYPE html>
     </div>
 
     <script>
+        // CONFIGURAÇÃO SUPABASE (COM PROTEÇÃO)
         const SUPABASE_URL = 'https://ngeofumxwasfkaathwbu.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nZW9mdW14d2FzZmthYXRod2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MzU3MzQsImV4cCI6MjA4MDAxMTczNH0._kT-LZlXDdNY3Kr4PEC-3yO3a3I7CupEDklj_rGSlnE';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let _supabase = null;
+        try {
+            if (typeof supabase !== 'undefined') {
+                _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } else {
+                console.error("Supabase SDK não carregou.");
+            }
+        } catch (e) {
+            console.error("Erro ao iniciar Supabase:", e);
+        }
 
         let playerName = "";
+        let cachedRanking = []; 
 
         const GRAVITY = 0.8;
         const JUMP_POWER = 16;
@@ -577,43 +602,75 @@ l<!DOCTYPE html>
         const modalRestartBtn = document.getElementById('modalRestartBtn');
         const rankingList = document.getElementById('rankingList');
         
-        async function salvarPontuacao(nome, pontos) {
-            try {
-                const { error } = await _supabase
-                    .from('ranking')
-                    .insert([{ nome: nome, pontos: pontos }]);
-                if (error) console.error('Erro ao salvar:', error);
-            } catch (err) {
-                console.error('Erro de conexão:', err);
-            }
-        }
+        // --- FUNÇÕES DE REDE ---
 
-        async function buscarRanking() {
-            rankingList.innerHTML = '<li style="color:#888;">Carregando...</li>';
+        async function fetchRankingToCache() {
+            if (!_supabase) return;
             try {
                 const { data, error } = await _supabase
                     .from('ranking')
                     .select('nome, pontos')
                     .order('pontos', { ascending: false })
-                    .limit(3);
-
-                if (error) throw error;
-
-                rankingList.innerHTML = '';
-                if (data && data.length > 0) {
-                    data.forEach((rank, index) => {
-                        const li = document.createElement('li');
-                        li.className = 'ranking-item';
-                        const pontosFormatados = rank.pontos.toLocaleString('pt-BR');
-                        li.innerHTML = `<span>#${index+1} ${rank.nome}</span> <span>${pontosFormatados}</span>`;
-                        rankingList.appendChild(li);
-                    });
-                } else {
-                    rankingList.innerHTML = '<li style="color:#888;">Sem recordes.</li>';
+                    .limit(10);
+                
+                if (!error && data) {
+                    cachedRanking = data;
                 }
             } catch (err) {
-                console.error('Erro ao buscar ranking:', err);
-                rankingList.innerHTML = '<li style="color:red;">Erro.</li>';
+                console.warn('Falha cache ranking:', err);
+            }
+        }
+
+        async function salvarPontuacao(nome, pontos) {
+            if (!_supabase) return;
+            try {
+                const { error } = await _supabase
+                    .from('ranking')
+                    .insert([{ nome: nome, pontos: pontos }]);
+                if (error) console.error('Erro salvar:', error);
+            } catch (err) {
+                console.error('Erro conexão:', err);
+            }
+        }
+
+        function showInstantMixedRanking(currentScore, currentPlayerName) {
+            if (!rankingList) return;
+            
+            rankingList.innerHTML = '';
+            let mixedRanking = [...cachedRanking];
+            const currentPlayerEntry = { nome: currentPlayerName, pontos: currentScore };
+            mixedRanking.push(currentPlayerEntry);
+            mixedRanking.sort((a, b) => b.pontos - a.pontos);
+            
+            // --- CÁLCULO DA POSIÇÃO (COM PROTEÇÃO) ---
+            const rankDisplay = document.getElementById('playerRankDisplay');
+            if (rankDisplay) {
+                const myRankIndex = mixedRanking.indexOf(currentPlayerEntry);
+                const myRankPosition = myRankIndex + 1;
+                
+                if (myRankIndex !== -1 && myRankPosition <= 3) {
+                    rankDisplay.textContent = `${myRankPosition}ª POSIÇÃO DO RANKING!`;
+                    rankDisplay.style.display = 'block';
+                    rankDisplay.style.animation = 'pulseVolume 1s infinite'; 
+                } else {
+                    rankDisplay.style.display = 'none';
+                }
+            }
+            
+            const top3 = mixedRanking.slice(0, 3);
+            if (top3.length > 0) {
+                top3.forEach((rank, index) => {
+                    const li = document.createElement('li');
+                    const isCurrentPlayerEntry = (rank === currentPlayerEntry);
+                    if (isCurrentPlayerEntry) li.className = 'ranking-item current-player-rank';
+                    else li.className = 'ranking-item';
+                    
+                    const pontosFormatados = rank.pontos.toLocaleString('pt-BR');
+                    li.innerHTML = `<span>#${index+1} ${rank.nome}</span> <span>${pontosFormatados}</span>`;
+                    rankingList.appendChild(li);
+                });
+            } else {
+                rankingList.innerHTML = '<li style="color:#888;">Seja o primeiro!</li>';
             }
         }
 
@@ -692,6 +749,7 @@ l<!DOCTYPE html>
 
         // --- RESIZE CANVAS ---
         function resizeCanvas() {
+            if (!gameContainer || !canvas) return;
             const containerWidth = gameContainer.clientWidth;
             const containerHeight = gameContainer.clientHeight;
             if (containerWidth === 0 || containerHeight === 0) return;
@@ -704,7 +762,10 @@ l<!DOCTYPE html>
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
         }
+        
+        // Resize inicial imediato e depois no load
         resizeCanvas();
+        window.addEventListener('load', resizeCanvas);
         window.addEventListener('resize', resizeCanvas);
 
         let gameRunning = false;
@@ -778,6 +839,8 @@ l<!DOCTYPE html>
             updateUI();
             for (let i = 0; i < 5; i++) createCloud();
             playMusicSafe();
+
+            fetchRankingToCache();
         }
         
         function createCloud() {
@@ -829,7 +892,29 @@ l<!DOCTYPE html>
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, {passive: false});
         canvas.addEventListener('mousedown', jump);
         
+        // --- INICIALIZAÇÃO ROBUSTA (PROTEÇÃO CONTRA TELA PRETA) ---
+        function checkScreenSizeAndInit() {
+            try {
+                resizeCanvas();
+                if (window.innerWidth < 1024) {
+                    if (introScreen) introScreen.style.display = 'flex';
+                    if (startScreen) startScreen.style.display = 'none';
+                } else {
+                    if (introScreen) introScreen.style.display = 'none';
+                    if (startScreen) startScreen.style.display = 'flex';
+                }
+            } catch (e) {
+                console.error("Erro na inicialização da UI:", e);
+                // Fallback: tenta mostrar o startScreen se tudo falhar
+                if (startScreen) startScreen.style.display = 'flex';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            checkScreenSizeAndInit();
+            // Tenta buscar ranking em background, sem travar
+            fetchRankingToCache();
+
             if (introScreen) {
                 const enableAudio = () => {
                     initAudio();
@@ -845,7 +930,7 @@ l<!DOCTYPE html>
                     initAudio();
                     playSound('ui-click'); 
                     introScreen.style.display = 'none';
-                    startScreen.style.display = 'flex';
+                    if (startScreen) startScreen.style.display = 'flex';
                 });
             }
 
@@ -853,37 +938,39 @@ l<!DOCTYPE html>
                  startBtn.addEventListener('click', () => {
                     initAudio();
                     playSound('ui-click'); 
-                    startScreen.style.display = 'none'; 
-                    nameModal.style.display = 'flex'; 
-                    playerNameInput.focus();
+                    if (startScreen) startScreen.style.display = 'none'; 
+                    if (nameModal) {
+                        nameModal.style.display = 'flex'; 
+                        if (playerNameInput) playerNameInput.focus();
+                    } else {
+                        startGame(); // Fallback se não tiver modal
+                    }
                  });
             }
             
-            confirmNameBtn.addEventListener('click', () => {
-                const name = playerNameInput.value.trim();
-                if (name === "") {
-                    alert("Por favor, digite seu nome!");
-                    return;
-                }
-                playSound('ui-click'); 
-                playerName = name;
-                nameModal.style.display = 'none';
-                startCountdown();
-            });
+            if (confirmNameBtn) {
+                confirmNameBtn.addEventListener('click', () => {
+                    const name = playerNameInput.value.trim();
+                    if (name === "") {
+                        alert("Por favor, digite seu nome!");
+                        return;
+                    }
+                    playSound('ui-click'); 
+                    playerName = name;
+                    nameModal.style.display = 'none';
+                    startCountdown();
+                });
+            }
 
-            modalRestartBtn.addEventListener('click', () => {
-                playSound('ui-click'); 
-                restartGame();
-            });
-            
-            if (window.innerWidth < 1024) {
-                introScreen.style.display = 'flex';
-                startScreen.style.display = 'none';
-            } else {
-                introScreen.style.display = 'none';
-                startScreen.style.display = 'flex';
+            if (modalRestartBtn) {
+                modalRestartBtn.addEventListener('click', () => {
+                    playSound('ui-click'); 
+                    restartGame();
+                });
             }
         });
+        
+        window.addEventListener('resize', checkScreenSizeAndInit);
         
         function startCountdown() {
             startScreen.style.display = 'none';
@@ -1014,7 +1101,6 @@ l<!DOCTYPE html>
             }
         }
         
-        // --- FUNÇÃO GAME OVER MODIFICADA ---
         function gameOver() {
             gameRunning = false;
             cancelAnimationFrame(gameLoopId);
@@ -1033,23 +1119,15 @@ l<!DOCTYPE html>
             finalPlayerName.textContent = playerName || "JOGADOR";
             finalScoreDisplay.textContent = score.toLocaleString('pt-BR');
             
-            // Abre modal imediatamente
-            newGameOverModal.style.display = 'flex';
+            if (newGameOverModal) newGameOverModal.style.display = 'flex';
 
-            // Inicia o processo assíncrono de salvar e DEPOIS buscar
-            updateRankingSequence();
-        }
-
-        // --- NOVA FUNÇÃO DE SEQUÊNCIA ---
-        async function updateRankingSequence() {
-            // Mostra status intermediário
-            rankingList.innerHTML = '<li style="color:#888;">Salvando pontuação...</li>';
-            
-            // Aguarda o Supabase terminar de salvar
-            await salvarPontuacao(playerName, score);
-            
-            // Só agora busca o ranking atualizado
-            await buscarRanking();
+            try {
+                showInstantMixedRanking(score, playerName);
+                salvarPontuacao(playerName, score);
+            } catch (e) {
+                console.error("Erro ao processar ranking:", e);
+                // Não deixa o jogo quebrar se der erro aqui
+            }
         }
         
         function restartGame() {
