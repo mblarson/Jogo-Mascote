@@ -114,15 +114,15 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
         }
         
-        /* --- ESTILOS NOVOS PARA OS MODAIS (Nome e Game Over) --- */
+        /* --- ESTILOS DOS MODAIS --- */
         .custom-modal {
-            display: none; /* Hidden by default */
+            display: none;
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85); /* Fundo escuro */
+            background: rgba(0, 0, 0, 0.85);
             z-index: 200;
             justify-content: center;
             align-items: center;
@@ -134,8 +134,8 @@
             border: 3px solid #FFA500;
             border-radius: 15px;
             padding: 20px;
-            width: 80%; /* 80% do container */
-            max-width: 600px;
+            width: 85%;
+            max-width: 500px;
             color: white;
             text-align: center;
             box-shadow: 0 0 25px rgba(255, 165, 0, 0.4);
@@ -144,7 +144,6 @@
             gap: 15px;
         }
 
-        /* Input de Nome */
         #playerNameInput {
             padding: 12px;
             font-size: 18px;
@@ -161,18 +160,16 @@
             border-color: #FFA500;
         }
 
-        /* Layout do Game Over (Grid) */
         .game-over-layout {
             display: flex;
-            flex-direction: row; /* Lado a lado */
-            gap: 20px;
+            flex-direction: row;
+            gap: 15px;
             margin-bottom: 10px;
             justify-content: space-between;
             align-items: flex-start;
             text-align: left;
         }
 
-        /* Coluna Esquerda: Resultado Atual */
         .result-column {
             flex: 1;
             display: flex;
@@ -183,7 +180,6 @@
             padding-right: 10px;
         }
 
-        /* Coluna Direita: Ranking */
         .ranking-column {
             flex: 1;
             display: flex;
@@ -193,43 +189,49 @@
         .ranking-title {
             font-size: 14px;
             color: #FFD700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             text-transform: uppercase;
             text-align: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
         }
 
         .ranking-list {
             list-style: none;
             padding: 0;
             font-size: 13px;
-            max-height: 150px;
-            overflow-y: auto;
+            max-height: 120px;
+            overflow-y: hidden; 
         }
 
         .ranking-item {
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
+            padding: 5px 0;
             border-bottom: 1px solid #333;
         }
-        .ranking-item:nth-child(1) { color: #FFD700; font-weight: bold; } /* 1º lugar Dourado */
-        .ranking-item:nth-child(2) { color: #C0C0C0; } /* 2º Prata */
-        .ranking-item:nth-child(3) { color: #CD7F32; } /* 3º Bronze */
+        .ranking-item:nth-child(1) { color: #FFD700; font-weight: bold; font-size: 1.1em; } 
+        .ranking-item:nth-child(2) { color: #C0C0C0; } 
+        .ranking-item:nth-child(3) { color: #CD7F32; } 
 
         .score-display-big {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: bold;
             color: #FFA500;
         }
         .player-name-display {
-            font-size: 20px;
+            font-size: 18px;
             color: #FFF;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .modal-footer {
-            margin-top: 10px;
-            font-size: 12px;
+            margin-top: 5px;
+            font-size: 11px;
             color: #888;
             border-top: 1px solid #333;
             padding-top: 10px;
@@ -240,11 +242,34 @@
             text-transform: uppercase;
         }
 
-        /* Responsividade para telas muito pequenas */
+        /* ANIMAÇÃO DE VOLUME (NOVO) */
+        .volume-warning {
+            color: #FFD700;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: pulseVolume 1.5s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #FFD700;
+        }
+
+        @keyframes pulseVolume {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 10px #FFD700; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
         @media (max-width: 500px) {
             .game-over-layout {
                 flex-direction: column;
                 border: none;
+                align-items: center;
             }
             .result-column {
                 border-right: none;
@@ -252,6 +277,7 @@
                 padding-bottom: 15px;
                 padding-right: 0;
                 width: 100%;
+                margin-bottom: 15px;
             }
             .ranking-column {
                 width: 100%;
@@ -409,7 +435,7 @@
         <div id="debugInfo"></div>
         <div id="gameMessage"></div>
         
-        <!-- MODAL DE NOME DO JOGADOR (NOVO) -->
+        <!-- MODAL DE NOME -->
         <div id="nameModal" class="custom-modal">
             <div class="modal-content">
                 <h2 style="color: #FFA500; margin-bottom: 10px;">QUEM VAI JOGAR?</h2>
@@ -419,13 +445,12 @@
             </div>
         </div>
 
-        <!-- MODAL DE GAME OVER COM RANKING (NOVO) -->
+        <!-- MODAL DE GAME OVER -->
         <div id="newGameOverModal" class="custom-modal">
             <div class="modal-content">
                 <h2 style="color: #FF4500; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">FIM DE JOGO</h2>
                 
                 <div class="game-over-layout">
-                    <!-- Lado Esquerdo: Resultado -->
                     <div class="result-column">
                         <div id="finalPlayerName" class="player-name-display">JOGADOR</div>
                         <div class="score-display-big" id="finalScoreDisplay">0</div>
@@ -436,9 +461,8 @@
                         </button>
                     </div>
 
-                    <!-- Lado Direito: Ranking -->
                     <div class="ranking-column">
-                        <div class="ranking-title">🏆 TOP 5 RANKING</div>
+                        <div class="ranking-title">🏆 TOP 3 RANKING</div>
                         <ul id="rankingList" class="ranking-list">
                             <li style="color: #888; font-style: italic;">Carregando...</li>
                         </ul>
@@ -451,11 +475,17 @@
             </div>
         </div>
         
-        <!-- TELA DE INTRODUÇÃO -->
+        <!-- TELA DE INTRODUÇÃO MOBILE -->
         <div id="introScreen">
             <div id="introWrapper">
                 <div id="introContent">
                     <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
+                        
+                        <!-- NOVO: Aviso de Volume Animado -->
+                        <div class="volume-warning">
+                            <span>🔊</span> AUMENTE O SOM PARA JOGAR
+                        </div>
+
                         <button id="introStartBtn" class="neo-pop-tilted-button">
                             <span>JOGUE<br>AGORA</span>
                         </button>
@@ -464,14 +494,13 @@
             </div>
         </div>
 
-        <!-- TELA INICIAL (START SCREEN) -->
+        <!-- TELA INICIAL -->
         <div id="startScreen">
             <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>ZÉO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
             <h1>AS AVENTURAS DE ZÉO</h1>
             <p>Toque na tela para fazer o Zéo pular e desviar das pedras brilhantes!</p>
             <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
-            <!-- Botão Iniciar agora abre o modal de nome -->
             <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
         </div>
         
@@ -485,21 +514,17 @@
     </div>
 
     <script>
-        // --- CONFIGURAÇÃO SUPABASE ---
         const SUPABASE_URL = 'https://ngeofumxwasfkaathwbu.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nZW9mdW14d2FzZmthYXRod2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MzU3MzQsImV4cCI6MjA4MDAxMTczNH0._kT-LZlXDdNY3Kr4PEC-3yO3a3I7CupEDklj_rGSlnE';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- VARIÁVEIS DE JOGADOR ---
-        let playerName = ""; // Armazena o nome do jogador atual
+        let playerName = "";
 
-        // --- CONSTANTES DE JOGO ---
         const GRAVITY = 0.8;
         const JUMP_POWER = 16;
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 15; 
 
-        // --- CONFIGURAÇÃO DE NÍVEIS ---
         const LEVEL_CONFIG = {
             1: { targetSpeed: 4.0, densityFactor: 1.0 },
             2: { targetSpeed: 4.4, densityFactor: 1.0 },
@@ -518,7 +543,6 @@
         const gameContainer = document.getElementById('gameContainer');
         const debugInfo = document.getElementById('debugInfo');
         
-        // Elementos UI
         const bgMusic = document.getElementById('bgMusic');
         const introScreen = document.getElementById('introScreen');
         const introStartBtn = document.getElementById('introStartBtn');
@@ -531,7 +555,6 @@
         const highScoreDisplay = document.getElementById('highScore');
         const levelDisplay = document.getElementById('level');
         
-        // Novos Modais
         const nameModal = document.getElementById('nameModal');
         const playerNameInput = document.getElementById('playerNameInput');
         const confirmNameBtn = document.getElementById('confirmNameBtn');
@@ -541,8 +564,6 @@
         const finalScoreDisplay = document.getElementById('finalScoreDisplay');
         const modalRestartBtn = document.getElementById('modalRestartBtn');
         const rankingList = document.getElementById('rankingList');
-        
-        // --- FUNÇÕES DE BANCO DE DADOS (SUPABASE) ---
         
         async function salvarPontuacao(nome, pontos) {
             try {
@@ -562,29 +583,29 @@
                     .from('ranking')
                     .select('nome, pontos')
                     .order('pontos', { ascending: false })
-                    .limit(5); // Pega apenas top 5
+                    .limit(3); // Apenas TOP 3
 
                 if (error) throw error;
 
-                // Renderiza a lista
                 rankingList.innerHTML = '';
                 if (data && data.length > 0) {
                     data.forEach((rank, index) => {
                         const li = document.createElement('li');
                         li.className = 'ranking-item';
-                        li.innerHTML = `<span>#${index+1} ${rank.nome}</span> <span>${rank.pontos}</span>`;
+                        // Formatação de Milhar (ex: 1.500)
+                        const pontosFormatados = rank.pontos.toLocaleString('pt-BR');
+                        li.innerHTML = `<span>#${index+1} ${rank.nome}</span> <span>${pontosFormatados}</span>`;
                         rankingList.appendChild(li);
                     });
                 } else {
-                    rankingList.innerHTML = '<li style="color:#888;">Sem recordes ainda.</li>';
+                    rankingList.innerHTML = '<li style="color:#888;">Sem recordes.</li>';
                 }
             } catch (err) {
                 console.error('Erro ao buscar ranking:', err);
-                rankingList.innerHTML = '<li style="color:red;">Erro ao carregar.</li>';
+                rankingList.innerHTML = '<li style="color:red;">Erro.</li>';
             }
         }
 
-        // --- ÁUDIO ---
         let audioCtx;
         let isAudioInitialized = false;
 
@@ -623,8 +644,7 @@
                 osc.frequency.linearRampToValueAtTime(600, now + 0.1);
                 gainNode.gain.setValueAtTime(1.0, now);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } 
             else if (type === 'levelup') {
                 osc.type = 'triangle';
@@ -632,8 +652,7 @@
                 osc.frequency.setValueAtTime(800, now + 0.1);
                 gainNode.gain.setValueAtTime(0.3, now);
                 gainNode.gain.linearRampToValueAtTime(0.01, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
             }
             else if (type === 'gameover') {
                 osc.type = 'sawtooth';
@@ -641,15 +660,35 @@
                 osc.frequency.exponentialRampToValueAtTime(40, now + 0.5);
                 gainNode.gain.setValueAtTime(0.5, now);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
+            }
+            // NOVO: Som de clique UI (Arcade Blip)
+            else if (type === 'ui-click') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, now);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
+            }
+            // NOVO: Som de Start (Power Up)
+            else if (type === 'start') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.3);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
             }
         }
 
-        // --- RESIZE CANVAS ---
+        // --- CORREÇÃO DO REDIMENSIONAMENTO ---
         function resizeCanvas() {
             const containerWidth = gameContainer.clientWidth;
             const containerHeight = gameContainer.clientHeight;
+            
+            // Se as dimensões forem 0 (invisível), não faz nada para evitar erros
+            if (containerWidth === 0 || containerHeight === 0) return;
+
             const dpr = window.devicePixelRatio || 1;
             canvas.width = containerWidth * dpr;
             canvas.height = containerHeight * dpr;
@@ -659,10 +698,11 @@
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
         }
+        
+        // Chamada inicial e evento
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        // --- ESTADO DO JOGO ---
         let gameRunning = false;
         let score = 0;
         let highScore = localStorage.getItem('zeoHighScore') || 0;
@@ -695,7 +735,6 @@
         let gameStartTime = 0;
         let firstObstacleCreated = false;
         
-        // --- LÓGICA DO JOGO ---
         function calculateSafeGap() {
             const jumpDurationFrames = (2 * player.jumpPower) / GRAVITY;
             const jumpDistance = jumpDurationFrames * gameSpeed;
@@ -723,6 +762,9 @@
             gameSpeed = LEVEL_CONFIG[1].targetSpeed;
             currentDensityFactor = LEVEL_CONFIG[1].densityFactor;
             
+            // CORREÇÃO: Força resize para garantir que canvas tenha tamanho
+            resizeCanvas();
+
             player.y = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
             player.velocityY = 0;
             player.grounded = true;
@@ -790,7 +832,6 @@
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, {passive: false});
         canvas.addEventListener('mousedown', jump);
         
-        // --- EVENTOS E FLUXO ---
         document.addEventListener('DOMContentLoaded', () => {
             if (introScreen) {
                 const enableAudio = () => {
@@ -805,35 +846,38 @@
             if (introStartBtn) {
                 introStartBtn.addEventListener('click', () => {
                     initAudio();
+                    playSound('ui-click'); // Som de clique
                     introScreen.style.display = 'none';
                     startScreen.style.display = 'flex';
                 });
             }
 
-            // MODIFICADO: Botão iniciar abre o modal de nome
             if (startBtn) {
                  startBtn.addEventListener('click', () => {
                     initAudio();
-                    startScreen.style.display = 'none'; // Esconde tela inicial
-                    nameModal.style.display = 'flex'; // Abre modal de nome
+                    playSound('ui-click'); // Som de clique
+                    startScreen.style.display = 'none'; 
+                    nameModal.style.display = 'flex'; 
                     playerNameInput.focus();
                  });
             }
             
-            // NOVO: Confirmar nome
             confirmNameBtn.addEventListener('click', () => {
                 const name = playerNameInput.value.trim();
                 if (name === "") {
                     alert("Por favor, digite seu nome!");
                     return;
                 }
+                playSound('ui-click'); // Som de clique
                 playerName = name;
                 nameModal.style.display = 'none';
                 startCountdown();
             });
 
-            // NOVO: Reiniciar pelo modal
-            modalRestartBtn.addEventListener('click', restartGame);
+            modalRestartBtn.addEventListener('click', () => {
+                playSound('ui-click'); // Som de clique
+                restartGame();
+            });
             
             if (window.innerWidth < 1024) {
                 introScreen.style.display = 'flex';
@@ -846,17 +890,21 @@
         
         function startCountdown() {
             startScreen.style.display = 'none';
-            nameModal.style.display = 'none'; // Garante fechamento
-            newGameOverModal.style.display = 'none'; // Garante fechamento
+            nameModal.style.display = 'none'; 
+            newGameOverModal.style.display = 'none'; 
             countdownScreen.style.display = 'flex';
             
             let count = 3;
             countdownElement.textContent = count;
             
+            // CORREÇÃO: Garante que o som de start toque apenas uma vez
+            playSound('start'); 
+
             const countdownInterval = setInterval(() => {
                 count--;
                 if (count > 0) {
                     countdownElement.textContent = count;
+                    playSound('ui-click'); // Bip de contagem
                 } else {
                     clearInterval(countdownInterval);
                     countdownScreen.style.display = 'none';
@@ -866,6 +914,9 @@
         }
         
         function startGame() {
+            // CORREÇÃO: Cancela qualquer loop anterior para evitar acumulação
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+            
             initGame();
             gameRunning = true;
             gameLoop();
@@ -873,6 +924,7 @@
         
         function gameLoop() {
             if (!gameRunning) return;
+            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             calculateDifficultyParams();
             updatePlayer();
@@ -889,6 +941,7 @@
             renderObstacles();
             score++;
             updateUI();
+            
             gameLoopId = requestAnimationFrame(gameLoop);
         }
         
@@ -972,7 +1025,6 @@
             }
         }
         
-        // MODIFICADO: Função Game Over agora integra Supabase e Novo Modal
         function gameOver() {
             gameRunning = false;
             cancelAnimationFrame(gameLoopId);
@@ -980,7 +1032,6 @@
             playSound('gameover');
             if (bgMusic && !bgMusic.paused) bgMusic.pause();
             
-            // Recorde Local
             if (score > highScore) {
                 highScore = score;
                 localStorage.setItem('zeoHighScore', highScore);
@@ -989,28 +1040,23 @@
             
             gameMessage.style.display = 'none';
 
-            // ATUALIZAÇÃO DO NOVO MODAL
             finalPlayerName.textContent = playerName || "JOGADOR";
-            finalScoreDisplay.textContent = score;
+            // Formatação de Milhar na Tela de Game Over
+            finalScoreDisplay.textContent = score.toLocaleString('pt-BR');
             
-            // Salvar no Supabase e Atualizar Ranking
             salvarPontuacao(playerName, score);
             buscarRanking();
 
-            // Exibir Modal
             newGameOverModal.style.display = 'flex';
         }
         
         function restartGame() {
             newGameOverModal.style.display = 'none';
             setTimeout(() => {
-                initGame();
-                gameRunning = true;
-                gameLoop();
+                startGame(); // Usa a função segura startGame em vez de initGame direto
             }, 100);
         }
         
-        // --- RENDERIZAÇÃO ---
         function renderBackground() {
             const width = canvas.width / (window.devicePixelRatio || 1);
             const height = canvas.height / (window.devicePixelRatio || 1);
@@ -1087,3 +1133,5 @@
     </script>
 </body>
 </html>
+
+
