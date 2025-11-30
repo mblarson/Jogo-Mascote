@@ -242,7 +242,7 @@
             text-transform: uppercase;
         }
 
-        /* ANIMAÇÃO DE VOLUME (NOVO) */
+        /* ANIMAÇÃO DE VOLUME */
         .volume-warning {
             color: #FFD700;
             font-size: 14px;
@@ -339,18 +339,27 @@
             font-size: 18px; max-width: 90%; line-height: 1.5; margin-bottom: 20px;
         }
         
+        /* --- ESTILO DO LOGO AJUSTADO --- */
         #gameLogo {
-            width: 200px; height: auto; margin-bottom: 15px;
-            image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; max-width: 80%;
+            width: 320px; /* Aumentado */
+            height: auto; 
+            margin-top: -30px; /* Margem negativa para subir */
+            margin-bottom: -50px; /* Margem negativa agressiva para puxar o texto */
+            image-rendering: -webkit-optimize-contrast; 
+            image-rendering: crisp-edges; 
+            max-width: 90%;
+            z-index: 1;
         }
         
         #startScreen h1 {
             font-size: 28px; margin-bottom: 15px; color: #FFA500;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); line-height: 1.2;
+            position: relative; z-index: 2;
         }
         
         #startScreen p {
             font-size: 16px; margin-bottom: 20px; max-width: 90%; line-height: 1.4;
+            position: relative; z-index: 2;
         }
         
         .neo-pop-tilted-button {
@@ -391,7 +400,10 @@
         @media (max-width: 480px) {
             #gameInfo { font-size: 14px; }
             #gameMessage { font-size: 20px; padding: 15px 25px; }
-            #gameLogo { width: 160px; }
+            
+            /* Logo mobile ajustado */
+            #gameLogo { width: 260px; margin-bottom: -40px; margin-top: -20px; }
+            
             #startScreen h1 { font-size: 24px; }
             #startScreen p { font-size: 14px; margin-bottom: 15px; }
             .neo-pop-tilted-button { font-size: 0.9rem; }
@@ -405,7 +417,7 @@
         @media (max-height: 600px) {
             #startScreen h1 { font-size: 22px; margin-bottom: 10px; }
             #startScreen p { font-size: 14px; margin-bottom: 15px; max-width: 95%; }
-            #gameLogo { width: 140px; margin-bottom: 10px; }
+            #gameLogo { width: 220px; margin-bottom: -30px; }
             #countdown { font-size: 50px; }
             #countdownMessage { font-size: 14px; }
         }
@@ -481,7 +493,7 @@
                 <div id="introContent">
                     <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
                         
-                        <!-- NOVO: Aviso de Volume Animado -->
+                        <!-- Aviso de Volume -->
                         <div class="volume-warning">
                             <span>🔊</span> AUMENTE O SOM PARA JOGAR
                         </div>
@@ -583,7 +595,7 @@
                     .from('ranking')
                     .select('nome, pontos')
                     .order('pontos', { ascending: false })
-                    .limit(3); // Apenas TOP 3
+                    .limit(3);
 
                 if (error) throw error;
 
@@ -592,7 +604,6 @@
                     data.forEach((rank, index) => {
                         const li = document.createElement('li');
                         li.className = 'ranking-item';
-                        // Formatação de Milhar (ex: 1.500)
                         const pontosFormatados = rank.pontos.toLocaleString('pt-BR');
                         li.innerHTML = `<span>#${index+1} ${rank.nome}</span> <span>${pontosFormatados}</span>`;
                         rankingList.appendChild(li);
@@ -662,7 +673,6 @@
                 gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                 osc.start(now); osc.stop(now + 0.5);
             }
-            // NOVO: Som de clique UI (Arcade Blip)
             else if (type === 'ui-click') {
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(800, now);
@@ -670,7 +680,6 @@
                 gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
                 osc.start(now); osc.stop(now + 0.05);
             }
-            // NOVO: Som de Start (Power Up)
             else if (type === 'start') {
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(200, now);
@@ -681,14 +690,11 @@
             }
         }
 
-        // --- CORREÇÃO DO REDIMENSIONAMENTO ---
+        // --- RESIZE CANVAS ---
         function resizeCanvas() {
             const containerWidth = gameContainer.clientWidth;
             const containerHeight = gameContainer.clientHeight;
-            
-            // Se as dimensões forem 0 (invisível), não faz nada para evitar erros
             if (containerWidth === 0 || containerHeight === 0) return;
-
             const dpr = window.devicePixelRatio || 1;
             canvas.width = containerWidth * dpr;
             canvas.height = containerHeight * dpr;
@@ -698,8 +704,6 @@
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
         }
-        
-        // Chamada inicial e evento
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
@@ -761,21 +765,16 @@
             nextLevelScore = 500;
             gameSpeed = LEVEL_CONFIG[1].targetSpeed;
             currentDensityFactor = LEVEL_CONFIG[1].densityFactor;
-            
-            // CORREÇÃO: Força resize para garantir que canvas tenha tamanho
             resizeCanvas();
-
             player.y = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
             player.velocityY = 0;
             player.grounded = true;
-            
             obstacles = [];
             clouds = [];
             groundPosition = 0;
             backgroundPosition = 0;
             gameStartTime = Date.now();
             firstObstacleCreated = false;
-            
             updateUI();
             for (let i = 0; i < 5; i++) createCloud();
             playMusicSafe();
@@ -795,11 +794,9 @@
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
             const obstacleSize = 35 + Math.random() * 10;
             let xPosition = canvas.width / (window.devicePixelRatio || 1);
-            
             if (obstacles.length === 0 && firstObstacleCreated) {
                 xPosition = Math.max(xPosition, player.x + 400);
             }
-            
             obstacles.push({
                 x: xPosition,
                 y: canvasHeight - GROUND_HEIGHT - obstacleSize,
@@ -846,7 +843,7 @@
             if (introStartBtn) {
                 introStartBtn.addEventListener('click', () => {
                     initAudio();
-                    playSound('ui-click'); // Som de clique
+                    playSound('ui-click'); 
                     introScreen.style.display = 'none';
                     startScreen.style.display = 'flex';
                 });
@@ -855,7 +852,7 @@
             if (startBtn) {
                  startBtn.addEventListener('click', () => {
                     initAudio();
-                    playSound('ui-click'); // Som de clique
+                    playSound('ui-click'); 
                     startScreen.style.display = 'none'; 
                     nameModal.style.display = 'flex'; 
                     playerNameInput.focus();
@@ -868,14 +865,14 @@
                     alert("Por favor, digite seu nome!");
                     return;
                 }
-                playSound('ui-click'); // Som de clique
+                playSound('ui-click'); 
                 playerName = name;
                 nameModal.style.display = 'none';
                 startCountdown();
             });
 
             modalRestartBtn.addEventListener('click', () => {
-                playSound('ui-click'); // Som de clique
+                playSound('ui-click'); 
                 restartGame();
             });
             
@@ -893,18 +890,14 @@
             nameModal.style.display = 'none'; 
             newGameOverModal.style.display = 'none'; 
             countdownScreen.style.display = 'flex';
-            
             let count = 3;
             countdownElement.textContent = count;
-            
-            // CORREÇÃO: Garante que o som de start toque apenas uma vez
             playSound('start'); 
-
             const countdownInterval = setInterval(() => {
                 count--;
                 if (count > 0) {
                     countdownElement.textContent = count;
-                    playSound('ui-click'); // Bip de contagem
+                    playSound('ui-click'); 
                 } else {
                     clearInterval(countdownInterval);
                     countdownScreen.style.display = 'none';
@@ -914,9 +907,7 @@
         }
         
         function startGame() {
-            // CORREÇÃO: Cancela qualquer loop anterior para evitar acumulação
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
-            
             initGame();
             gameRunning = true;
             gameLoop();
@@ -924,7 +915,6 @@
         
         function gameLoop() {
             if (!gameRunning) return;
-            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             calculateDifficultyParams();
             updatePlayer();
@@ -941,7 +931,6 @@
             renderObstacles();
             score++;
             updateUI();
-            
             gameLoopId = requestAnimationFrame(gameLoop);
         }
         
@@ -1025,6 +1014,7 @@
             }
         }
         
+        // --- FUNÇÃO GAME OVER MODIFICADA ---
         function gameOver() {
             gameRunning = false;
             cancelAnimationFrame(gameLoopId);
@@ -1041,19 +1031,31 @@
             gameMessage.style.display = 'none';
 
             finalPlayerName.textContent = playerName || "JOGADOR";
-            // Formatação de Milhar na Tela de Game Over
             finalScoreDisplay.textContent = score.toLocaleString('pt-BR');
             
-            salvarPontuacao(playerName, score);
-            buscarRanking();
-
+            // Abre modal imediatamente
             newGameOverModal.style.display = 'flex';
+
+            // Inicia o processo assíncrono de salvar e DEPOIS buscar
+            updateRankingSequence();
+        }
+
+        // --- NOVA FUNÇÃO DE SEQUÊNCIA ---
+        async function updateRankingSequence() {
+            // Mostra status intermediário
+            rankingList.innerHTML = '<li style="color:#888;">Salvando pontuação...</li>';
+            
+            // Aguarda o Supabase terminar de salvar
+            await salvarPontuacao(playerName, score);
+            
+            // Só agora busca o ranking atualizado
+            await buscarRanking();
         }
         
         function restartGame() {
             newGameOverModal.style.display = 'none';
             setTimeout(() => {
-                startGame(); // Usa a função segura startGame em vez de initGame direto
+                startGame(); 
             }, 100);
         }
         
@@ -1133,5 +1135,3 @@
     </script>
 </body>
 </html>
-
-
