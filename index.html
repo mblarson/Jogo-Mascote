@@ -14,11 +14,8 @@
         }
         
         body {
-            background-image: url('./backgournd.png'), url('./background.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            /* Fundo padrão do HTML (backup) */
+            background-color: #202020; 
             font-family: 'Arial', sans-serif;
             overflow: hidden;
             display: flex;
@@ -26,7 +23,6 @@
             align-items: center;
             height: 100vh;
             touch-action: none;
-            background-color: #87CEEB; /* Cor de fundo caso a imagem falhe */
         }
         
         #gameContainer {
@@ -35,7 +31,7 @@
             max-width: 800px;
             height: 100vh;
             max-height: 500px;
-            background: rgba(135, 206, 235, 0.7);
+            background: #000; /* Fundo base preto */
             overflow: hidden;
             border: 3px solid #FF0000;
             border-radius: 10px;
@@ -56,7 +52,7 @@
             height: 100%;
             display: block;
             background: transparent;
-            image-rendering: -webkit-optimize-contrast;
+            image-rendering: -webkit-optimize-contrast; /* Para pixel art nítida */
             image-rendering: crisp-edges;
         }
         
@@ -774,7 +770,7 @@
         
         highScoreDisplay.textContent = Math.floor(highScore);
         
-        // --- JOGADOR PADRÃO ---
+        // --- JOGADOR PADRÃO (ZEÓ) ---
         const player = {
             x: 10, y: 0, width: 70, height: 80,
             hitboxWidth: 30, hitboxHeight: 40, hitboxOffsetX: 20, hitboxOffsetY: 30,
@@ -785,10 +781,11 @@
         player.image.src = "./mascote.png";
 
         // --- NOVO MASCOTE (MODO FLAPPY) ---
-        // Proteção contra URL com espaços (codificação)
+        // Nova URL fornecida pelo usuário
         const flappyPlayerImage = new Image();
         flappyPlayerImage.onload = () => { flappyPlayerImage.loaded = true; };
         flappyPlayerImage.onerror = () => { console.warn("Erro ao carregar imagem Flappy"); };
+        // URL codificada para segurança
         flappyPlayerImage.src = encodeURI('https://raw.githubusercontent.com/mblarson/jogo-mascote/main/MATERIAL CONGRESSO - DRIVE.png');
         
         const backgroundImage = new Image();
@@ -802,8 +799,11 @@
         let gameStartTime = 0;
         let firstObstacleCreated = false;
 
+        // --- MÁQUINA DE ESTADOS DO JOGO ---
+        // Estados: 'RUNNER', 'TRANSITION', 'WAITING_FLAPPY_START', 'FLAPPY', 'GAME_OVER'
+        let gameState = 'RUNNER';
+        
         // --- VARIÁVEIS DE TRANSIÇÃO (NÍVEL 4) ---
-        let isTransitioning = false;
         let transitionPhase = 'none'; // 'fade-out', 'fade-in', 'countdown', 'none'
         let transitionTimer = 0;
         let transitionAlpha = 0;
@@ -817,7 +817,6 @@
         }
 
         function calculateDifficultyParams(deltaFactor) {
-            // Se o nível 4 não existir aqui, causaria o crash. Corrigido acima.
             const config = LEVEL_CONFIG[currentLevel] || (currentLevel >= FLAPPY_LEVEL_START ? LEVEL_CONFIG[FLAPPY_LEVEL_START] : LEVEL_CONFIG[10]);
             
             if (gameSpeed < config.targetSpeed) gameSpeed += 0.005 * deltaFactor; 
@@ -848,8 +847,8 @@
             gameStartTime = Date.now();
             firstObstacleCreated = false;
             
-            // RESET TRANSIÇÃO
-            isTransitioning = false;
+            // RESET ESTADO
+            gameState = 'RUNNER'; 
             transitionPhase = 'none';
             if (bgMusic) bgMusic.volume = 0.4;
 
@@ -892,11 +891,12 @@
             const width = 60; 
             const gapSize = 180; 
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
-            const groundY = canvasHeight - GROUND_HEIGHT;
+            const groundY = canvasHeight - GROUND_HEIGHT; // Limite visual, mas no flappy é infinito
             const minPipeHeight = 50;
             
-            // Lógica mais segura para evitar valores negativos
-            const maxTopHeight = Math.max(10, groundY - minPipeHeight - gapSize);
+            // Calcula altura disponível (considerando que não há chão físico visível)
+            const availableHeight = canvasHeight;
+            const maxTopHeight = Math.max(50, availableHeight - minPipeHeight - gapSize);
             const topHeight = Math.max(minPipeHeight, Math.random() * maxTopHeight);
             
             const bottomY = topHeight + gapSize;
@@ -907,7 +907,7 @@
                 width: width,
                 topHeight: topHeight,
                 bottomY: bottomY,
-                bottomHeight: groundY - bottomY
+                bottomHeight: availableHeight - bottomY + 100 // Extende para baixo da tela
             });
         }
         
@@ -922,19 +922,29 @@
             setTimeout(() => { gameMessage.style.display = 'none'; }, duration);
         }
         
-        // --- LÓGICA DE PULO (HÍBRIDA) ---
+        // --- LÓGICA DE PULO UNIFICADA ---
         function jump() {
             if (!gameRunning) return;
-            // Bloqueia input durante transição
-            if (isTransitioning) return;
+            
+            // Se estiver em transição (fade/countdown), ignora
+            if (gameState === 'TRANSITION') return;
 
-            if (currentLevel >= FLAPPY_LEVEL_START) {
-                // Modo Flappy: Pula sempre, inclusive no ar
+            // Se estiver esperando toque para começar Flappy
+            if (gameState === 'WAITING_FLAPPY_START') {
+                gameState = 'FLAPPY'; // Começa o jogo!
+                player.velocityY = -FLAPPY_JUMP_POWER; // Primeiro pulo
+                playSound('jump');
+                gameMessage.style.display = 'none'; // Esconde msg "Toque para voar"
+                return;
+            }
+
+            if (gameState === 'FLAPPY') {
+                // Modo Flappy: Pula sempre
                 player.velocityY = -FLAPPY_JUMP_POWER;
                 player.grounded = false;
                 playSound('jump');
-            } else {
-                // Modo Runner: Só pula se estiver no chão
+            } else if (gameState === 'RUNNER') {
+                // Modo Runner: Só pula no chão
                 if (player.grounded) {
                     player.velocityY = -player.jumpPower;
                     player.grounded = false;
@@ -1060,7 +1070,7 @@
         // --- FUNÇÕES DE TRANSIÇÃO ---
 
         function startLevelTransition() {
-            isTransitioning = true;
+            gameState = 'TRANSITION';
             transitionPhase = 'fade-out';
             transitionTimer = 0;
             transitionAlpha = 0;
@@ -1070,25 +1080,24 @@
         }
 
         function updateTransition(deltaFactor) {
-            // Converte deltaFactor (frames) para segundos aproximados
-            const dt = deltaFactor / 60;
+            const dt = deltaFactor / 60; // Segundos
 
             if (transitionPhase === 'fade-out') {
-                transitionAlpha += dt * 2; // Fade out rápido (0.5s)
+                transitionAlpha += dt * 2; 
                 if (transitionAlpha >= 1) {
                     transitionAlpha = 1;
                     transitionPhase = 'fade-in';
                     
-                    // --- TROCA DE LÓGICA (NO ESCURO) ---
+                    // --- PONTO DE VIRADA: TROCA TUDO NO ESCURO ---
                     currentLevel++;
                     nextLevelScore += 500;
                     obstacles = []; // Limpa obstáculos do runner
                     player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2; // Centraliza jogador
                     player.velocityY = 0;
-                    // A troca de sprite é automática no renderPlayer com base no currentLevel
+                    // A renderização já vai pegar o novo background e sprite baseada no estado FLAPPY
                 }
             } else if (transitionPhase === 'fade-in') {
-                transitionAlpha -= dt * 2; // Fade in rápido (0.5s)
+                transitionAlpha -= dt * 2;
                 if (transitionAlpha <= 0) {
                     transitionAlpha = 0;
                     transitionPhase = 'countdown';
@@ -1097,39 +1106,39 @@
                 }
             } else if (transitionPhase === 'countdown') {
                 transitionTimer += dt;
-                if (transitionTimer >= 1.0) { // 1 segundo por número
+                if (transitionTimer >= 1.0) { 
                     transitionCountdown--;
                     transitionTimer = 0;
                     if (transitionCountdown > 0) {
                          playSound('ui-click'); 
                     } else {
-                        // --- FIM DA TRANSIÇÃO ---
-                        isTransitioning = false;
+                        // --- FIM DO COUNTDOWN: AGORA ESPERA TOQUE ---
+                        gameState = 'WAITING_FLAPPY_START';
                         transitionPhase = 'none';
-                        lastTime = performance.now(); // RESET CRÍTICO DE DELTA TIME
-                        if (bgMusic) bgMusic.volume = 0.4; // Restaura volume
-                        playSound('start'); 
-                        showMessage("VAI!", 1000);
+                        lastTime = performance.now(); 
+                        if (bgMusic) bgMusic.volume = 0.4;
+                        // Exibe mensagem persistente
+                        gameMessage.textContent = "TOQUE PARA VOAR!";
+                        gameMessage.style.display = 'block';
                     }
                 }
             }
         }
 
         function renderTransition() {
-            if (!isTransitioning) return;
+            if (gameState !== 'TRANSITION') return;
 
             const width = canvas.width / (window.devicePixelRatio || 1);
             const height = canvas.height / (window.devicePixelRatio || 1);
 
-            // Desenha Overlay de Fade
+            // Overlay de Fade
             if (transitionPhase === 'fade-out' || transitionPhase === 'fade-in') {
                 ctx.fillStyle = `rgba(0, 0, 0, ${transitionAlpha})`;
                 ctx.fillRect(0, 0, width, height);
             }
 
-            // Desenha Contagem Regressiva
+            // Contagem Regressiva
             if (transitionPhase === 'countdown') {
-                // Fundo semi-transparente para leitura
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
                 ctx.fillRect(0, 0, width, height);
                 
@@ -1145,13 +1154,26 @@
                 ctx.strokeText(transitionCountdown, width / 2, height / 2);
                 ctx.fillText(transitionCountdown, width / 2, height / 2);
                 
-                // Texto de aviso
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 24px Arial';
                 ctx.shadowBlur = 5;
-                ctx.fillText("MODO FLAPPY!", width / 2, height / 2 + 80);
+                ctx.fillText("PREPARE-SE...", width / 2, height / 2 + 80);
                 ctx.restore();
             }
+        }
+        
+        // --- RENDERIZAÇÃO DE CENÁRIO (CÉU AZUL) ---
+        function renderSkyBackground() {
+            const width = canvas.width / (window.devicePixelRatio || 1);
+            const height = canvas.height / (window.devicePixelRatio || 1);
+            
+            // Gradiente Céu Profissional
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, '#4facfe'); // Azul claro topo
+            gradient.addColorStop(1, '#00f2fe'); // Ciano base
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
         }
 
         function gameLoop(timestamp) {
@@ -1160,45 +1182,80 @@
             if (!timestamp) timestamp = performance.now();
             
             const deltaTimeInSeconds = (timestamp - lastTime) / 1000;
-            lastTime = timestamp; // Mantemos o relógio rodando para consistência
+            lastTime = timestamp; 
             
             const safeDeltaTime = Math.min(deltaTimeInSeconds, 0.1);
             const deltaFactor = safeDeltaTime * TARGET_FPS;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // --- BRANCH DE LÓGICA PRINCIPAL ---
-            if (isTransitioning) {
-                // Durante transição: Atualiza APENAS efeito visual, pausa física
+            // --- LÓGICA DE ESTADOS ---
+            
+            if (gameState === 'TRANSITION') {
+                // Durante transição: Só roda efeito visual
                 updateTransition(deltaFactor);
                 
-                // Renderiza jogo congelado ao fundo
-                renderBackground();
-                renderClouds();
-                renderGround();
-                renderPlayer(); 
-                renderObstacles();
+                // Renderiza o que está por trás (pode ser o cenário antigo ou novo dependendo do fade)
+                if (transitionAlpha > 0.9) { 
+                    // Tela preta total, pode desenhar qualquer coisa vazia ou nada
+                } else if (transitionPhase === 'fade-out') {
+                    // Ainda vê o jogo antigo
+                    renderBackground();
+                    renderClouds();
+                    renderGround();
+                    renderPlayer(); 
+                } else {
+                    // Fade-in: Já vê o cenário novo
+                    renderSkyBackground();
+                    renderClouds(); // Nuvens novas
+                    renderPlayer(); // Mascote novo
+                }
                 
-                // Renderiza efeito de transição por cima
                 renderTransition();
+                
+            } else if (gameState === 'WAITING_FLAPPY_START') {
+                // Esperando toque: Desenha novo cenário congelado
+                renderSkyBackground();
+                updateClouds(deltaFactor * 0.2); // Nuvens movem devagar
+                renderClouds();
+                renderPlayer(); // Mascote parado no ar
+                // Mensagem "Toque para voar" já está no HTML
+                
             } else {
-                // Jogo Normal
+                // --- JOGO RODANDO (RUNNER OU FLAPPY) ---
+                
                 calculateDifficultyParams(deltaFactor);
                 
+                // Update Lógico
                 updatePlayer(deltaFactor);
                 updateObstacles(deltaFactor); 
                 updateClouds(deltaFactor);
-                updateGround(deltaFactor);
-                updateBackground(deltaFactor);
                 
-                checkLevelProgression();
+                if (gameState === 'RUNNER') {
+                    updateGround(deltaFactor);
+                    updateBackground(deltaFactor);
+                    checkLevelProgression(); // Só checa progressão no runner para ativar flappy
+                } else if (gameState === 'FLAPPY') {
+                    // No flappy não tem updateGround visual do runner
+                    // updateBackground não é necessário pois é céu sólido
+                }
+                
                 checkCollisions();
                 
-                renderBackground();
-                renderClouds();
-                renderGround();
-                renderPlayer();
-                renderObstacles();
+                // Render
+                if (gameState === 'RUNNER') {
+                    renderBackground();
+                    renderClouds();
+                    renderGround();
+                    renderPlayer();
+                    renderObstacles();
+                } else {
+                    // FLAPPY RENDER
+                    renderSkyBackground();
+                    renderClouds();
+                    renderPlayer();
+                    renderObstacles();
+                }
                 
                 score += 1 * deltaFactor;
             }
@@ -1209,22 +1266,29 @@
         }
         
         function updatePlayer(deltaFactor) {
+            // Em WAITING, não aplica gravidade
+            if (gameState === 'WAITING_FLAPPY_START') return;
+
             player.velocityY += GRAVITY * deltaFactor;
             player.y += player.velocityY * deltaFactor;
             
             const groundY = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
 
-            if (currentLevel >= FLAPPY_LEVEL_START) {
-                // --- MODO FLAPPY: Chão e Teto são letais ---
-                if (player.y > groundY) {
-                    gameOver(); // Caiu no chão
+            if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START') {
+                // --- MODO FLAPPY ---
+                // Não tem chão seguro, cair é morte (chão visual não existe, limite lógico sim)
+                // Usamos a altura total da tela como limite de morte
+                const deathY = canvas.height / (window.devicePixelRatio || 1); 
+                
+                if (player.y > deathY) {
+                    gameOver();
                 }
-                if (player.y < 0) {
-                    player.y = 0; // Opcional: bater no teto não mata, apenas bloqueia
+                if (player.y < -50) { // Teto (permite subir um pouco pra fora)
+                    player.y = -50; 
                     player.velocityY = 0;
                 }
             } else {
-                // --- MODO RUNNER: Chão é seguro ---
+                // --- MODO RUNNER ---
                 if (player.y > groundY) {
                     player.y = groundY; 
                     player.velocityY = 0; 
@@ -1234,25 +1298,26 @@
         }
         
         function updateObstacles(deltaFactor) {
+            // Se estiver esperando, não move obstáculos
+            if (gameState === 'WAITING_FLAPPY_START') return;
+
             const elapsedTime = (Date.now() - gameStartTime) / 1000;
             const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
 
             // GERAÇÃO
-            if (currentLevel >= FLAPPY_LEVEL_START) {
+            if (gameState === 'FLAPPY') {
                 // MODO FLAPPY (Canos)
                 if (obstacles.length === 0) {
                     createFlappyObstacle();
                 } else {
                     const lastObstacle = obstacles[obstacles.length - 1];
                     const distanceToRight = canvasWidth - lastObstacle.x;
-                    // Distância fixa ou levemente variável entre canos (ex: 300px)
-                    // Como flappy é mais difícil, o espaço deve ser constante para ritmo
                     const pipeGap = 350; 
                     if (distanceToRight > pipeGap) {
                         createFlappyObstacle();
                     }
                 }
-            } else {
+            } else if (gameState === 'RUNNER') {
                 // MODO RUNNER (Pedras)
                 if (!firstObstacleCreated && elapsedTime >= 3) {
                     createObstacle(); firstObstacleCreated = true;
@@ -1283,7 +1348,10 @@
         }
         
         function updateClouds(deltaFactor) {
-            if (clouds.length < 5 && Math.random() < 0.01) createCloud();
+            // Mais nuvens no modo Flappy
+            const maxClouds = (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START') ? 8 : 5;
+            
+            if (clouds.length < maxClouds && Math.random() < 0.02) createCloud();
             for (let i = clouds.length - 1; i >= 0; i--) {
                 clouds[i].x -= clouds[i].speed * deltaFactor;
                 if (clouds[i].x + clouds[i].width < 0) clouds.splice(i, 1);
@@ -1305,8 +1373,6 @@
             if (score >= nextLevelScore) {
                 // Se estamos prestes a ir para o nível Flappy (Nível 4)
                 if (currentLevel === FLAPPY_LEVEL_START - 1) {
-                    // INICIA TRANSIÇÃO VISUAL
-                    // Não incrementamos o nível aqui, a transição cuida disso
                     startLevelTransition();
                 } else {
                     currentLevel++; 
@@ -1318,6 +1384,9 @@
         }
         
         function checkCollisions() {
+            // Sem colisão na espera
+            if (gameState === 'WAITING_FLAPPY_START') return;
+
             for (let i = 0; i < obstacles.length; i++) {
                 const obs = obstacles[i];
                 const pX = player.x + player.hitboxOffsetX;
@@ -1326,31 +1395,19 @@
                 const pH = player.hitboxHeight;
                 
                 if (obs.type === 'rock') {
-                    // COLISÃO PADRÃO (Pedra)
-                    if (pX < obs.x + obs.width &&
-                        pX + pW > obs.x &&
-                        pY < obs.y + obs.height &&
-                        pY + pH > obs.y) {
+                    if (pX < obs.x + obs.width && pX + pW > obs.x &&
+                        pY < obs.y + obs.height && pY + pH > obs.y) {
                         gameOver();
                         return;
                     }
                 } else if (obs.type === 'pipe') {
-                    // COLISÃO FLAPPY (Cano Cima ou Cano Baixo)
-                    
-                    // Verifica Cano de Cima
-                    // Rect: x, 0, width, topHeight
-                    if (pX < obs.x + obs.width &&
-                        pX + pW > obs.x &&
-                        pY < 0 + obs.topHeight) {
+                    // Cano Cima
+                    if (pX < obs.x + obs.width && pX + pW > obs.x && pY < obs.topHeight) {
                         gameOver();
                         return;
                     }
-                    
-                    // Verifica Cano de Baixo
-                    // Rect: x, bottomY, width, bottomHeight
-                    if (pX < obs.x + obs.width &&
-                        pX + pW > obs.x &&
-                        pY + pH > obs.bottomY) {
+                    // Cano Baixo
+                    if (pX < obs.x + obs.width && pX + pW > obs.x && pY + pH > obs.bottomY) {
                         gameOver();
                         return;
                     }
@@ -1360,6 +1417,7 @@
         
         function gameOver() {
             gameRunning = false;
+            gameState = 'GAME_OVER';
             cancelAnimationFrame(gameLoopId);
             deathCount++; 
             playSound('gameover');
@@ -1438,16 +1496,17 @@
             ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
             ctx.shadowColor = '#FFA500'; ctx.shadowBlur = 10;
             
-            // Lógica de Renderização Híbrida
-            if (currentLevel >= FLAPPY_LEVEL_START) {
-                // Desenha NOVO MASCOTE
-                if (flappyPlayerImage.loaded) { // Usando flag correta
+            // Lógica de Sprite Baseada em Estado
+            if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || (gameState === 'TRANSITION' && transitionPhase !== 'fade-out')) {
+                // MODO FLAPPY
+                if (flappyPlayerImage.loaded) { 
+                    // Ajuste leve de proporção se necessário
                     ctx.drawImage(flappyPlayerImage, player.x, player.y, player.width, player.height);
                 } else {
                     ctx.fillStyle = '#FF4500'; ctx.fillRect(player.x, player.y, player.width, player.height);
                 }
             } else {
-                // Desenha ZÉO (Padrão)
+                // MODO RUNNER
                 if (player.loaded) {
                     ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
                 } else {
@@ -1482,17 +1541,16 @@
                     // RENDERIZAÇÃO DOS CANOS (FLAPPY)
                     // Cano de Cima
                     ctx.shadowColor = '#000'; ctx.shadowBlur = 5;
-                    ctx.fillStyle = '#228B22'; // Verde clássico de cano
-                    // Cano Cima
+                    ctx.fillStyle = '#228B22'; // Verde clássico
                     ctx.fillRect(obstacle.x, 0, obstacle.width, obstacle.topHeight);
-                    // Borda do cano de cima
-                    ctx.fillStyle = '#006400'; // Verde escuro
+                    // Borda topo
+                    ctx.fillStyle = '#006400';
                     ctx.fillRect(obstacle.x - 5, obstacle.topHeight - 20, obstacle.width + 10, 20);
                     
                     // Cano de Baixo
                     ctx.fillStyle = '#228B22';
                     ctx.fillRect(obstacle.x, obstacle.bottomY, obstacle.width, obstacle.bottomHeight);
-                    // Borda do cano de baixo
+                    // Borda baixo
                     ctx.fillStyle = '#006400';
                     ctx.fillRect(obstacle.x - 5, obstacle.bottomY, obstacle.width + 10, 20);
                 }
