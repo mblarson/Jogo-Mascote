@@ -554,7 +554,9 @@
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 15; 
         
-        const FLAPPY_LEVEL_START = 4; 
+        // --- CONFIGURAÇÃO DE NÍVEL ---
+        // Defina aqui em qual nível o jogo muda para o estilo Flappy Bird
+        const FLAPPY_LEVEL_START = 4; // >>> ALTERE AQUI O NÍVEL QUE ATIVA O MODO FLAPPY <<<
         
         let lastTime = 0;
         const TARGET_FPS = 60;
@@ -789,7 +791,7 @@
         const flappyPlayerImage = new Image();
         flappyPlayerImage.onload = () => { flappyPlayerImage.loaded = true; };
         flappyPlayerImage.onerror = () => { console.warn("Erro ao carregar imagem Flappy"); };
-        flappyPlayerImage.src = encodeURI('https://raw.githubusercontent.com/mblarson/jogo-mascote/main/MATERIAL CONGRESSO - DRIVE.png');
+        flappyPlayerImage.src = encodeURI('https://raw.githubusercontent.com/mblarson/jogo-mascote/main/mascoteaviao.png');
         
         const backgroundImage = new Image();
         backgroundImage.onload = () => { backgroundImage.loaded = true; };
@@ -1324,10 +1326,16 @@
         }
         
         function checkLevelProgression() {
+            // Verifica se a pontuação atual atingiu a meta para o próximo nível
             if (score >= nextLevelScore) {
+                
+                // --- DETECÇÃO DE MUDANÇA DE MODO (RUNNER -> FLAPPY) ---
+                // Verifica se o próximo nível (currentLevel + 1) é o nível de início do Flappy
                 if (currentLevel === FLAPPY_LEVEL_START - 1) {
+                    // Se for, inicia a transição visual e lógica para o modo Flappy
                     startLevelTransition();
                 } else {
+                    // Caso contrário, apenas avança para o próximo nível normal (Runner)
                     currentLevel++; 
                     nextLevelScore += 500;
                     showMessage(`NÍVEL ${currentLevel}!`, 2000);
