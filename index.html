@@ -14,7 +14,6 @@
         }
         
         body {
-            /* Mantido o nome original 'backgournd.png' caso seja o nome do arquivo real */
             background-image: url('./backgournd.png'), url('./background.png');
             background-size: cover;
             background-position: center;
@@ -216,7 +215,6 @@
         .ranking-item:nth-child(2) { color: #C0C0C0; } 
         .ranking-item:nth-child(3) { color: #CD7F32; } 
         
-        /* Destaque para o jogador atual no ranking local */
         .current-player-rank {
             background: rgba(255, 215, 0, 0.15);
             border: 1px solid #FFD700;
@@ -253,7 +251,6 @@
             text-transform: uppercase;
         }
 
-        /* ANIMAÇÃO DE VOLUME */
         .volume-warning {
             color: #FFD700;
             font-size: 14px;
@@ -331,7 +328,6 @@
             background: rgba(0, 0, 0, 0.8);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto;
-            /* Proteção: Display none por padrão, mas JS controla */
             display: none; 
         }
         
@@ -351,7 +347,6 @@
             font-size: 18px; max-width: 90%; line-height: 1.5; margin-bottom: 20px;
         }
         
-        /* --- ESTILO DO LOGO AJUSTADO --- */
         #gameLogo {
             width: 320px;
             height: auto; 
@@ -458,7 +453,6 @@
         <div id="debugInfo"></div>
         <div id="gameMessage"></div>
         
-        <!-- MODAL DE NOME -->
         <div id="nameModal" class="custom-modal">
             <div class="modal-content">
                 <h2 style="color: #FFA500; margin-bottom: 10px;">QUEM VAI JOGAR?</h2>
@@ -468,7 +462,6 @@
             </div>
         </div>
 
-        <!-- MODAL DE GAME OVER -->
         <div id="newGameOverModal" class="custom-modal">
             <div class="modal-content">
                 <h2 style="color: #FF4500; margin-bottom: -25px; border-bottom: -1px solid #444; padding-bottom: 10px;">FIM DE JOGO</h2>
@@ -479,7 +472,6 @@
                         <div class="score-display-big" id="finalScoreDisplay">0</div>
                         <div style="font-size: 14px; color: #AAA; margin-top: 5px;">PONTOS</div>
                         
-                        <!-- NOVO ELEMENTO: Exibição de Posição (SEMPRE INCLUA ISSO) -->
                         <div id="playerRankDisplay" style="display: none; margin-top: 10px; color: #FFD700; font-weight: bold; font-size: 0.75em; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px;"></div>
                         
                         <button id="modalRestartBtn" class="neo-pop-tilted-button" style="margin-top: 20px;">
@@ -501,7 +493,6 @@
             </div>
         </div>
         
-        <!-- TELA DE INTRODUÇÃO MOBILE -->
         <div id="introScreen">
             <div id="introWrapper">
                 <div id="introContent">
@@ -519,7 +510,6 @@
             </div>
         </div>
 
-        <!-- TELA INICIAL -->
         <div id="startScreen">
             <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>ZÉO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
@@ -539,7 +529,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO SUPABASE (COM PROTEÇÃO)
         const SUPABASE_URL = 'https://ngeofumxwasfkaathwbu.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nZW9mdW14d2FzZmthYXRod2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MzU3MzQsImV4cCI6MjA4MDAxMTczNH0._kT-LZlXDdNY3Kr4PEC-3yO3a3I7CupEDklj_rGSlnE';
         
@@ -559,10 +548,11 @@
 
         const GRAVITY = 0.8;
         const JUMP_POWER = 16;
+        const FLAPPY_JUMP_POWER = 12; // Impulso para o modo Flappy
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 15; 
+        const FLAPPY_LEVEL_START = 14; // Nível onde começa a fase Flappy
         
-        // --- DELTA TIME VARIABLES ---
         let lastTime = 0;
         const TARGET_FPS = 60;
 
@@ -576,7 +566,8 @@
             7: { targetSpeed: 8.9, densityFactor: 3.0 },
             8: { targetSpeed: 9.9, densityFactor: 3.4 },
             9: { targetSpeed: 9.9, densityFactor: 3.9 },
-            10: { targetSpeed: 10.0, densityFactor: 4.5 }
+            10: { targetSpeed: 10.0, densityFactor: 4.5 },
+            14: { targetSpeed: 5.5, densityFactor: 2.0 } // Config inicial do Flappy
         };
 
         const canvas = document.getElementById('gameCanvas');
@@ -606,8 +597,6 @@
         const modalRestartBtn = document.getElementById('modalRestartBtn');
         const rankingList = document.getElementById('rankingList');
         
-        // --- FUNÇÕES DE REDE ---
-
         async function fetchRankingToCache() {
             if (!_supabase) return;
             try {
@@ -646,7 +635,6 @@
             mixedRanking.push(currentPlayerEntry);
             mixedRanking.sort((a, b) => b.pontos - a.pontos);
             
-            // --- CÁLCULO DA POSIÇÃO (COM PROTEÇÃO) ---
             const rankDisplay = document.getElementById('playerRankDisplay');
             if (rankDisplay) {
                 const myRankIndex = mixedRanking.indexOf(currentPlayerEntry);
@@ -751,7 +739,6 @@
             }
         }
 
-        // --- RESIZE CANVAS ---
         function resizeCanvas() {
             if (!gameContainer || !canvas) return;
             const containerWidth = gameContainer.clientWidth;
@@ -767,7 +754,6 @@
             ctx.imageSmoothingQuality = 'high';
         }
         
-        // Resize inicial imediato e depois no load
         resizeCanvas();
         window.addEventListener('load', resizeCanvas);
         window.addEventListener('resize', resizeCanvas);
@@ -784,6 +770,7 @@
         
         highScoreDisplay.textContent = Math.floor(highScore);
         
+        // --- JOGADOR PADRÃO ---
         const player = {
             x: 10, y: 0, width: 70, height: 80,
             hitboxWidth: 30, hitboxHeight: 40, hitboxOffsetX: 20, hitboxOffsetY: 30,
@@ -792,6 +779,10 @@
         };
         player.image.onload = () => { player.loaded = true; };
         player.image.src = "./mascote.png";
+
+        // --- NOVO MASCOTE (MODO FLAPPY) ---
+        const flappyPlayerImage = new Image();
+        flappyPlayerImage.src = 'https://raw.githubusercontent.com/mblarson/jogo-mascote/main/MATERIAL CONGRESSO - DRIVE.png.PNG';
         
         const backgroundImage = new Image();
         backgroundImage.onload = () => { backgroundImage.loaded = true; };
@@ -812,13 +803,12 @@
         }
 
         function calculateDifficultyParams(deltaFactor) {
-            const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[10];
-            // Multiplicamos o incremento pela deltaFactor para a aceleração ser consistente no tempo
+            const config = LEVEL_CONFIG[currentLevel] || (currentLevel >= FLAPPY_LEVEL_START ? LEVEL_CONFIG[FLAPPY_LEVEL_START] : LEVEL_CONFIG[10]);
+            
             if (gameSpeed < config.targetSpeed) gameSpeed += 0.005 * deltaFactor; 
             else gameSpeed = config.targetSpeed; 
 
             let density = config.densityFactor;
-            // Ajustamos a probabilidade de reset da deathCount também
             if (deathCount > 3) {
                 density *= 0.8;
                 if (Math.random() < (0.001 * deltaFactor)) deathCount = 0; 
@@ -845,7 +835,6 @@
             updateUI();
             for (let i = 0; i < 5; i++) createCloud();
             playMusicSafe();
-
             fetchRankingToCache();
         }
         
@@ -859,6 +848,7 @@
             });
         }
         
+        // --- CRIAÇÃO DE OBSTÁCULOS (RUNNER VS FLAPPY) ---
         function createObstacle() {
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
             const obstacleSize = 35 + Math.random() * 10;
@@ -867,12 +857,37 @@
                 xPosition = Math.max(xPosition, player.x + 400);
             }
             obstacles.push({
+                type: 'rock',
                 x: xPosition,
                 y: canvasHeight - GROUND_HEIGHT - obstacleSize,
                 width: obstacleSize,
                 height: obstacleSize,
                 rotation: Math.random() * Math.PI * 2,
                 glowIntensity: 0.5 + Math.random() * 0.5
+            });
+        }
+
+        function createFlappyObstacle() {
+            const width = 60; // Largura do cano
+            const gapSize = 180; // Abertura para o player passar
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            const groundY = canvasHeight - GROUND_HEIGHT;
+            const minPipeHeight = 50;
+            
+            // Calcula altura aleatória para o cano de cima
+            // Deve sobrar espaço para o gap e o cano de baixo
+            const maxTopHeight = groundY - minPipeHeight - gapSize;
+            const topHeight = Math.max(minPipeHeight, Math.random() * maxTopHeight);
+            
+            const bottomY = topHeight + gapSize;
+            
+            obstacles.push({
+                type: 'pipe',
+                x: canvas.width / (window.devicePixelRatio || 1),
+                width: width,
+                topHeight: topHeight,
+                bottomY: bottomY,
+                bottomHeight: groundY - bottomY
             });
         }
         
@@ -887,26 +902,33 @@
             setTimeout(() => { gameMessage.style.display = 'none'; }, duration);
         }
         
+        // --- LÓGICA DE PULO (HÍBRIDA) ---
         function jump() {
-            if (player.grounded && gameRunning) {
-                player.velocityY = -player.jumpPower;
+            if (!gameRunning) return;
+
+            if (currentLevel >= FLAPPY_LEVEL_START) {
+                // Modo Flappy: Pula sempre, inclusive no ar
+                player.velocityY = -FLAPPY_JUMP_POWER;
                 player.grounded = false;
                 playSound('jump');
+            } else {
+                // Modo Runner: Só pula se estiver no chão
+                if (player.grounded) {
+                    player.velocityY = -player.jumpPower;
+                    player.grounded = false;
+                    playSound('jump');
+                }
             }
         }
         
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, {passive: false});
         canvas.addEventListener('mousedown', jump);
         
-        // --- NOVA VARIÁVEL DE CONTROLE PARA O MOBILE ---
-        let introDismissed = false; // Garante que a intro não volte a aparecer sozinha
+        let introDismissed = false;
 
-        // --- INICIALIZAÇÃO ROBUSTA (PROTEÇÃO CONTRA TELA PRETA) ---
         function checkScreenSizeAndInit() {
             try {
                 resizeCanvas();
-                
-                // SE O USUÁRIO JÁ PASSOU DA INTRO OU JÁ ESTÁ JOGANDO, NÃO FORÇA A INTRO DE NOVO
                 if (introDismissed || gameRunning) return;
 
                 if (window.innerWidth < 1024) {
@@ -918,14 +940,12 @@
                 }
             } catch (e) {
                 console.error("Erro na inicialização da UI:", e);
-                // Fallback: tenta mostrar o startScreen se tudo falhar
                 if (startScreen) startScreen.style.display = 'flex';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             checkScreenSizeAndInit();
-            // Tenta buscar ranking em background, sem travar
             fetchRankingToCache();
 
             if (introScreen) {
@@ -942,10 +962,7 @@
                 introStartBtn.addEventListener('click', () => {
                     initAudio();
                     playSound('ui-click'); 
-                    
-                    // MARCA QUE A INTRO FOI VISTA PARA NÃO VOLTAR NO RESIZE
                     introDismissed = true; 
-                    
                     introScreen.style.display = 'none';
                     if (startScreen) startScreen.style.display = 'flex';
                 });
@@ -960,7 +977,7 @@
                         nameModal.style.display = 'flex'; 
                         if (playerNameInput) playerNameInput.focus();
                     } else {
-                        startGame(); // Fallback se não tiver modal
+                        startGame();
                     }
                  });
             }
@@ -1014,7 +1031,6 @@
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
             initGame();
             gameRunning = true;
-            // Reset do tempo para evitar salto inicial
             lastTime = performance.now();
             gameLoopId = requestAnimationFrame(gameLoop);
         }
@@ -1022,28 +1038,17 @@
         function gameLoop(timestamp) {
             if (!gameRunning) return;
             
-            // Tratamento inicial se timestamp não for fornecido
             if (!timestamp) timestamp = performance.now();
             
-            // Cálculo do Delta Time (em segundos)
             const deltaTimeInSeconds = (timestamp - lastTime) / 1000;
             lastTime = timestamp;
-            
-            // Trava de segurança: se o deltaTime for muito grande (ex: aba minimizada), 
-            // limitamos para evitar que o personagem atravesse o chão.
-            // 0.1s corresponde a 10 FPS.
             const safeDeltaTime = Math.min(deltaTimeInSeconds, 0.1);
-            
-            // Fator de ajuste baseado em 60 FPS
-            // Se o jogo rodar a 60 FPS, deltaFactor é ~1.0
-            // Se o jogo rodar a 120 FPS, deltaFactor é ~0.5
             const deltaFactor = safeDeltaTime * TARGET_FPS;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             calculateDifficultyParams(deltaFactor);
             
-            // Aplicamos deltaFactor em todas as funções de movimento
             updatePlayer(deltaFactor);
             updateObstacles(deltaFactor); 
             updateClouds(deltaFactor);
@@ -1059,7 +1064,6 @@
             renderPlayer();
             renderObstacles();
             
-            // Pontuação agora é baseada em tempo/movimento para ser justa
             score += 1 * deltaFactor;
             
             updateUI();
@@ -1068,42 +1072,74 @@
         }
         
         function updatePlayer(deltaFactor) {
-            // Aplicando Delta Time na gravidade e posição
             player.velocityY += GRAVITY * deltaFactor;
             player.y += player.velocityY * deltaFactor;
             
             const groundY = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
-            if (player.y > groundY) {
-                player.y = groundY; 
-                player.velocityY = 0; 
-                player.grounded = true;
+
+            if (currentLevel >= FLAPPY_LEVEL_START) {
+                // --- MODO FLAPPY: Chão e Teto são letais ---
+                if (player.y > groundY) {
+                    gameOver(); // Caiu no chão
+                }
+                if (player.y < 0) {
+                    player.y = 0; // Opcional: bater no teto não mata, apenas bloqueia
+                    player.velocityY = 0;
+                }
+            } else {
+                // --- MODO RUNNER: Chão é seguro ---
+                if (player.y > groundY) {
+                    player.y = groundY; 
+                    player.velocityY = 0; 
+                    player.grounded = true;
+                }
             }
         }
         
         function updateObstacles(deltaFactor) {
             const elapsedTime = (Date.now() - gameStartTime) / 1000;
-            if (!firstObstacleCreated && elapsedTime >= 3) {
-                createObstacle(); firstObstacleCreated = true;
-            }
-            if (firstObstacleCreated) {
-                const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+
+            // GERAÇÃO
+            if (currentLevel >= FLAPPY_LEVEL_START) {
+                // MODO FLAPPY (Canos)
                 if (obstacles.length === 0) {
-                    createObstacle();
+                    createFlappyObstacle();
                 } else {
                     const lastObstacle = obstacles[obstacles.length - 1];
                     const distanceToRight = canvasWidth - lastObstacle.x;
-                    const minSafeGap = calculateSafeGap();
-                    let maxGap = Math.max(minSafeGap + 50, 600 / currentDensityFactor);
-                    if (distanceToRight > minSafeGap) {
-                        const gapProgress = (distanceToRight - minSafeGap) / (maxGap - minSafeGap);
-                        let chance = 0.30 + (gapProgress * 0.3); 
-                        if (distanceToRight > maxGap) chance = 1.0;
-                        if (Math.random() < chance) createObstacle();
+                    // Distância fixa ou levemente variável entre canos (ex: 300px)
+                    // Como flappy é mais difícil, o espaço deve ser constante para ritmo
+                    const pipeGap = 350; 
+                    if (distanceToRight > pipeGap) {
+                        createFlappyObstacle();
+                    }
+                }
+            } else {
+                // MODO RUNNER (Pedras)
+                if (!firstObstacleCreated && elapsedTime >= 3) {
+                    createObstacle(); firstObstacleCreated = true;
+                }
+                if (firstObstacleCreated) {
+                    if (obstacles.length === 0) {
+                        createObstacle();
+                    } else {
+                        const lastObstacle = obstacles[obstacles.length - 1];
+                        const distanceToRight = canvasWidth - lastObstacle.x;
+                        const minSafeGap = calculateSafeGap();
+                        let maxGap = Math.max(minSafeGap + 50, 600 / currentDensityFactor);
+                        if (distanceToRight > minSafeGap) {
+                            const gapProgress = (distanceToRight - minSafeGap) / (maxGap - minSafeGap);
+                            let chance = 0.30 + (gapProgress * 0.3); 
+                            if (distanceToRight > maxGap) chance = 1.0;
+                            if (Math.random() < chance) createObstacle();
+                        }
                     }
                 }
             }
+
+            // MOVIMENTO E REMOÇÃO
             for (let i = obstacles.length - 1; i >= 0; i--) {
-                // Obstáculos agora se movem multiplicados pelo fator
                 obstacles[i].x -= gameSpeed * deltaFactor;
                 if (obstacles[i].x + obstacles[i].width < 0) obstacles.splice(i, 1);
             }
@@ -1112,20 +1148,17 @@
         function updateClouds(deltaFactor) {
             if (clouds.length < 5 && Math.random() < 0.01) createCloud();
             for (let i = clouds.length - 1; i >= 0; i--) {
-                // Nuvens com deltaFactor
                 clouds[i].x -= clouds[i].speed * deltaFactor;
                 if (clouds[i].x + clouds[i].width < 0) clouds.splice(i, 1);
             }
         }
         
         function updateGround(deltaFactor) {
-            // Chão com deltaFactor
             groundPosition -= gameSpeed * deltaFactor;
             if (groundPosition <= -40) groundPosition = 0;
         }
         
         function updateBackground(deltaFactor) {
-            // Fundo com deltaFactor
             backgroundPosition -= gameSpeed * 0.5 * deltaFactor;
             const width = canvas.width / (window.devicePixelRatio || 1);
             if (backgroundPosition <= -width) backgroundPosition = 0;
@@ -1133,24 +1166,61 @@
         
         function checkLevelProgression() {
             if (score >= nextLevelScore) {
-                currentLevel++; nextLevelScore += 500;
-                showMessage(`NÍVEL ${currentLevel}!`, 2000);
+                // Se a transição for exatamente AGORA para o nível Flappy
+                if (currentLevel === FLAPPY_LEVEL_START - 1) {
+                    // Limpa obstáculos do runner para dar uma chance justa
+                    obstacles = [];
+                    // Posiciona o player no meio para não morrer instantaneamente
+                    player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2;
+                    player.velocityY = 0;
+                    showMessage(`FASE FLAPPY!`, 3000);
+                } else {
+                    showMessage(`NÍVEL ${currentLevel + 1}!`, 2000);
+                }
+
+                currentLevel++; 
+                nextLevelScore += 500;
                 playSound('levelup');
             }
         }
         
         function checkCollisions() {
             for (let i = 0; i < obstacles.length; i++) {
-                const obstacle = obstacles[i];
-                const playerHitboxX = player.x + player.hitboxOffsetX;
-                const playerHitboxY = player.y + player.hitboxOffsetY;
+                const obs = obstacles[i];
+                const pX = player.x + player.hitboxOffsetX;
+                const pY = player.y + player.hitboxOffsetY;
+                const pW = player.hitboxWidth;
+                const pH = player.hitboxHeight;
                 
-                if (playerHitboxX < obstacle.x + obstacle.width &&
-                    playerHitboxX + player.hitboxWidth > obstacle.x &&
-                    playerHitboxY < obstacle.y + obstacle.height &&
-                    playerHitboxY + player.hitboxHeight > obstacle.y) {
-                    gameOver();
-                    return;
+                if (obs.type === 'rock') {
+                    // COLISÃO PADRÃO (Pedra)
+                    if (pX < obs.x + obs.width &&
+                        pX + pW > obs.x &&
+                        pY < obs.y + obs.height &&
+                        pY + pH > obs.y) {
+                        gameOver();
+                        return;
+                    }
+                } else if (obs.type === 'pipe') {
+                    // COLISÃO FLAPPY (Cano Cima ou Cano Baixo)
+                    
+                    // Verifica Cano de Cima
+                    // Rect: x, 0, width, topHeight
+                    if (pX < obs.x + obs.width &&
+                        pX + pW > obs.x &&
+                        pY < 0 + obs.topHeight) {
+                        gameOver();
+                        return;
+                    }
+                    
+                    // Verifica Cano de Baixo
+                    // Rect: x, bottomY, width, bottomHeight
+                    if (pX < obs.x + obs.width &&
+                        pX + pW > obs.x &&
+                        pY + pH > obs.bottomY) {
+                        gameOver();
+                        return;
+                    }
                 }
             }
         }
@@ -1162,7 +1232,7 @@
             playSound('gameover');
             if (bgMusic && !bgMusic.paused) bgMusic.pause();
             
-            let finalScore = Math.floor(score); // Arredonda para exibição e salvamento
+            let finalScore = Math.floor(score);
 
             if (finalScore > highScore) {
                 highScore = finalScore;
@@ -1182,7 +1252,6 @@
                 salvarPontuacao(playerName, finalScore);
             } catch (e) {
                 console.error("Erro ao processar ranking:", e);
-                // Não deixa o jogo quebrar se der erro aqui
             }
         }
         
@@ -1235,34 +1304,66 @@
         function renderPlayer() {
             ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
             ctx.shadowColor = '#FFA500'; ctx.shadowBlur = 10;
-            if (player.loaded) {
-                ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
+            
+            // Lógica de Renderização Híbrida
+            if (currentLevel >= FLAPPY_LEVEL_START) {
+                // Desenha NOVO MASCOTE
+                if (flappyPlayerImage.complete) {
+                    ctx.drawImage(flappyPlayerImage, player.x, player.y, player.width, player.height);
+                } else {
+                    ctx.fillStyle = '#FF4500'; ctx.fillRect(player.x, player.y, player.width, player.height);
+                }
             } else {
-                ctx.fillStyle = '#FFA500'; ctx.fillRect(player.x, player.y, player.width, player.height);
-                ctx.fillStyle = 'white'; ctx.font = '16px Arial'; ctx.textAlign = 'center';
-                ctx.fillText('Zéo', player.x + player.width/2, player.y + player.height/2 + 5); 
+                // Desenha ZÉO (Padrão)
+                if (player.loaded) {
+                    ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
+                } else {
+                    ctx.fillStyle = '#FFA500'; ctx.fillRect(player.x, player.y, player.width, player.height);
+                    ctx.fillStyle = 'white'; ctx.font = '16px Arial'; ctx.textAlign = 'center';
+                    ctx.fillText('Zéo', player.x + player.width/2, player.y + player.height/2 + 5); 
+                }
             }
             ctx.restore();
         }
         
         function renderObstacles() {
             obstacles.forEach(obstacle => {
-                ctx.save(); ctx.translate(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2);
-                ctx.rotate(obstacle.rotation); ctx.shadowColor = '#FFD700'; ctx.shadowBlur = 15 * obstacle.glowIntensity;
-                ctx.fillStyle = '#C0C0C0'; ctx.beginPath();
-                ctx.moveTo(-obstacle.width/2, -obstacle.height/3); ctx.lineTo(-obstacle.width/3, -obstacle.height/2);
-                ctx.lineTo(obstacle.width/4, -obstacle.height/2.5); ctx.lineTo(obstacle.width/2, -obstacle.height/4);
-                ctx.lineTo(obstacle.width/2.2, obstacle.height/6); ctx.lineTo(obstacle.width/3, obstacle.height/2.5);
-                ctx.lineTo(0, obstacle.height/2); ctx.lineTo(-obstacle.width/3, obstacle.height/3);
-                ctx.lineTo(-obstacle.width/2.2, obstacle.height/8); ctx.closePath(); ctx.fill();
-                ctx.fillStyle = '#A9A9A9';
-                ctx.beginPath(); ctx.arc(-obstacle.width/4, -obstacle.height/6, obstacle.width/8, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(obstacle.width/5, obstacle.height/8, obstacle.width/10, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(-obstacle.width/6, obstacle.height/5, obstacle.width/12, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#FFFFFF';
-                ctx.beginPath(); ctx.arc(-obstacle.width/5, -obstacle.height/4, obstacle.width/15, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(obstacle.width/6, -obstacle.height/5, obstacle.width/18, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(0, -obstacle.height/6, obstacle.width/20, 0, Math.PI * 2); ctx.fill();
+                ctx.save(); 
+                
+                if (obstacle.type === 'rock') {
+                    // RENDERIZAÇÃO DA PEDRA
+                    ctx.translate(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2);
+                    ctx.rotate(obstacle.rotation); ctx.shadowColor = '#FFD700'; ctx.shadowBlur = 15 * obstacle.glowIntensity;
+                    ctx.fillStyle = '#C0C0C0'; ctx.beginPath();
+                    ctx.moveTo(-obstacle.width/2, -obstacle.height/3); ctx.lineTo(-obstacle.width/3, -obstacle.height/2);
+                    ctx.lineTo(obstacle.width/4, -obstacle.height/2.5); ctx.lineTo(obstacle.width/2, -obstacle.height/4);
+                    ctx.lineTo(obstacle.width/2.2, obstacle.height/6); ctx.lineTo(obstacle.width/3, obstacle.height/2.5);
+                    ctx.lineTo(0, obstacle.height/2); ctx.lineTo(-obstacle.width/3, obstacle.height/3);
+                    ctx.lineTo(-obstacle.width/2.2, obstacle.height/8); ctx.closePath(); ctx.fill();
+                    // Detalhes da pedra...
+                    ctx.fillStyle = '#A9A9A9';
+                    ctx.beginPath(); ctx.arc(-obstacle.width/4, -obstacle.height/6, obstacle.width/8, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(obstacle.width/5, obstacle.height/8, obstacle.width/10, 0, Math.PI * 2); ctx.fill();
+                    
+                } else if (obstacle.type === 'pipe') {
+                    // RENDERIZAÇÃO DOS CANOS (FLAPPY)
+                    // Cano de Cima
+                    ctx.shadowColor = '#000'; ctx.shadowBlur = 5;
+                    ctx.fillStyle = '#228B22'; // Verde clássico de cano
+                    // Cano Cima
+                    ctx.fillRect(obstacle.x, 0, obstacle.width, obstacle.topHeight);
+                    // Borda do cano de cima
+                    ctx.fillStyle = '#006400'; // Verde escuro
+                    ctx.fillRect(obstacle.x - 5, obstacle.topHeight - 20, obstacle.width + 10, 20);
+                    
+                    // Cano de Baixo
+                    ctx.fillStyle = '#228B22';
+                    ctx.fillRect(obstacle.x, obstacle.bottomY, obstacle.width, obstacle.bottomHeight);
+                    // Borda do cano de baixo
+                    ctx.fillStyle = '#006400';
+                    ctx.fillRect(obstacle.x - 5, obstacle.bottomY, obstacle.width + 10, 20);
+                }
+                
                 ctx.restore();
             });
         }
