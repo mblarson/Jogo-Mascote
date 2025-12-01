@@ -554,26 +554,25 @@
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 15; 
         
-        // --- CONFIGURAÇÃO DE NÍVEL ---
-        // Defina aqui em qual nível o jogo muda para o estilo Flappy Bird
-        const FLAPPY_LEVEL_START = 2; // >>> ALTERE AQUI O NÍVEL QUE ATIVA O MODO FLAPPY <<<
+        // --- [ALTERAÇÃO 1] CONFIGURAÇÃO DE NÍVEL ATUALIZADA ---
+        // Agora o Flappy começa apenas no nível 11.
+        const FLAPPY_LEVEL_START = 11; 
         
         let lastTime = 0;
         const TARGET_FPS = 60;
 
+        // --- [ALTERAÇÃO 1] TABELA DE VELOCIDADES ORGANIZADA (1-10) ---
+        // Lista completa sem buracos, conforme solicitado.
         const LEVEL_CONFIG = {
-            1: { targetSpeed: 4.0, densityFactor: 1.0 },
-            2: { targetSpeed: 4.4, densityFactor: 1.0 },
-            3: { targetSpeed: 4.9, densityFactor: 1.2 }, 
-            
-            // --- AJUSTE: Velocidade reduzida no Nível 4 (Flappy) ---
-            4: { targetSpeed: 4.0, densityFactor: 2.0 },
-            
-            5: { targetSpeed: 6.9, densityFactor: 2.3 },
-            6: { targetSpeed: 7.4, densityFactor: 2.4 },
-            7: { targetSpeed: 8.9, densityFactor: 3.0 },
-            8: { targetSpeed: 9.9, densityFactor: 3.4 },
-            9: { targetSpeed: 9.9, densityFactor: 3.9 },
+            1:  { targetSpeed: 4.0, densityFactor: 1.0 },
+            2:  { targetSpeed: 4.9, densityFactor: 1.0 },
+            3:  { targetSpeed: 5.9, densityFactor: 1.2 },
+            4:  { targetSpeed: 6.9, densityFactor: 2.3 },
+            5:  { targetSpeed: 6.9, densityFactor: 2.3 },
+            6:  { targetSpeed: 7.9, densityFactor: 2.4 },
+            7:  { targetSpeed: 8.9, densityFactor: 3.0 },
+            8:  { targetSpeed: 9.9, densityFactor: 3.4 },
+            9:  { targetSpeed: 9.9, densityFactor: 3.9 },
             10: { targetSpeed: 10.0, densityFactor: 4.5 }
         };
 
@@ -631,6 +630,27 @@
             } catch (err) {
                 console.error('Erro conexão:', err);
             }
+        }
+        
+        // --- [ALTERAÇÃO 3] SUPABASE KEEPALIVE ---
+        // Mantém a conexão ativa realizando um ping leve a cada 4 minutos
+        function startSupabaseKeepAlive() {
+            if (!_supabase) return;
+
+            // Intervalo de 4 minutos (240.000 ms)
+            setInterval(async () => {
+                try {
+                    // Faz um select apenas do head (metadados), sem retornar corpo de resposta.
+                    // Isso é invisível ao usuário e extremamente leve para o banco.
+                    const { error } = await _supabase
+                        .from('ranking')
+                        .select('id', { count: 'exact', head: true });
+                    
+                    // Se houver erro de rede silencioso, ignora
+                } catch (e) {
+                    // Captura falhas de conexão silenciosamente
+                }
+            }, 240000);
         }
 
         function showInstantMixedRanking(currentScore, currentPlayerName) {
@@ -818,8 +838,19 @@
             return jumpDistance + safetyMargin;
         }
 
+        // --- [ALTERAÇÃO 1 e 2] CÁLCULO DE DIFICULDADE ATUALIZADO ---
         function calculateDifficultyParams(deltaFactor) {
-            const config = LEVEL_CONFIG[currentLevel] || (currentLevel >= FLAPPY_LEVEL_START ? LEVEL_CONFIG[FLAPPY_LEVEL_START] : LEVEL_CONFIG[10]);
+            
+            // GARANTIA: Se for modo FLAPPY, a velocidade é fixa em 4.0
+            // Isso sobrescreve qualquer outra lógica, garantindo estabilidade no voo.
+            if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START') {
+                gameSpeed = 4.0; 
+                currentDensityFactor = 2.0; 
+                return; // Sai da função para não aplicar lógica do Runner
+            }
+
+            // Lógica original do modo RUNNER (lê da tabela LEVEL_CONFIG atualizada)
+            const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[10];
             
             if (gameSpeed < config.targetSpeed) gameSpeed += 0.005 * deltaFactor; 
             else gameSpeed = config.targetSpeed; 
@@ -973,6 +1004,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             checkScreenSizeAndInit();
             fetchRankingToCache();
+            // --- [ALTERAÇÃO 3] INICIAR KEEPALIVE ---
+            startSupabaseKeepAlive();
 
             if (introScreen) {
                 const enableAudio = () => {
@@ -1199,6 +1232,9 @@
                 
                 calculateDifficultyParams(deltaFactor);
                 
+                // --- [VERIFICAÇÃO 2] DELTATIME APLICADO ---
+                // deltaFactor está sendo passado para todas as funções de update,
+                // garantindo que a física seja baseada em tempo (time-based) e não em frames.
                 updatePlayer(deltaFactor);
                 updateObstacles(deltaFactor); 
                 updateClouds(deltaFactor);
@@ -1330,12 +1366,12 @@
             if (score >= nextLevelScore) {
                 
                 // --- DETECÇÃO DE MUDANÇA DE MODO (RUNNER -> FLAPPY) ---
-                // Verifica se o próximo nível (currentLevel + 1) é o nível de início do Flappy
+                // Verifica se o próximo nível é o início do Flappy
                 if (currentLevel === FLAPPY_LEVEL_START - 1) {
-                    // Se for, inicia a transição visual e lógica para o modo Flappy
+                    // Inicia a transição visual para o modo Flappy
                     startLevelTransition();
                 } else {
-                    // Caso contrário, apenas avança para o próximo nível normal (Runner)
+                    // Avança para o próximo nível normal (Runner)
                     currentLevel++; 
                     nextLevelScore += 500;
                     showMessage(`NÍVEL ${currentLevel}!`, 2000);
