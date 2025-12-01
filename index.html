@@ -561,6 +561,10 @@
         const JUMP_POWER = 16;
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 15; 
+        
+        // --- DELTA TIME VARIABLES ---
+        let lastTime = 0;
+        const TARGET_FPS = 60;
 
         const LEVEL_CONFIG = {
             1: { targetSpeed: 4.0, densityFactor: 1.0 },
@@ -665,7 +669,7 @@
                     if (isCurrentPlayerEntry) li.className = 'ranking-item current-player-rank';
                     else li.className = 'ranking-item';
                     
-                    const pontosFormatados = rank.pontos.toLocaleString('pt-BR');
+                    const pontosFormatados = Math.floor(rank.pontos).toLocaleString('pt-BR');
                     li.innerHTML = `<span>#${index+1} ${rank.nome}</span> <span>${pontosFormatados}</span>`;
                     rankingList.appendChild(li);
                 });
@@ -778,7 +782,7 @@
         let currentDensityFactor = 1.0;
         let gameLoopId;
         
-        highScoreDisplay.textContent = highScore;
+        highScoreDisplay.textContent = Math.floor(highScore);
         
         const player = {
             x: 10, y: 0, width: 70, height: 80,
@@ -807,15 +811,17 @@
             return jumpDistance + safetyMargin;
         }
 
-        function calculateDifficultyParams() {
+        function calculateDifficultyParams(deltaFactor) {
             const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[10];
-            if (gameSpeed < config.targetSpeed) gameSpeed += 0.005; 
+            // Multiplicamos o incremento pela deltaFactor para a aceleração ser consistente no tempo
+            if (gameSpeed < config.targetSpeed) gameSpeed += 0.005 * deltaFactor; 
             else gameSpeed = config.targetSpeed; 
 
             let density = config.densityFactor;
+            // Ajustamos a probabilidade de reset da deathCount também
             if (deathCount > 3) {
                 density *= 0.8;
-                if (Math.random() < 0.001) deathCount = 0; 
+                if (Math.random() < (0.001 * deltaFactor)) deathCount = 0; 
             }
             currentDensityFactor = density;
         }
@@ -871,7 +877,7 @@
         }
         
         function updateUI() {
-            scoreDisplay.textContent = score;
+            scoreDisplay.textContent = Math.floor(score);
             levelDisplay.textContent = currentLevel;
         }
         
@@ -1008,40 +1014,73 @@
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
             initGame();
             gameRunning = true;
-            gameLoop();
+            // Reset do tempo para evitar salto inicial
+            lastTime = performance.now();
+            gameLoopId = requestAnimationFrame(gameLoop);
         }
         
-        function gameLoop() {
+        function gameLoop(timestamp) {
             if (!gameRunning) return;
+            
+            // Tratamento inicial se timestamp não for fornecido
+            if (!timestamp) timestamp = performance.now();
+            
+            // Cálculo do Delta Time (em segundos)
+            const deltaTimeInSeconds = (timestamp - lastTime) / 1000;
+            lastTime = timestamp;
+            
+            // Trava de segurança: se o deltaTime for muito grande (ex: aba minimizada), 
+            // limitamos para evitar que o personagem atravesse o chão.
+            // 0.1s corresponde a 10 FPS.
+            const safeDeltaTime = Math.min(deltaTimeInSeconds, 0.1);
+            
+            // Fator de ajuste baseado em 60 FPS
+            // Se o jogo rodar a 60 FPS, deltaFactor é ~1.0
+            // Se o jogo rodar a 120 FPS, deltaFactor é ~0.5
+            const deltaFactor = safeDeltaTime * TARGET_FPS;
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            calculateDifficultyParams();
-            updatePlayer();
-            updateObstacles(); 
-            updateClouds();
-            updateGround();
-            updateBackground();
+            
+            calculateDifficultyParams(deltaFactor);
+            
+            // Aplicamos deltaFactor em todas as funções de movimento
+            updatePlayer(deltaFactor);
+            updateObstacles(deltaFactor); 
+            updateClouds(deltaFactor);
+            updateGround(deltaFactor);
+            updateBackground(deltaFactor);
+            
             checkLevelProgression();
             checkCollisions();
+            
             renderBackground();
             renderClouds();
             renderGround();
             renderPlayer();
             renderObstacles();
-            score++;
+            
+            // Pontuação agora é baseada em tempo/movimento para ser justa
+            score += 1 * deltaFactor;
+            
             updateUI();
+            
             gameLoopId = requestAnimationFrame(gameLoop);
         }
         
-        function updatePlayer() {
-            player.velocityY += GRAVITY;
-            player.y += player.velocityY;
+        function updatePlayer(deltaFactor) {
+            // Aplicando Delta Time na gravidade e posição
+            player.velocityY += GRAVITY * deltaFactor;
+            player.y += player.velocityY * deltaFactor;
+            
             const groundY = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
             if (player.y > groundY) {
-                player.y = groundY; player.velocityY = 0; player.grounded = true;
+                player.y = groundY; 
+                player.velocityY = 0; 
+                player.grounded = true;
             }
         }
         
-        function updateObstacles() {
+        function updateObstacles(deltaFactor) {
             const elapsedTime = (Date.now() - gameStartTime) / 1000;
             if (!firstObstacleCreated && elapsedTime >= 3) {
                 createObstacle(); firstObstacleCreated = true;
@@ -1064,26 +1103,30 @@
                 }
             }
             for (let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].x -= gameSpeed;
+                // Obstáculos agora se movem multiplicados pelo fator
+                obstacles[i].x -= gameSpeed * deltaFactor;
                 if (obstacles[i].x + obstacles[i].width < 0) obstacles.splice(i, 1);
             }
         }
         
-        function updateClouds() {
+        function updateClouds(deltaFactor) {
             if (clouds.length < 5 && Math.random() < 0.01) createCloud();
             for (let i = clouds.length - 1; i >= 0; i--) {
-                clouds[i].x -= clouds[i].speed;
+                // Nuvens com deltaFactor
+                clouds[i].x -= clouds[i].speed * deltaFactor;
                 if (clouds[i].x + clouds[i].width < 0) clouds.splice(i, 1);
             }
         }
         
-        function updateGround() {
-            groundPosition -= gameSpeed;
+        function updateGround(deltaFactor) {
+            // Chão com deltaFactor
+            groundPosition -= gameSpeed * deltaFactor;
             if (groundPosition <= -40) groundPosition = 0;
         }
         
-        function updateBackground() {
-            backgroundPosition -= gameSpeed * 0.5;
+        function updateBackground(deltaFactor) {
+            // Fundo com deltaFactor
+            backgroundPosition -= gameSpeed * 0.5 * deltaFactor;
             const width = canvas.width / (window.devicePixelRatio || 1);
             if (backgroundPosition <= -width) backgroundPosition = 0;
         }
@@ -1119,8 +1162,10 @@
             playSound('gameover');
             if (bgMusic && !bgMusic.paused) bgMusic.pause();
             
-            if (score > highScore) {
-                highScore = score;
+            let finalScore = Math.floor(score); // Arredonda para exibição e salvamento
+
+            if (finalScore > highScore) {
+                highScore = finalScore;
                 localStorage.setItem('zeoHighScore', highScore);
                 highScoreDisplay.textContent = highScore;
             }
@@ -1128,13 +1173,13 @@
             gameMessage.style.display = 'none';
 
             finalPlayerName.textContent = playerName || "JOGADOR";
-            finalScoreDisplay.textContent = score.toLocaleString('pt-BR');
+            finalScoreDisplay.textContent = finalScore.toLocaleString('pt-BR');
             
             if (newGameOverModal) newGameOverModal.style.display = 'flex';
 
             try {
-                showInstantMixedRanking(score, playerName);
-                salvarPontuacao(playerName, score);
+                showInstantMixedRanking(finalScore, playerName);
+                salvarPontuacao(playerName, finalScore);
             } catch (e) {
                 console.error("Erro ao processar ranking:", e);
                 // Não deixa o jogo quebrar se der erro aqui
