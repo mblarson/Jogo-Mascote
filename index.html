@@ -844,7 +844,7 @@
             // GARANTIA: Se for modo FLAPPY, a velocidade é fixa em 4.0
             // Isso sobrescreve qualquer outra lógica, garantindo estabilidade no voo.
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START') {
-                gameSpeed = 4.0; 
+                gameSpeed = 3.0; 
                 currentDensityFactor = 2.0; 
                 return; // Sai da função para não aplicar lógica do Runner
             }
