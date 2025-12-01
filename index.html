@@ -1457,7 +1457,7 @@
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || (gameState === 'TRANSITION' && transitionPhase !== 'fade-out')) {
                 // DIMENSÕES FLAPPY: 90x80
                 const flappyWidth = 90;
-                const flappyHeight = 80;
+                const flappyHeight = 90;
 
                 if (flappyPlayerImage.loaded) { 
                     ctx.drawImage(flappyPlayerImage, player.x, player.y, flappyWidth, flappyHeight);
