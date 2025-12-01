@@ -551,7 +551,9 @@
         const FLAPPY_JUMP_POWER = 12; // Impulso para o modo Flappy
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 15; 
-        const FLAPPY_LEVEL_START = 14; // Nível onde começa a fase Flappy
+        
+        // --- ALTERAÇÃO SOLICITADA: NÍVEL 4 ---
+        const FLAPPY_LEVEL_START = 4; 
         
         let lastTime = 0;
         const TARGET_FPS = 60;
@@ -560,14 +562,17 @@
             1: { targetSpeed: 4.0, densityFactor: 1.0 },
             2: { targetSpeed: 4.4, densityFactor: 1.0 },
             3: { targetSpeed: 4.9, densityFactor: 1.2 }, 
-            4: { targetSpeed: 5.9, densityFactor: 1.4 },
+            
+            // --- CORREÇÃO DO TRAVAMENTO ---
+            // Adicionado configuração explícita para o nível 4 (Flappy)
+            4: { targetSpeed: 5.5, densityFactor: 2.0 },
+            
             5: { targetSpeed: 6.9, densityFactor: 2.3 },
             6: { targetSpeed: 7.4, densityFactor: 2.4 },
             7: { targetSpeed: 8.9, densityFactor: 3.0 },
             8: { targetSpeed: 9.9, densityFactor: 3.4 },
             9: { targetSpeed: 9.9, densityFactor: 3.9 },
-            10: { targetSpeed: 10.0, densityFactor: 4.5 },
-            14: { targetSpeed: 5.5, densityFactor: 2.0 } // Config inicial do Flappy
+            10: { targetSpeed: 10.0, densityFactor: 4.5 }
         };
 
         const canvas = document.getElementById('gameCanvas');
@@ -781,8 +786,11 @@
         player.image.src = "./mascote.png";
 
         // --- NOVO MASCOTE (MODO FLAPPY) ---
+        // Proteção contra URL com espaços (codificação)
         const flappyPlayerImage = new Image();
-        flappyPlayerImage.src = 'https://raw.githubusercontent.com/mblarson/jogo-mascote/main/MATERIAL CONGRESSO - DRIVE.png.PNG';
+        flappyPlayerImage.onload = () => { flappyPlayerImage.loaded = true; };
+        flappyPlayerImage.onerror = () => { console.warn("Erro ao carregar imagem Flappy"); };
+        flappyPlayerImage.src = encodeURI('https://raw.githubusercontent.com/mblarson/jogo-mascote/main/MATERIAL CONGRESSO - DRIVE.png.PNG');
         
         const backgroundImage = new Image();
         backgroundImage.onload = () => { backgroundImage.loaded = true; };
@@ -803,6 +811,7 @@
         }
 
         function calculateDifficultyParams(deltaFactor) {
+            // Se o nível 4 não existir aqui, causaria o crash. Corrigido acima.
             const config = LEVEL_CONFIG[currentLevel] || (currentLevel >= FLAPPY_LEVEL_START ? LEVEL_CONFIG[FLAPPY_LEVEL_START] : LEVEL_CONFIG[10]);
             
             if (gameSpeed < config.targetSpeed) gameSpeed += 0.005 * deltaFactor; 
@@ -868,15 +877,14 @@
         }
 
         function createFlappyObstacle() {
-            const width = 60; // Largura do cano
-            const gapSize = 180; // Abertura para o player passar
+            const width = 60; 
+            const gapSize = 180; 
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
             const groundY = canvasHeight - GROUND_HEIGHT;
             const minPipeHeight = 50;
             
-            // Calcula altura aleatória para o cano de cima
-            // Deve sobrar espaço para o gap e o cano de baixo
-            const maxTopHeight = groundY - minPipeHeight - gapSize;
+            // Lógica mais segura para evitar valores negativos
+            const maxTopHeight = Math.max(10, groundY - minPipeHeight - gapSize);
             const topHeight = Math.max(minPipeHeight, Math.random() * maxTopHeight);
             
             const bottomY = topHeight + gapSize;
@@ -1166,7 +1174,7 @@
         
         function checkLevelProgression() {
             if (score >= nextLevelScore) {
-                // Se a transição for exatamente AGORA para o nível Flappy
+                // Se a transição for exatamente AGORA para o nível Flappy (agora nível 4)
                 if (currentLevel === FLAPPY_LEVEL_START - 1) {
                     // Limpa obstáculos do runner para dar uma chance justa
                     obstacles = [];
@@ -1308,7 +1316,7 @@
             // Lógica de Renderização Híbrida
             if (currentLevel >= FLAPPY_LEVEL_START) {
                 // Desenha NOVO MASCOTE
-                if (flappyPlayerImage.complete) {
+                if (flappyPlayerImage.loaded) { // Usando flag correta
                     ctx.drawImage(flappyPlayerImage, player.x, player.y, player.width, player.height);
                 } else {
                     ctx.fillStyle = '#FF4500'; ctx.fillRect(player.x, player.y, player.width, player.height);
