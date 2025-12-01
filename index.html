@@ -552,7 +552,6 @@
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 15; 
         
-        // --- ALTERAÇÃO SOLICITADA: NÍVEL 4 ---
         const FLAPPY_LEVEL_START = 4; 
         
         let lastTime = 0;
@@ -802,6 +801,13 @@
         let groundPosition = 0;
         let gameStartTime = 0;
         let firstObstacleCreated = false;
+
+        // --- VARIÁVEIS DE TRANSIÇÃO (NÍVEL 4) ---
+        let isTransitioning = false;
+        let transitionPhase = 'none'; // 'fade-out', 'fade-in', 'countdown', 'none'
+        let transitionTimer = 0;
+        let transitionAlpha = 0;
+        let transitionCountdown = 3;
         
         function calculateSafeGap() {
             const jumpDurationFrames = (2 * player.jumpPower) / GRAVITY;
@@ -841,6 +847,12 @@
             backgroundPosition = 0;
             gameStartTime = Date.now();
             firstObstacleCreated = false;
+            
+            // RESET TRANSIÇÃO
+            isTransitioning = false;
+            transitionPhase = 'none';
+            if (bgMusic) bgMusic.volume = 0.4;
+
             updateUI();
             for (let i = 0; i < 5; i++) createCloud();
             playMusicSafe();
@@ -913,6 +925,8 @@
         // --- LÓGICA DE PULO (HÍBRIDA) ---
         function jump() {
             if (!gameRunning) return;
+            // Bloqueia input durante transição
+            if (isTransitioning) return;
 
             if (currentLevel >= FLAPPY_LEVEL_START) {
                 // Modo Flappy: Pula sempre, inclusive no ar
@@ -1043,36 +1057,151 @@
             gameLoopId = requestAnimationFrame(gameLoop);
         }
         
+        // --- FUNÇÕES DE TRANSIÇÃO ---
+
+        function startLevelTransition() {
+            isTransitioning = true;
+            transitionPhase = 'fade-out';
+            transitionTimer = 0;
+            transitionAlpha = 0;
+            
+            // Reduz volume para efeito
+            if (bgMusic) bgMusic.volume = 0.1;
+        }
+
+        function updateTransition(deltaFactor) {
+            // Converte deltaFactor (frames) para segundos aproximados
+            const dt = deltaFactor / 60;
+
+            if (transitionPhase === 'fade-out') {
+                transitionAlpha += dt * 2; // Fade out rápido (0.5s)
+                if (transitionAlpha >= 1) {
+                    transitionAlpha = 1;
+                    transitionPhase = 'fade-in';
+                    
+                    // --- TROCA DE LÓGICA (NO ESCURO) ---
+                    currentLevel++;
+                    nextLevelScore += 500;
+                    obstacles = []; // Limpa obstáculos do runner
+                    player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2; // Centraliza jogador
+                    player.velocityY = 0;
+                    // A troca de sprite é automática no renderPlayer com base no currentLevel
+                }
+            } else if (transitionPhase === 'fade-in') {
+                transitionAlpha -= dt * 2; // Fade in rápido (0.5s)
+                if (transitionAlpha <= 0) {
+                    transitionAlpha = 0;
+                    transitionPhase = 'countdown';
+                    transitionCountdown = 3;
+                    transitionTimer = 0;
+                }
+            } else if (transitionPhase === 'countdown') {
+                transitionTimer += dt;
+                if (transitionTimer >= 1.0) { // 1 segundo por número
+                    transitionCountdown--;
+                    transitionTimer = 0;
+                    if (transitionCountdown > 0) {
+                         playSound('ui-click'); 
+                    } else {
+                        // --- FIM DA TRANSIÇÃO ---
+                        isTransitioning = false;
+                        transitionPhase = 'none';
+                        lastTime = performance.now(); // RESET CRÍTICO DE DELTA TIME
+                        if (bgMusic) bgMusic.volume = 0.4; // Restaura volume
+                        playSound('start'); 
+                        showMessage("VAI!", 1000);
+                    }
+                }
+            }
+        }
+
+        function renderTransition() {
+            if (!isTransitioning) return;
+
+            const width = canvas.width / (window.devicePixelRatio || 1);
+            const height = canvas.height / (window.devicePixelRatio || 1);
+
+            // Desenha Overlay de Fade
+            if (transitionPhase === 'fade-out' || transitionPhase === 'fade-in') {
+                ctx.fillStyle = `rgba(0, 0, 0, ${transitionAlpha})`;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            // Desenha Contagem Regressiva
+            if (transitionPhase === 'countdown') {
+                // Fundo semi-transparente para leitura
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                ctx.fillRect(0, 0, width, height);
+                
+                ctx.save();
+                ctx.fillStyle = '#FFD700';
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 4;
+                ctx.font = 'bold 100px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'black';
+                ctx.shadowBlur = 20;
+                ctx.strokeText(transitionCountdown, width / 2, height / 2);
+                ctx.fillText(transitionCountdown, width / 2, height / 2);
+                
+                // Texto de aviso
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 24px Arial';
+                ctx.shadowBlur = 5;
+                ctx.fillText("MODO FLAPPY!", width / 2, height / 2 + 80);
+                ctx.restore();
+            }
+        }
+
         function gameLoop(timestamp) {
             if (!gameRunning) return;
             
             if (!timestamp) timestamp = performance.now();
             
             const deltaTimeInSeconds = (timestamp - lastTime) / 1000;
-            lastTime = timestamp;
+            lastTime = timestamp; // Mantemos o relógio rodando para consistência
+            
             const safeDeltaTime = Math.min(deltaTimeInSeconds, 0.1);
             const deltaFactor = safeDeltaTime * TARGET_FPS;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            calculateDifficultyParams(deltaFactor);
-            
-            updatePlayer(deltaFactor);
-            updateObstacles(deltaFactor); 
-            updateClouds(deltaFactor);
-            updateGround(deltaFactor);
-            updateBackground(deltaFactor);
-            
-            checkLevelProgression();
-            checkCollisions();
-            
-            renderBackground();
-            renderClouds();
-            renderGround();
-            renderPlayer();
-            renderObstacles();
-            
-            score += 1 * deltaFactor;
+            // --- BRANCH DE LÓGICA PRINCIPAL ---
+            if (isTransitioning) {
+                // Durante transição: Atualiza APENAS efeito visual, pausa física
+                updateTransition(deltaFactor);
+                
+                // Renderiza jogo congelado ao fundo
+                renderBackground();
+                renderClouds();
+                renderGround();
+                renderPlayer(); 
+                renderObstacles();
+                
+                // Renderiza efeito de transição por cima
+                renderTransition();
+            } else {
+                // Jogo Normal
+                calculateDifficultyParams(deltaFactor);
+                
+                updatePlayer(deltaFactor);
+                updateObstacles(deltaFactor); 
+                updateClouds(deltaFactor);
+                updateGround(deltaFactor);
+                updateBackground(deltaFactor);
+                
+                checkLevelProgression();
+                checkCollisions();
+                
+                renderBackground();
+                renderClouds();
+                renderGround();
+                renderPlayer();
+                renderObstacles();
+                
+                score += 1 * deltaFactor;
+            }
             
             updateUI();
             
@@ -1174,21 +1303,17 @@
         
         function checkLevelProgression() {
             if (score >= nextLevelScore) {
-                // Se a transição for exatamente AGORA para o nível Flappy (agora nível 4)
+                // Se estamos prestes a ir para o nível Flappy (Nível 4)
                 if (currentLevel === FLAPPY_LEVEL_START - 1) {
-                    // Limpa obstáculos do runner para dar uma chance justa
-                    obstacles = [];
-                    // Posiciona o player no meio para não morrer instantaneamente
-                    player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2;
-                    player.velocityY = 0;
-                    showMessage(`FASE FLAPPY!`, 3000);
+                    // INICIA TRANSIÇÃO VISUAL
+                    // Não incrementamos o nível aqui, a transição cuida disso
+                    startLevelTransition();
                 } else {
-                    showMessage(`NÍVEL ${currentLevel + 1}!`, 2000);
+                    currentLevel++; 
+                    nextLevelScore += 500;
+                    showMessage(`NÍVEL ${currentLevel}!`, 2000);
+                    playSound('levelup');
                 }
-
-                currentLevel++; 
-                nextLevelScore += 500;
-                playSound('levelup');
             }
         }
         
