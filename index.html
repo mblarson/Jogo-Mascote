@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AS AVENTURAS DE ZÉO - HARDCORE</title>
+    <title>ZÉO & FLAPPYMATS</title>
     <!-- Importando Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -14,7 +14,6 @@
         }
         
         body {
-            /* Fundo original */
             background-image: url('./backgournd.png'), url('./background.png');
             background-size: cover;
             background-position: center;
@@ -27,7 +26,7 @@
             align-items: center;
             height: 100vh;
             touch-action: none;
-            background-color: #87CEEB; /* Azul celeste original */
+            background-color: #87CEEB;
         }
         
         #gameContainer {
@@ -36,7 +35,6 @@
             max-width: 800px;
             height: 100vh;
             max-height: 500px;
-            /* Fundo semi-transparente original */
             background: rgba(135, 206, 235, 0.7);
             overflow: hidden;
             border: 3px solid #FF0000;
@@ -274,26 +272,8 @@
             50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 10px #FFD700; }
             100% { transform: scale(1); opacity: 0.8; }
         }
-
-        @media (max-width: 500px) {
-            .game-over-layout {
-                flex-direction: column;
-                border: none;
-                align-items: center;
-            }
-            .result-column {
-                border-right: none;
-                border-bottom: 1px solid #444;
-                padding-bottom: 15px;
-                padding-right: 0;
-                width: 100%;
-                margin-bottom: 15px;
-            }
-            .ranking-column {
-                width: 100%;
-            }
-        }
         
+        /* ESTILOS DE TELA DE INTRODUÇÃO */
         #introScreen {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             width: 100vw; height: 100vh;
@@ -325,9 +305,19 @@
             align-items: center; width: 100%; height: 100%; padding: 20px;
         }
         
+        /* TELA PRÉ-JOGO (Runner) */
         #startScreen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto;
+            display: none; 
+        }
+
+        /* TELA PRÉ-JOGO (FlappyMats) */
+        #startScreenFlappy {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* Um pouco mais escuro para diferenciar */
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto;
             display: none; 
@@ -360,17 +350,18 @@
             z-index: 1;
         }
         
-        #startScreen h1 {
+        h1 {
             font-size: 28px; margin-bottom: 15px; color: #FFA500;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); line-height: 1.2;
             position: relative; z-index: 2;
         }
         
-        #startScreen p {
+        p {
             font-size: 16px; margin-bottom: 20px; max-width: 90%; line-height: 1.4;
-            position: relative; z-index: 2;
+            position: relative; z-index: 2; color: white;
         }
         
+        /* BOTÕES */
         .neo-pop-tilted-button {
           border: 0.1px; padding-bottom: 6px; box-shadow: 1px 5px 7px #494a4b;
           position: relative; overflow: hidden; background-color: #b7a81d; color: #000000;
@@ -390,6 +381,16 @@
           background: linear-gradient(to right, rgba(255, 255, 255, 1) 5px, rgba(255, 255, 255, 0) 5px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 1) 2px);
           animation: shimmer 5.5s infinite linear;
         }
+        
+        /* Botão específico para Flappy (Ciano para diferenciar) */
+        .btn-flappy {
+            background-color: #008B8B;
+        }
+        .btn-flappy span {
+            background: #00FFFF;
+            color: #000;
+        }
+        .btn-flappy:focus-visible { box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.5); }
 
         @keyframes shimmer { 0% { transform: translateX(-1950%); } 100% { transform: translateX(100%); } }
 
@@ -405,26 +406,37 @@
         #introContent .neo-pop-tilted-button {
             margin-left: 0; max-width: 250px; align-self: flex-start;
         }
+        
+        .intro-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+            margin-top: auto;
+            margin-bottom: 100px;
+        }
 
         @media (max-width: 480px) {
+            .game-over-layout { flex-direction: column; border: none; align-items: center; }
+            .result-column { border-right: none; border-bottom: 1px solid #444; padding-bottom: 15px; padding-right: 0; width: 100%; margin-bottom: 15px; }
+            .ranking-column { width: 100%; }
             #gameInfo { font-size: 14px; }
             #gameMessage { font-size: 20px; padding: 15px 25px; }
-            
             #gameLogo { width: 200px; margin-bottom: -20px; margin-top: -20px; }
-            
-            #startScreen h1 { font-size: 24px; }
-            #startScreen p { font-size: 14px; margin-bottom: 15px; }
+            h1 { font-size: 24px; }
+            p { font-size: 14px; margin-bottom: 15px; }
             .neo-pop-tilted-button { font-size: 0.9rem; }
             .neo-pop-tilted-button span { padding: 0.7rem 1.5rem; }
             #countdown { font-size: 60px; }
             #countdownMessage { font-size: 16px; }
             #introContent .neo-pop-tilted-button { font-size: 1.1rem; letter-spacing: 0.1rem; padding: 0; }
             #introContent .neo-pop-tilted-button span { padding: 0.8rem 2rem; }
+            .intro-btn-group { margin-bottom: 120px; }
         }
         
         @media (max-height: 600px) {
-            #startScreen h1 { font-size: 22px; margin-bottom: 10px; }
-            #startScreen p { font-size: 14px; margin-bottom: 15px; max-width: 95%; }
+            h1 { font-size: 22px; margin-bottom: 10px; }
+            p { font-size: 14px; margin-bottom: 15px; max-width: 95%; }
             #gameLogo { width: 220px; margin-bottom: -30px; }
             #countdown { font-size: 50px; }
             #countdownMessage { font-size: 14px; }
@@ -498,20 +510,25 @@
         <div id="introScreen">
             <div id="introWrapper">
                 <div id="introContent">
-                    <div style="margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding-left: 0; margin-bottom: 150px;">
-                        
-                        <div class="volume-warning">
-                            <span>🔊</span> AUMENTE O SOM PARA JOGAR
-                        </div>
+                    <div class="volume-warning">
+                        <span>🔊</span> AUMENTE O SOM PARA JOGAR
+                    </div>
+
+                    <div class="intro-btn-group">
+                        <!-- NOVO BOTÃO FLAPPYMATS -->
+                        <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy">
+                            <span>FLAPPYMATS</span>
+                        </button>
 
                         <button id="introStartBtn" class="neo-pop-tilted-button">
-                            <span>JOGUE<br>AGORA</span>
+                            <span>JOGUE AGORA</span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- TELA PRÉ-INÍCIO (RUNNER) -->
         <div id="startScreen">
             <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>ZÉO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
@@ -520,12 +537,21 @@
             <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
             <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
         </div>
+
+        <!-- NOVA TELA PRÉ-INÍCIO (FLAPPYMATS) -->
+        <div id="startScreenFlappy">
+            <img id="flappyLogo" src="./mascoteaviao.png" alt="Mascote Aviao" 
+                 style="width: 150px; height: auto; margin-bottom: 10px;">
+            <h1 style="color: #00FFFF;">FLAPPYMATS</h1>
+            <p>O jogador controla o mascote que deve voar através de canos verdes empilhados sem tocá-los.</p>
+            <p>A mecânica é básica: tocar na tela faz o mascote levantar voo para se manter no ar, enquanto a gravidade o puxa para baixo.</p>
+            <button id="startBtnFlappy" class="neo-pop-tilted-button btn-flappy"><span>INICIAR JOGO</span></button>
+        </div>
         
         <div id="countdownScreen">
             <div id="countdown">3</div>
             <div id="countdownMessage">
-                <p>Atenção: Toque apenas dentro da área iluminada do jogo para fazer o Zéo pular!</p>
-                <p>Toques na borda vermelha não funcionarão.</p>
+                <p>Atenção: Toque apenas dentro da área iluminada do jogo!</p>
             </div>
         </div>
     </div>
@@ -534,6 +560,16 @@
         const SUPABASE_URL = 'https://ngeofumxwasfkaathwbu.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nZW9mdW14d2FzZmthYXRod2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MzU3MzQsImV4cCI6MjA4MDAxMTczNH0._kT-LZlXDdNY3Kr4PEC-3yO3a3I7CupEDklj_rGSlnE';
         
+        // --- GERENCIAMENTO DE MODO DE JOGO ---
+        const MODE_RUNNER = 'RUNNER';
+        const MODE_FLAPPY = 'FLAPPY_SOLO'; // Modo Flappy independente
+        
+        const TABLE_RUNNER = 'ranking';
+        const TABLE_FLAPPY = 'ranking_flappy';
+
+        let selectedGameMode = MODE_RUNNER; // Default
+        let activeTable = TABLE_RUNNER;
+
         let _supabase = null;
         try {
             if (typeof supabase !== 'undefined') {
@@ -548,28 +584,18 @@
         let playerName = "";
         let cachedRanking = []; 
 
-        // --- CORREÇÃO DE FÍSICA ---
-        // Aumentei a gravidade para 0.95 (era 0.85). Isso faz o Zéo voltar ao chão mais rápido.
-        // Aumentei a força do pulo para 17 para compensar.
         const GRAVITY = 0.95; 
         const JUMP_POWER = 17;
         const FLAPPY_JUMP_POWER = 12; 
         const GROUND_HEIGHT = 50;
-        
-        // --- REACTION BUFFER RESTAURADO ---
-        // Aumentei de 8 para 12 frames. O jogo garante que sempre haverá 12 frames 
-        // de espaço vazio após você cair, para dar tempo de pular de novo.
         const REACTION_BUFFER_FRAMES = 12; 
         
-        // --- [CONFIGURAÇÃO] NÍVEL FLAPPY ---
-        // O Flappy começa apenas no nível 11.
-        const FLAPPY_LEVEL_START = 2; 
+        // O Flappy começa apenas no nível 11 do Runner
+        const FLAPPY_LEVEL_START_RUNNER = 11; 
         
         let lastTime = 0;
         const TARGET_FPS = 60;
 
-        // --- TABELA DE DIFICULDADE REAJUSTADA ---
-        // Reduzi os picos máximos. Nível 8 ainda é rápido (11.0), mas não 13.0.
         const LEVEL_CONFIG = {
             1:  { targetSpeed: 6.0, densityFactor: 1.8 },
             2:  { targetSpeed: 7.0, densityFactor: 2.0 },
@@ -578,7 +604,7 @@
             5:  { targetSpeed: 9.0, densityFactor: 2.8 },
             6:  { targetSpeed: 9.5, densityFactor: 3.2 },
             7:  { targetSpeed: 10.0, densityFactor: 3.8 },
-            8:  { targetSpeed: 10.5, densityFactor: 4.2 }, // Nível difícil, mas jogável
+            8:  { targetSpeed: 10.5, densityFactor: 4.2 },
             9:  { targetSpeed: 11.0, densityFactor: 4.8 },
             10: { targetSpeed: 11.5, densityFactor: 5.0 }
         };
@@ -586,35 +612,44 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const gameContainer = document.getElementById('gameContainer');
-        const debugInfo = document.getElementById('debugInfo');
         
         const bgMusic = document.getElementById('bgMusic');
+        
+        // Telas
         const introScreen = document.getElementById('introScreen');
-        const introStartBtn = document.getElementById('introStartBtn');
-        const startScreen = document.getElementById('startScreen');
+        const startScreen = document.getElementById('startScreen'); // Runner Pre-start
+        const startScreenFlappy = document.getElementById('startScreenFlappy'); // Flappy Pre-start
         const countdownScreen = document.getElementById('countdownScreen');
+        
+        // Botões
+        const introStartBtn = document.getElementById('introStartBtn'); // Intro -> Runner
+        const introFlappyBtn = document.getElementById('introFlappyBtn'); // Intro -> Flappy
+        const startBtn = document.getElementById('startBtn'); // Iniciar Runner
+        const startBtnFlappy = document.getElementById('startBtnFlappy'); // Iniciar Flappy
+        
+        // UI Jogo
         const countdownElement = document.getElementById('countdown');
-        const startBtn = document.getElementById('startBtn');
         const gameMessage = document.getElementById('gameMessage');
         const scoreDisplay = document.getElementById('score');
         const highScoreDisplay = document.getElementById('highScore');
         const levelDisplay = document.getElementById('level');
         
+        // Modais
         const nameModal = document.getElementById('nameModal');
         const playerNameInput = document.getElementById('playerNameInput');
         const confirmNameBtn = document.getElementById('confirmNameBtn');
-        
         const newGameOverModal = document.getElementById('newGameOverModal');
         const finalPlayerName = document.getElementById('finalPlayerName');
         const finalScoreDisplay = document.getElementById('finalScoreDisplay');
         const modalRestartBtn = document.getElementById('modalRestartBtn');
         const rankingList = document.getElementById('rankingList');
         
+        // Carrega o ranking correto baseado na tabela ativa
         async function fetchRankingToCache() {
             if (!_supabase) return;
             try {
                 const { data, error } = await _supabase
-                    .from('ranking')
+                    .from(activeTable)
                     .select('nome, pontos')
                     .order('pontos', { ascending: false })
                     .limit(10);
@@ -631,7 +666,7 @@
             if (!_supabase) return;
             try {
                 const { error } = await _supabase
-                    .from('ranking')
+                    .from(activeTable) // Salva na tabela ativa (runner ou flappy)
                     .insert([{ nome: nome, pontos: pontos }]);
                 if (error) console.error('Erro salvar:', error);
             } catch (err) {
@@ -639,17 +674,6 @@
             }
         }
         
-        function startSupabaseKeepAlive() {
-            if (!_supabase) return;
-            setInterval(async () => {
-                try {
-                    const { error } = await _supabase
-                        .from('ranking')
-                        .select('id', { count: 'exact', head: true });
-                } catch (e) {}
-            }, 240000);
-        }
-
         function showInstantMixedRanking(currentScore, currentPlayerName) {
             if (!rankingList) return;
             
@@ -784,15 +808,13 @@
 
         let gameRunning = false;
         let score = 0;
-        let highScore = localStorage.getItem('zeoHighScore') || 0;
+        let highScore = 0;
         let currentLevel = 1;
         let gameSpeed = 4.0; 
         let nextLevelScore = 500;
         let deathCount = 0;
         let currentDensityFactor = 1.0;
         let gameLoopId;
-        
-        highScoreDisplay.textContent = Math.floor(highScore);
         
         const player = {
             x: 10, y: 0, width: 70, height: 80,
@@ -819,7 +841,7 @@
         let gameStartTime = 0;
         let firstObstacleCreated = false;
 
-        let gameState = 'RUNNER';
+        let gameState = 'RUNNER'; 
         
         let transitionPhase = 'none'; 
         let transitionTimer = 0;
@@ -827,22 +849,16 @@
         let transitionCountdown = 3;
         
         function calculateSafeGap() {
-            // Calcula o tempo que o boneco passa no ar (subida + descida)
             const jumpDurationFrames = (2 * player.jumpPower) / GRAVITY;
-            
-            // Distância que o jogo percorre enquanto o boneco está no ar
             const jumpDistance = jumpDurationFrames * gameSpeed;
-            
-            // Margem de segurança fixa baseada na reação humana
             const safetyMargin = (REACTION_BUFFER_FRAMES * gameSpeed) + player.width;
-            
-            // O gap mínimo é a distância do pulo + margem.
             return jumpDistance + safetyMargin;
         }
 
         function calculateDifficultyParams(deltaFactor) {
             
-            if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START') {
+            // Se estiver em modo Flappy (seja solo ou dentro do runner)
+            if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || selectedGameMode === MODE_FLAPPY) {
                 gameSpeed = 4.0; 
                 currentDensityFactor = 2.0; 
                 return; 
@@ -879,14 +895,25 @@
             gameStartTime = Date.now();
             firstObstacleCreated = false;
             
-            gameState = 'RUNNER'; 
+            // Lógica de Inicialização por Modo
+            if (selectedGameMode === MODE_FLAPPY) {
+                gameState = 'FLAPPY';
+                activeTable = TABLE_FLAPPY;
+                highScore = localStorage.getItem('zeoHighScoreFlappy') || 0;
+            } else {
+                gameState = 'RUNNER';
+                activeTable = TABLE_RUNNER;
+                highScore = localStorage.getItem('zeoHighScore') || 0;
+            }
+            highScoreDisplay.textContent = Math.floor(highScore);
+            
             transitionPhase = 'none';
             if (bgMusic) bgMusic.volume = 0.4;
 
             updateUI();
             for (let i = 0; i < 5; i++) createCloud();
             playMusicSafe();
-            fetchRankingToCache();
+            fetchRankingToCache(); // Atualiza cache com a tabela correta
         }
         
         function createCloud() {
@@ -956,6 +983,7 @@
             
             if (gameState === 'TRANSITION') return;
 
+            // Se for FLAPPY (seja modo solo ou pós-transição no runner)
             if (gameState === 'WAITING_FLAPPY_START') {
                 gameState = 'FLAPPY';
                 player.velocityY = -FLAPPY_JUMP_POWER;
@@ -989,10 +1017,17 @@
 
                 if (window.innerWidth < 1024) {
                     if (introScreen) introScreen.style.display = 'flex';
+                    // Esconde pré-inícios
                     if (startScreen) startScreen.style.display = 'none';
+                    if (startScreenFlappy) startScreenFlappy.style.display = 'none';
                 } else {
                     if (introScreen) introScreen.style.display = 'none';
-                    if (startScreen) startScreen.style.display = 'flex';
+                    // Mostra o pré-início apropriado se já tiver escolhido
+                    if (selectedGameMode === MODE_FLAPPY) {
+                        startScreenFlappy.style.display = 'flex';
+                    } else {
+                        startScreen.style.display = 'flex';
+                    }
                 }
             } catch (e) {
                 console.error("Erro na inicialização da UI:", e);
@@ -1002,9 +1037,10 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             checkScreenSizeAndInit();
-            fetchRankingToCache();
-            startSupabaseKeepAlive();
-
+            // Inicia cache com Runner por padrão, será trocado se user escolher Flappy
+            activeTable = TABLE_RUNNER;
+            fetchRankingToCache(); 
+            
             if (introScreen) {
                 const enableAudio = () => {
                     initAudio();
@@ -1015,28 +1051,46 @@
                 introScreen.addEventListener('touchstart', enableAudio);
             }
 
+            // BOTÃO: JOGUE AGORA (RUNNER)
             if (introStartBtn) {
                 introStartBtn.addEventListener('click', () => {
                     initAudio();
                     playSound('ui-click'); 
                     introDismissed = true; 
+                    selectedGameMode = MODE_RUNNER;
+                    
                     introScreen.style.display = 'none';
+                    startScreenFlappy.style.display = 'none';
                     if (startScreen) startScreen.style.display = 'flex';
                 });
             }
 
-            if (startBtn) {
-                 startBtn.addEventListener('click', () => {
+            // BOTÃO: FLAPPYMATS (NOVO)
+            if (introFlappyBtn) {
+                introFlappyBtn.addEventListener('click', () => {
                     initAudio();
                     playSound('ui-click'); 
-                    if (startScreen) startScreen.style.display = 'none'; 
-                    if (nameModal) {
-                        nameModal.style.display = 'flex'; 
-                        if (playerNameInput) playerNameInput.focus();
-                    } else {
-                        startGame();
-                    }
+                    introDismissed = true;
+                    selectedGameMode = MODE_FLAPPY;
+                    
+                    introScreen.style.display = 'none';
+                    startScreen.style.display = 'none';
+                    if (startScreenFlappy) startScreenFlappy.style.display = 'flex';
+                });
+            }
+
+            // INICIAR: RUNNER
+            if (startBtn) {
+                 startBtn.addEventListener('click', () => {
+                    handleStartClick();
                  });
+            }
+
+            // INICIAR: FLAPPY
+            if (startBtnFlappy) {
+                startBtnFlappy.addEventListener('click', () => {
+                    handleStartClick();
+                });
             }
             
             if (confirmNameBtn) {
@@ -1061,10 +1115,25 @@
             }
         });
         
+        function handleStartClick() {
+            initAudio();
+            playSound('ui-click'); 
+            startScreen.style.display = 'none'; 
+            startScreenFlappy.style.display = 'none';
+            
+            if (nameModal) {
+                nameModal.style.display = 'flex'; 
+                if (playerNameInput) playerNameInput.focus();
+            } else {
+                startGame();
+            }
+        }
+
         window.addEventListener('resize', checkScreenSizeAndInit);
         
         function startCountdown() {
             startScreen.style.display = 'none';
+            startScreenFlappy.style.display = 'none';
             nameModal.style.display = 'none'; 
             newGameOverModal.style.display = 'none'; 
             countdownScreen.style.display = 'flex';
@@ -1317,11 +1386,18 @@
                     } else {
                         const lastObstacle = obstacles[obstacles.length - 1];
                         const distanceToRight = canvasWidth - lastObstacle.x;
-                        const minSafeGap = calculateSafeGap(); // Agora usa a fórmula segura
+                        const minSafeGap = calculateSafeGap(); 
                         
-                        // Garante que o maxGap é sempre possível
+                        // --- AJUSTE LEVEL 7+: VARIAÇÃO DE OBSTÁCULOS ---
                         let maxGap = Math.max(minSafeGap + 100, 600 / currentDensityFactor);
                         
+                        // Se for nível 7 ou maior, introduz mais aleatoriedade no espaço máximo
+                        // para que as pedras não venham sempre no mesmo ritmo "metrônomo"
+                        if (currentLevel >= 7) {
+                            const randomVariation = Math.random() * 200; // Variação extra
+                            maxGap += randomVariation;
+                        }
+
                         if (distanceToRight > minSafeGap) {
                             const gapProgress = (distanceToRight - minSafeGap) / (maxGap - minSafeGap);
                             let chance = 0.30 + (gapProgress * 0.3); 
@@ -1360,22 +1436,22 @@
         }
         
         function checkLevelProgression() {
-            // Verifica se a pontuação atual atingiu a meta para o próximo nível
-            if (score >= nextLevelScore) {
+            // Em modo Runner, avança de nível
+            if (selectedGameMode === MODE_RUNNER && score >= nextLevelScore) {
                 
-                // --- DETECÇÃO DE MUDANÇA DE MODO (RUNNER -> FLAPPY) ---
-                // Verifica se o próximo nível é o início do Flappy
-                if (currentLevel === FLAPPY_LEVEL_START - 1) {
-                    // Inicia a transição visual para o modo Flappy
+                // Transição para Flappy (se for o level 11 do runner)
+                if (currentLevel === FLAPPY_LEVEL_START_RUNNER - 1) {
                     startLevelTransition();
                 } else {
-                    // Avança para o próximo nível normal (Runner)
                     currentLevel++; 
                     nextLevelScore += 500;
                     showMessage(`NÍVEL ${currentLevel}!`, 2000);
                     playSound('levelup');
                 }
             }
+            // Em modo Flappy Solo, não há níveis "numéricos" que mudam a mecânica drasticamente,
+            // mas podemos mostrar mensagem a cada 500 pontos se quiser.
+            // Por enquanto, deixamos infinito sem interrupções.
         }
         
         function checkCollisions() {
@@ -1409,6 +1485,9 @@
         
         function gameOver() {
             gameRunning = false;
+            // Se estava no Flappy (seja solo ou no runner), continua como Game Over normal
+            // mas precisamos garantir que o restart volte pro modo correto.
+            
             gameState = 'GAME_OVER';
             cancelAnimationFrame(gameLoopId);
             deathCount++; 
@@ -1417,10 +1496,19 @@
             
             let finalScore = Math.floor(score);
 
-            if (finalScore > highScore) {
-                highScore = finalScore;
-                localStorage.setItem('zeoHighScore', highScore);
-                highScoreDisplay.textContent = highScore;
+            // Salva recorde local dependendo do modo
+            if (selectedGameMode === MODE_FLAPPY) {
+                if (finalScore > highScore) {
+                    highScore = finalScore;
+                    localStorage.setItem('zeoHighScoreFlappy', highScore);
+                    highScoreDisplay.textContent = highScore;
+                }
+            } else {
+                if (finalScore > highScore) {
+                    highScore = finalScore;
+                    localStorage.setItem('zeoHighScore', highScore);
+                    highScoreDisplay.textContent = highScore;
+                }
             }
             
             gameMessage.style.display = 'none';
