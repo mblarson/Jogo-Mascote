@@ -9,7 +9,7 @@ const ASSETS_TO_CACHE = [
   './mascoteaviao.png',
   './cenario.png',
   './background.png',
-  './backgournd.png', // Notei que no seu HTML tem esse typo, mantive para garantir
+  './backgournd.png', // Mantido conforme o HTML original
   './image.PNG',
   './musica.mp3'
 ];
@@ -19,7 +19,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Opened cache');
+        console.log('Cache aberto com sucesso');
         return cache.addAll(ASSETS_TO_CACHE);
       })
   );
@@ -32,6 +32,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
+            console.log('Removendo cache antigo:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -41,14 +42,16 @@ self.addEventListener('activate', (event) => {
 });
 
 // Interceptação de requisições (Offline support)
+// Requisito obrigatório para PWA instalável no Android
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Cache hit - return response
+        // Se encontrar no cache, retorna o recurso cacheado
         if (response) {
           return response;
         }
+        // Se não, busca na rede
         return fetch(event.request);
       })
   );
