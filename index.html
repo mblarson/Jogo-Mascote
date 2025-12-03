@@ -861,7 +861,7 @@
         }
         
         // -------------------------------------------------------------
-        // LOGICA DE INSTALAÇÃO PWA (BEFOREINSTALLPROMPT)
+        // LOGICA DE INSTALAÇÃO PWA (BEFOREINSTALLPROMPT + APP INSTALADO)
         // -------------------------------------------------------------
         let deferredPrompt;
         
@@ -878,6 +878,27 @@
                 installBtn.style.display = 'block';
                 // Adiciona uma animação para chamar atenção
                 installBtn.style.animation = 'pulseVolume 1s infinite';
+            }
+        });
+
+        // Evento que detecta que o app foi instalado com sucesso
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('App instalado com sucesso!');
+            
+            // Esconder botão de instalar
+            const installBtn = document.getElementById('pwa-install-btn');
+            if(installBtn) installBtn.style.display = 'none';
+            
+            // Alterar o conteúdo da caixa de aviso para Sucesso
+            const instructionBox = document.querySelector('#android-browser-warning .ios-instruction-box');
+            if(instructionBox) {
+                instructionBox.innerHTML = `
+                    <div class="ios-icon">✅</div>
+                    <h3 style="color:#3DDC84; margin-bottom:10px;">INSTALAÇÃO CONCLUÍDA!</h3>
+                    <p style="font-size:14px; line-height:1.5;">O aplicativo foi instalado no seu dispositivo.</p>
+                    <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
+                    <p style="font-size:13px; color:#ccc;">Procure o ícone <b>UmadeGAMES</b> na sua tela inicial para jogar em tela cheia.</p>
+                `;
             }
         });
 
