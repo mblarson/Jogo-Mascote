@@ -47,7 +47,10 @@
             overflow: hidden;
             border: 3px solid #FF0000;
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5), 0 0 40px rgba(255, 0, 0, 0.3), inset 0 0 20px rgba(255, 0, 0, 0.2);
+            box-shadow: 
+                0 0 20px rgba(255, 0, 0, 0.5),
+                0 0 40px rgba(255, 0, 0, 0.3),
+                inset 0 0 20px rgba(255, 0, 0, 0.2);
             animation: pulseBorder 2s infinite alternate;
             touch-action: none;
         }
@@ -196,7 +199,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            align-items: flex-start; /* Restaurado alinhamento à esquerda */
+            align-items: flex-start;
             margin-top: auto;
             margin-bottom: 100px;
         }
@@ -261,6 +264,7 @@
         <p>Instale o App para jogar melhor! 📲</p>
     </div>
     
+    <!-- AUDIO: Preload auto ajuda a carregar buffer -->
     <audio id="bgMusic" loop preload="auto">
         <source src="./musica.mp3" type="audio/mpeg">
         Seu navegador não suporta áudio.
@@ -391,16 +395,17 @@
                     return;
                 }
                 
-                // MUDANÇA DE ESTADO: FEEDBACK "INSTALANDO..."
+                // MUDANÇA DE ESTADO: FEEDBACK "AGUARDANDO..."
                 installBtn.disabled = true;
                 const span = installBtn.querySelector('span');
                 if(span) {
-                    span.textContent = "INSTALANDO...";
-                    span.style.backgroundColor = "#555";
-                    span.style.color = "#DDD";
+                    span.textContent = "AGUARDANDO...";
+                    span.style.backgroundColor = "#FFD700"; // Amarelo
+                    span.style.color = "#000";
                 }
-                installBtn.style.animation = "none";
-                installBtn.style.opacity = "0.7";
+                installBtn.style.animation = "pulseVolume 0.5s infinite"; // Pulsa mais rápido
+                
+                // Não mostramos mensagem de sucesso aqui. Esperamos o evento appinstalled.
 
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
@@ -415,7 +420,6 @@
                         span.style.color = "white";
                     }
                     installBtn.style.animation = "pulseVolume 1s infinite";
-                    installBtn.style.opacity = "1";
                 }
                 
                 deferredPrompt = null;
@@ -539,7 +543,8 @@
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 12; 
         
-        // REMOVIDO: const FLAPPY_LEVEL_START_RUNNER = 11; // Não muda mais para Flappy
+        // CORREÇÃO: Removida a constante que causava a transição para Flappy
+        // const FLAPPY_LEVEL_START_RUNNER = 11; 
         
         let lastTime = 0;
         const TARGET_FPS = 60;
@@ -848,36 +853,38 @@
         }
 
         function calculateDifficultyParams(deltaFactor) {
+            
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || selectedGameMode === MODE_FLAPPY) {
                 gameSpeed = 4.0; 
                 currentDensityFactor = 2.0; 
                 return; 
             }
 
-            // Lógica melhorada para níveis > 10 (Runner Infinito)
+            // CORREÇÃO: Lógica para níveis > 10 (Runner Infinito)
             let config;
+            let targetSpeed;
+            
             if (currentLevel <= 10) {
-                config = LEVEL_CONFIG[currentLevel];
+                config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[1];
+                targetSpeed = config.targetSpeed;
             } else {
                 // A partir do nível 11, aumenta velocidade em 0.7 por nível
                 // Base Nível 10 = 11.5
                 // Nível 11 = 11.5 + 0.7 = 12.2
                 const extraLevels = currentLevel - 10;
-                const extraSpeed = extraLevels * 0.7;
+                targetSpeed = 11.5 + (extraLevels * 0.7);
                 
-                // Limite de segurança para não quebrar a física (aprox 22)
-                let newTargetSpeed = 11.5 + extraSpeed;
-                if (newTargetSpeed > 22) newTargetSpeed = 22;
+                // Limite de segurança para não quebrar a física (aprox 25)
+                if (targetSpeed > 25) targetSpeed = 25;
 
                 config = { 
-                    targetSpeed: newTargetSpeed, 
                     densityFactor: 5.0 + (extraLevels * 0.2) // Aumenta levemente a densidade também
                 };
             }
             
             // Suavização da aceleração
-            if (gameSpeed < config.targetSpeed) gameSpeed += 0.005 * deltaFactor; 
-            else gameSpeed = config.targetSpeed; 
+            if (gameSpeed < targetSpeed) gameSpeed += 0.005 * deltaFactor; 
+            else gameSpeed = targetSpeed; 
 
             let density = config.densityFactor;
             if (deathCount > 3) {
@@ -1317,7 +1324,7 @@
                     renderGround();
                     renderPlayer(); 
                 } else {
-                    renderSkyBackground(); // Pode mudar o céu aqui se quiser indicar nível avançado
+                    renderSkyBackground();
                     renderClouds(); 
                     renderPlayer(); 
                 }
@@ -1654,3 +1661,5 @@
     </script>
 </body>
 </html>
+
+
