@@ -9,7 +9,8 @@
     <!-- CONFIGURAÇÕES DE ÍCONE E APP MOBILE (PWA)  -->
     <!-- ========================================== -->
     <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" href="./iconejogo.JPG">
+    <!-- CORREÇÃO: Tipo ajustado para image/jpeg para combinar com o arquivo .JPG e o manifest.json -->
+    <link rel="icon" type="image/jpeg" href="./iconejogo.JPG">
     <link rel="apple-touch-icon" href="./iconejogo.JPG">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -165,7 +166,7 @@
                 height: auto;
                 display: block;
                 opacity: 0;
-                animation: appear 4s ease-in-out infinite;
+                animation: appear 6s ease-in-out infinite;
             }
 
             .fullscreen-shine {
@@ -655,11 +656,19 @@
             <div class="ios-icon">📲</div>
             <h3 style="color:#3DDC84; margin-bottom:10px;">INSTALE O APP</h3>
             <p style="font-size:14px; line-height:1.5;">Para jogar, é necessário instalar o aplicativo.</p>
-            <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
-            <p style="font-size:13px; color:#ccc;">1. Toque nos <b>três pontos (⋮)</b> no canto superior direito do navegador</p>
-            <p style="font-size:13px; color:#ccc;">2. Escolha <b>"Adicionar à Tela Inicial"</b> ou <b>"Instalar Aplicativo"</b>.</p>
-            <br>
-            <p style="font-size:12px; color:#888;">*Se não aparecer, abra no Google Chrome.</p>
+            
+            <!-- BOTÃO DE INSTALAÇÃO AUTOMÁTICA (Inicialmente oculto) -->
+            <button id="pwa-install-btn" class="neo-pop-tilted-button" style="display:none; margin: 15px auto; background-color: #3DDC84;">
+                <span style="background-color: #3DDC84; color: white; border: 1px solid #2eaf69;">INSTALAR AGORA</span>
+            </button>
+
+            <div id="manual-install-instructions">
+                <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
+                <p style="font-size:13px; color:#ccc;">1. Toque nos <b>três pontos (⋮)</b> do navegador.</p>
+                <p style="font-size:13px; color:#ccc;">2. Escolha <b>"Adicionar à Tela Inicial"</b> ou <b>"Instalar Aplicativo"</b>.</p>
+                <br>
+                <p style="font-size:12px; color:#888;">*Se não aparecer, abra no Google Chrome.</p>
+            </div>
         </div>
     </div>
     
@@ -678,7 +687,7 @@
     <!-- AVISO IOS: INSTALAR PWA -->
     <div id="ios-pwa-install-hint" class="system-warning-banner">
         <p style="margin-bottom:5px; color:#555; font-weight:bold;">Instale o App para jogar melhor! 📲</p>
-        <p style="font-size:12px; color:#555;">Toque nos <b>três pontos (...)</b> no canto inferior direito > <span style="font-size:13px">COMPARTILHAR</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
+        <p style="font-size:12px; color:#555;">Toque nos <b>três pontos (...)</b>  > <span style="font-size:13px">COMPARTILHAR</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
     </div>
     
     <audio id="bgMusic" loop>
@@ -817,6 +826,48 @@
                     });
             });
         }
+        
+        // -------------------------------------------------------------
+        // LOGICA DE INSTALAÇÃO PWA (BEFOREINSTALLPROMPT)
+        // -------------------------------------------------------------
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Previne o Chrome de mostrar o mini-infobar automaticamente
+            e.preventDefault();
+            // Salva o evento para usar depois
+            deferredPrompt = e;
+            console.log('beforeinstallprompt disparado!');
+            
+            // Se o overlay de Android já estiver visível, mostra o botão de instalação
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) {
+                installBtn.style.display = 'block';
+                // Adiciona uma animação para chamar atenção
+                installBtn.style.animation = 'pulseVolume 1s infinite';
+            }
+        });
+
+        // Configura o clique no botão de instalação
+        const installBtn = document.getElementById('pwa-install-btn');
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) {
+                    return;
+                }
+                // Mostra o prompt nativo
+                deferredPrompt.prompt();
+                
+                // Espera a escolha do usuário
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                
+                // Limpa o prompt, pois só pode ser usado uma vez
+                deferredPrompt = null;
+            });
+        }
+
+        // -------------------------------------------------------------
 
         function getMobileOperatingSystem() {
             var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -860,6 +911,15 @@
                 if (androidWarning) {
                     androidWarning.style.display = 'flex'; // Torna visível (overlay)
                     document.body.style.overflow = 'hidden'; // Bloqueia scroll
+                    
+                    // Se o evento deferredPrompt já foi capturado antes do load, mostra o botão agora
+                    if (deferredPrompt) {
+                        const installBtn = document.getElementById('pwa-install-btn');
+                        if (installBtn) {
+                            installBtn.style.display = 'block';
+                            installBtn.style.animation = 'pulseVolume 1s infinite';
+                        }
+                    }
                 }
             }
 
