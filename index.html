@@ -2,8 +2,28 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ZÉO & FLAPPYMATS</title>
+
+    <!-- ========================================== -->
+    <!-- CONFIGURAÇÕES DE ÍCONE E APP MOBILE (PWA)  -->
+    <!-- ========================================== -->
+    
+    <!-- 1. Link para o arquivo de manifesto (Android) -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- 2. Ícone para navegadores Desktop e Android -->
+    <link rel="icon" type="image/png" href="./mascoteuma.png">
+    
+    <!-- 3. Configurações Específicas para iOS (iPhone/iPad) -->
+    <link rel="apple-touch-icon" href="./mascoteuma.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ZéO Game">
+    
+    <!-- 4. Cor da barra de endereço do navegador -->
+    <meta name="theme-color" content="#87CEEB">
+
     <!-- Importando Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -27,6 +47,9 @@
             height: 100vh;
             touch-action: none;
             background-color: #87CEEB;
+            /* Proteção para evitar seleção de texto no celular */
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         #gameContainer {
