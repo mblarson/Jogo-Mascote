@@ -43,30 +43,37 @@
         }
 
         /* ========================================= */
-        /* CSS DO AVISO DE NAVEGADOR (ANDROID)      */
+        /* CSS DOS AVISOS DE NAVEGADOR (PWA/IAB)    */
         /* ========================================= */
-        #browser-warning {
-            display: none; /* Oculto por padrão */
+        
+        /* Container geral dos avisos */
+        .system-warning-banner {
+            display: none; /* Oculto por padrão, ativado via JS */
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(90deg, #FF8C00, #FFA500);
-            color: white;
             z-index: 999999;
-            padding: 10px;
+            width: 100%;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            font-size: 14px;
-            font-weight: bold;
+            font-family: sans-serif;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             animation: slideDown 0.5s ease-out;
         }
 
-        #browser-warning button {
+        /* Estilo Android: Barra no topo */
+        #android-browser-warning {
+            top: 0;
+            left: 0;
+            background: linear-gradient(90deg, #FF8C00, #FFA500);
+            color: white;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        #android-browser-warning button {
             background: #fff;
             color: #FF8C00;
             border: none;
-            padding: 5px 15px;
+            padding: 6px 16px;
             border-radius: 20px;
             font-weight: bold;
             margin-left: 10px;
@@ -76,8 +83,55 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
+        /* Estilo iOS (In-App Browser): Overlay escuro com instrução */
+        #ios-iab-warning {
+            top: 0;
+            left: 0;
+            height: 100vh; /* Tela inteira para focar na instrução */
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .ios-instruction-box {
+            background: #1a1a1a;
+            border: 2px solid #FFA500;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        .ios-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        /* Estilo iOS (Safari PWA): Banner inferior discreto */
+        #ios-pwa-install-hint {
+            bottom: 0;
+            left: 0;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
         @keyframes slideDown {
             from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
             to { transform: translateY(0); }
         }
 
@@ -614,10 +668,28 @@
         </div>
     </div>
     
-    <!-- NOVO: BARRA DE AVISO PARA ABRIR NO NAVEGADOR (ANDROID) -->
-    <div id="browser-warning">
+    <!-- AVISO ANDROID: ESCAPAR DO INSTAGRAM/FB -->
+    <div id="android-browser-warning" class="system-warning-banner">
         📱 Melhore sua experiência!
-        <button onclick="openInSystemBrowser()">ABRIR NO NAVEGADOR</button>
+        <button onclick="openInSystemBrowserAndroid()">ABRIR NO NAVEGADOR</button>
+    </div>
+
+    <!-- AVISO IOS: ESCAPAR DO INSTAGRAM/FB -->
+    <div id="ios-iab-warning" class="system-warning-banner">
+        <div class="ios-instruction-box">
+            <div class="ios-icon">⚠️</div>
+            <h3 style="color:#FFA500; margin-bottom:10px;">ABRA NO SAFARI</h3>
+            <p style="font-size:14px; line-height:1.5;">Para jogar sem travamentos e em tela cheia, você precisa sair do navegador do aplicativo.</p>
+            <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
+            <p style="font-size:13px; color:#ccc;">1. Toque nos <b>três pontos (...)</b> ou em <b>Compartilhar</b>.</p>
+            <p style="font-size:13px; color:#ccc;">2. Escolha <b>"Abrir no Safari"</b> ou <b>"Abrir no Navegador"</b>.</p>
+        </div>
+    </div>
+
+    <!-- AVISO IOS: INSTALAR PWA (Se já estiver no Safari) -->
+    <div id="ios-pwa-install-hint" class="system-warning-banner">
+        <p style="margin-bottom:5px; font-weight:bold;">Instale o App para jogar melhor! 📲</p>
+        <p style="font-size:12px; color:#555;">Toque em <span style="font-size:16px">share</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
     </div>
     
     <!-- Inicia script do loader (Remove ele após 4 segundos) -->
@@ -750,43 +822,83 @@
     </div>
 
     <script>
-        // --- FUNÇÕES DE DETECÇÃO DE NAVEGADOR EM APP (In-App Browser) ---
-        function detectInAppBrowser() {
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            // Detecta Instagram, Facebook, LinkedIn e WebViews genéricas no Android
-            const isInstagram = (ua.indexOf('Instagram') > -1);
-            const isFacebook = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1);
-            const isAndroid = (ua.indexOf('Android') > -1);
-            
-            // Se for Android E estiver dentro de um desses apps
-            if (isAndroid && (isInstagram || isFacebook)) {
-                return true;
-            }
-            return false;
+        // --- FUNÇÕES DE DETECÇÃO AVANÇADA DE NAVEGADOR ---
+        
+        function getMobileOperatingSystem() {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+            // Windows Phone deve vir primeiro porque seu UA pode conter "Android"
+            if (/windows phone/i.test(userAgent)) return "Windows Phone";
+            if (/android/i.test(userAgent)) return "Android";
+            // iOS detection from: stackoverflow.com/a/9039885/177710
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return "iOS";
+
+            return "unknown";
         }
 
-        // Função chamada pelo botão "Abrir no Navegador"
-        function openInSystemBrowser() {
+        function isInAppBrowser(os) {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            
+            // Lista de assinaturas de WebViews conhecidas (In-App Browsers)
+            const rules = [
+                'WebView',
+                '(iPhone|iPod|iPad)(?!.*Safari\/)', // iOS WebView sem Safari
+                'Android.*(wv|\.0\.0\.0)', // Android WebView antiga
+                'Instagram', // Instagram IAB
+                'FBAN',      // Facebook IAB
+                'FBAV',      // Facebook IAB
+                'Twitter',   // Twitter IAB
+                'LinkedIn',  // LinkedIn IAB
+                'WhatsApp'   // WhatsApp IAB
+            ];
+            
+            const regex = new RegExp(`(${rules.join('|')})`, 'ig');
+            return Boolean(ua.match(regex));
+        }
+
+        function isStandalone() {
+            // Verifica se o app já está instalado (PWA mode)
+            return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
+        }
+
+        // Função chamada pelo botão "Abrir no Navegador" (Android)
+        function openInSystemBrowserAndroid() {
             const currentUrl = window.location.href;
-            // Remove o protocolo para montar a intent limpa
             const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
-            
-            // Monta a Intent do Android para "Forçar" a abertura
-            // scheme=https garante que vai tentar abrir num navegador seguro
-            // package=com.android.chrome tenta forçar o Chrome (opcional, mas recomendado para compatibilidade PWA)
-            // S.browser_fallback_url garante que se falhar, ele tenta abrir a URL normalmente
             const intentUrl = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;S.browser_fallback_url=${currentUrl};end`;
-            
             window.location.href = intentUrl;
         }
 
-        // Executa a verificação ao carregar a página
+        // --- LÓGICA PRINCIPAL DE EXECUÇÃO ---
         window.addEventListener('load', function() {
-            if (detectInAppBrowser()) {
-                const warningBanner = document.getElementById('browser-warning');
-                if (warningBanner) {
-                    warningBanner.style.display = 'block';
+            const os = getMobileOperatingSystem();
+            const inApp = isInAppBrowser(os);
+            const installed = isStandalone();
+
+            // 1. Cenário Android em In-App Browser
+            if (os === 'Android' && inApp) {
+                const banner = document.getElementById('android-browser-warning');
+                if (banner) banner.style.display = 'block';
+            }
+
+            // 2. Cenário iOS em In-App Browser (Instagram/Facebook)
+            else if (os === 'iOS' && inApp) {
+                const modal = document.getElementById('ios-iab-warning');
+                if (modal) {
+                    modal.style.display = 'flex'; // Overlay Bloqueante
+                    // Impede o scroll de fundo para focar na instrução
+                    document.body.style.overflow = 'hidden'; 
                 }
+            }
+
+            // 3. Cenário iOS no Safari (Navegador real) mas NÃO instalado
+            else if (os === 'iOS' && !inApp && !installed) {
+                // Mostra dica para instalar/adicionar à home
+                const hint = document.getElementById('ios-pwa-install-hint');
+                // Pequeno delay para não ser intrusivo logo de cara
+                setTimeout(() => {
+                    if (hint) hint.style.display = 'flex';
+                }, 2000);
             }
         });
 
