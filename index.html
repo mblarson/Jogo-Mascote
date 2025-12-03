@@ -43,37 +43,30 @@
         }
 
         /* ========================================= */
-        /* CSS DOS AVISOS DE NAVEGADOR (PWA/IAB)    */
+        /* CSS DO AVISO DE NAVEGADOR (ANDROID)      */
         /* ========================================= */
-        
-        /* Container geral dos avisos */
-        .system-warning-banner {
-            display: none; /* Oculto por padrão, ativado via JS */
+        #browser-warning {
+            display: none; /* Oculto por padrão */
             position: fixed;
-            z-index: 999999;
+            top: 0;
+            left: 0;
             width: 100%;
+            background: linear-gradient(90deg, #FF8C00, #FFA500);
+            color: white;
+            z-index: 999999;
+            padding: 10px;
             text-align: center;
-            font-family: sans-serif;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            font-size: 14px;
+            font-weight: bold;
             animation: slideDown 0.5s ease-out;
         }
 
-        /* Estilo Android: Barra no topo */
-        #android-browser-warning {
-            top: 0;
-            left: 0;
-            background: linear-gradient(90deg, #FF8C00, #FFA500);
-            color: white;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        #android-browser-warning button {
+        #browser-warning button {
             background: #fff;
             color: #FF8C00;
             border: none;
-            padding: 6px 16px;
+            padding: 5px 15px;
             border-radius: 20px;
             font-weight: bold;
             margin-left: 10px;
@@ -83,55 +76,8 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Estilo iOS (In-App Browser): Overlay escuro com instrução */
-        #ios-iab-warning {
-            top: 0;
-            left: 0;
-            height: 100vh; /* Tela inteira para focar na instrução */
-            background: rgba(0, 0, 0, 0.85);
-            color: white;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .ios-instruction-box {
-            background: #1a1a1a;
-            border: 2px solid #FFA500;
-            border-radius: 15px;
-            padding: 20px;
-            max-width: 320px;
-            text-align: center;
-        }
-
-        .ios-icon {
-            font-size: 30px;
-            margin-bottom: 10px;
-        }
-
-        /* Estilo iOS (Safari PWA): Banner inferior discreto */
-        #ios-pwa-install-hint {
-            bottom: 0;
-            left: 0;
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
-            padding: 15px;
-            border-top: 1px solid #ddd;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            animation: slideUp 0.5s ease-out;
-        }
-
         @keyframes slideDown {
             from { transform: translateY(-100%); }
-            to { transform: translateY(0); }
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
             to { transform: translateY(0); }
         }
 
@@ -668,28 +614,10 @@
         </div>
     </div>
     
-    <!-- AVISO ANDROID: ESCAPAR DO INSTAGRAM/FB -->
-    <div id="android-browser-warning" class="system-warning-banner">
+    <!-- NOVO: BARRA DE AVISO PARA ABRIR NO NAVEGADOR (ANDROID) -->
+    <div id="browser-warning">
         📱 Melhore sua experiência!
-        <button onclick="openInSystemBrowserAndroid()">ABRIR NO NAVEGADOR</button>
-    </div>
-
-    <!-- AVISO IOS: ESCAPAR DO INSTAGRAM/FB -->
-    <div id="ios-iab-warning" class="system-warning-banner">
-        <div class="ios-instruction-box">
-            <div class="ios-icon">⚠️</div>
-            <h3 style="color:#FFA500; margin-bottom:10px;">ABRA NO SAFARI</h3>
-            <p style="font-size:14px; line-height:1.5;">Para jogar sem travamentos e em tela cheia, você precisa sair do navegador do aplicativo.</p>
-            <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
-            <p style="font-size:13px; color:#ccc;">1. Toque nos <b>três pontos (...)</b> ou em <b>Compartilhar</b>.</p>
-            <p style="font-size:13px; color:#ccc;">2. Escolha <b>"Abrir no Safari"</b> ou <b>"Abrir no Navegador"</b>.</p>
-        </div>
-    </div>
-
-    <!-- AVISO IOS: INSTALAR PWA (Se já estiver no Safari) -->
-    <div id="ios-pwa-install-hint" class="system-warning-banner">
-        <p style="margin-bottom:5px; color:#555; font-weight:bold;">Instale o App para jogar melhor! 📲</p>
-        <p style="font-size:12px; color:#555;">Toque em <span style="font-size:16px">COMPARTILHAR</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
+        <button onclick="openInSystemBrowser()">ABRIR NO NAVEGADOR</button>
     </div>
     
     <!-- Inicia script do loader (Remove ele após 4 segundos) -->
@@ -796,9 +724,9 @@
         <!-- TELA PRÉ-INÍCIO (RUNNER) -->
         <div id="startScreen">
             <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
-                onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>ZÉO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
-            <h1>AS AVENTURAS DE ZÉO</h1>
-            <p>Toque na tela para fazer o Zéo pular e desviar das pedras brilhantes!</p>
+                onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'16\' text-anchor=\'middle\' fill=\'white\'>MATIZINHO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
+            <h1>AS AVENTURAS DE MATIZINHO</h1>
+            <p>Toque na tela para fazer o Matizinho pular e desviar das pedras brilhantes!</p>
             <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
             <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
         </div>
@@ -822,83 +750,43 @@
     </div>
 
     <script>
-        // --- FUNÇÕES DE DETECÇÃO AVANÇADA DE NAVEGADOR ---
-        
-        function getMobileOperatingSystem() {
-            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-            // Windows Phone deve vir primeiro porque seu UA pode conter "Android"
-            if (/windows phone/i.test(userAgent)) return "Windows Phone";
-            if (/android/i.test(userAgent)) return "Android";
-            // iOS detection from: stackoverflow.com/a/9039885/177710
-            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return "iOS";
-
-            return "unknown";
-        }
-
-        function isInAppBrowser(os) {
+        // --- FUNÇÕES DE DETECÇÃO DE NAVEGADOR EM APP (In-App Browser) ---
+        function detectInAppBrowser() {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
+            // Detecta Instagram, Facebook, LinkedIn e WebViews genéricas no Android
+            const isInstagram = (ua.indexOf('Instagram') > -1);
+            const isFacebook = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1);
+            const isAndroid = (ua.indexOf('Android') > -1);
             
-            // Lista de assinaturas de WebViews conhecidas (In-App Browsers)
-            const rules = [
-                'WebView',
-                '(iPhone|iPod|iPad)(?!.*Safari\/)', // iOS WebView sem Safari
-                'Android.*(wv|\.0\.0\.0)', // Android WebView antiga
-                'Instagram', // Instagram IAB
-                'FBAN',      // Facebook IAB
-                'FBAV',      // Facebook IAB
-                'Twitter',   // Twitter IAB
-                'LinkedIn',  // LinkedIn IAB
-                'WhatsApp'   // WhatsApp IAB
-            ];
-            
-            const regex = new RegExp(`(${rules.join('|')})`, 'ig');
-            return Boolean(ua.match(regex));
+            // Se for Android E estiver dentro de um desses apps
+            if (isAndroid && (isInstagram || isFacebook)) {
+                return true;
+            }
+            return false;
         }
 
-        function isStandalone() {
-            // Verifica se o app já está instalado (PWA mode)
-            return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
-        }
-
-        // Função chamada pelo botão "Abrir no Navegador" (Android)
-        function openInSystemBrowserAndroid() {
+        // Função chamada pelo botão "Abrir no Navegador"
+        function openInSystemBrowser() {
             const currentUrl = window.location.href;
+            // Remove o protocolo para montar a intent limpa
             const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+            
+            // Monta a Intent do Android para "Forçar" a abertura
+            // scheme=https garante que vai tentar abrir num navegador seguro
+            // package=com.android.chrome tenta forçar o Chrome (opcional, mas recomendado para compatibilidade PWA)
+            // S.browser_fallback_url garante que se falhar, ele tenta abrir a URL normalmente
             const intentUrl = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;S.browser_fallback_url=${currentUrl};end`;
+            
             window.location.href = intentUrl;
         }
 
-        // --- LÓGICA PRINCIPAL DE EXECUÇÃO ---
+        // Executa a verificação ao carregar a página
         window.addEventListener('load', function() {
-            const os = getMobileOperatingSystem();
-            const inApp = isInAppBrowser(os);
-            const installed = isStandalone();
-
-            // 1. Cenário Android em In-App Browser
-            if (os === 'Android' && inApp) {
-                const banner = document.getElementById('android-browser-warning');
-                if (banner) banner.style.display = 'block';
-            }
-
-            // 2. Cenário iOS em In-App Browser (Instagram/Facebook)
-            else if (os === 'iOS' && inApp) {
-                const modal = document.getElementById('ios-iab-warning');
-                if (modal) {
-                    modal.style.display = 'flex'; // Overlay Bloqueante
-                    // Impede o scroll de fundo para focar na instrução
-                    document.body.style.overflow = 'hidden'; 
+            if (detectInAppBrowser()) {
+                const warningBanner = document.getElementById('browser-warning');
+                if (warningBanner) {
+                    warningBanner.style.display = 'block';
                 }
-            }
-
-            // 3. Cenário iOS no Safari (Navegador real) mas NÃO instalado
-            else if (os === 'iOS' && !inApp && !installed) {
-                // Mostra dica para instalar/adicionar à home
-                const hint = document.getElementById('ios-pwa-install-hint');
-                // Pequeno delay para não ser intrusivo logo de cara
-                setTimeout(() => {
-                    if (hint) hint.style.display = 'flex';
-                }, 2000);
             }
         });
 
@@ -1249,7 +1137,8 @@
                 // Define o estado de espera "Toque para Voar"
                 gameState = 'WAITING_FLAPPY_START';
                 activeTable = TABLE_FLAPPY;
-                highScore = localStorage.getItem('zeoHighScoreFlappy') || 0;
+                // ALTERADO: de zeoHighScoreFlappy para matizinhoHighScoreFlappy
+                highScore = localStorage.getItem('matizinhoHighScoreFlappy') || 0;
                 
                 // Posiciona o jogador no meio da tela (ar) e flutuando
                 player.y = (canvas.height / (window.devicePixelRatio || 1)) / 3; 
@@ -1263,7 +1152,8 @@
                 // MODO RUNNER CLÁSSICO
                 gameState = 'RUNNER';
                 activeTable = TABLE_RUNNER;
-                highScore = localStorage.getItem('zeoHighScore') || 0;
+                // ALTERADO: de zeoHighScore para matizinhoHighScore
+                highScore = localStorage.getItem('matizinhoHighScore') || 0;
             }
             highScoreDisplay.textContent = Math.floor(highScore);
             
@@ -1863,16 +1753,17 @@
             let finalScore = Math.floor(score);
 
             // Salva recorde local dependendo do modo
+            // ALTERADO: chaves de armazenamento atualizadas para "matizinho"
             if (selectedGameMode === MODE_FLAPPY) {
                 if (finalScore > highScore) {
                     highScore = finalScore;
-                    localStorage.setItem('zeoHighScoreFlappy', highScore);
+                    localStorage.setItem('matizinhoHighScoreFlappy', highScore);
                     highScoreDisplay.textContent = highScore;
                 }
             } else {
                 if (finalScore > highScore) {
                     highScore = finalScore;
-                    localStorage.setItem('zeoHighScore', highScore);
+                    localStorage.setItem('matizinhoHighScore', highScore);
                     highScoreDisplay.textContent = highScore;
                 }
             }
@@ -1958,7 +1849,8 @@
                 } else {
                     ctx.fillStyle = '#FFA500'; ctx.fillRect(player.x, player.y, player.width, player.height);
                     ctx.fillStyle = 'white'; ctx.font = '16px Arial'; ctx.textAlign = 'center';
-                    ctx.fillText('Zéo', player.x + player.width/2, player.y + player.height/2 + 5); 
+                    // ALTERADO: de Zéo para Matizinho (usando fonte menor ou apenas texto se não couber no placeholder)
+                    ctx.fillText('Matizinho', player.x + player.width/2, player.y + player.height/2 + 5); 
                 }
             }
             ctx.restore();
