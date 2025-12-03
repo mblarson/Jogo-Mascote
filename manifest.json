@@ -9,12 +9,12 @@
   "scope": "./",
   "icons": [
     {
-      "src": "./iconejogo.png",
+      "src": "./iconejogo.JPG",
       "sizes": "192x192",
       "type": "image/jpeg"
     },
     {
-      "src": "./iconejogo.png",
+      "src": "./iconejogo.JPG",
       "sizes": "512x512",
       "type": "image/jpeg"
     }
