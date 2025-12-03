@@ -8,14 +8,14 @@
   "orientation": "landscape",
   "icons": [
     {
-      "src": "./iconejogo.JPG",
+      "src": "./iconejogo.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png"
     },
     {
-      "src": "./iconejogo.JPG",
+      "src": "./iconejogo.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     }
   ]
 }
