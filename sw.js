@@ -16,6 +16,9 @@ const ASSETS_TO_CACHE = [
 
 // Instalação do Service Worker e cache dos recursos
 self.addEventListener('install', (event) => {
+  // Força a ativação imediata do novo Service Worker
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -37,6 +40,10 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
+    })
+    .then(() => {
+        // Garante que o SW controle todas as abas abertas imediatamente
+        return self.clients.claim();
     })
   );
 });
