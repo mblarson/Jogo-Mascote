@@ -158,7 +158,9 @@
                 width: 90%; 
                 max-width: 500px; 
                 height: auto;
-                z-index: 100001; 
+                z-index: 100001;
+                /* Perspectiva para dar profundidade ao giro */
+                perspective: 1000px; 
             }
 
             .logo-img {
@@ -166,7 +168,10 @@
                 height: auto;
                 display: block;
                 opacity: 0;
-                animation: appear 6s ease-in-out infinite;
+                /* NOVA ANIMAÇÃO: Estilo Intro de Game */
+                /* Duração sincronizada com o JS (6s), mas a ação acontece antes */
+                animation: gameEntranceSpin 5.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0));
             }
 
             .fullscreen-shine {
@@ -200,11 +205,39 @@
             }
         }
 
-        @keyframes appear {
-            0% { opacity: 0; transform: scale(0.95); }
-            20% { opacity: 1; }
-            80% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.05); }
+        /* --- NOVOS KEYFRAMES ESTILO GAME INTRO --- */
+        @keyframes gameEntranceSpin {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-720deg); /* Começa minúsculo girando muito */
+                filter: blur(10px) drop-shadow(0 0 0px #FFD700);
+            }
+            20% {
+                opacity: 1;
+                transform: scale(1.1) rotate(10deg); /* Overshoot (passa um pouco do tamanho) */
+                filter: blur(0px) drop-shadow(0 0 20px #FFD700); /* Brilho forte no impacto */
+            }
+            30% {
+                transform: scale(1) rotate(0deg); /* Estabiliza */
+                filter: drop-shadow(0 0 5px #FFD700);
+            }
+            
+            /* Fase de "Respiração" / Loading enquanto aguarda */
+            45% { transform: scale(1.05); filter: drop-shadow(0 0 15px #FFA500); }
+            60% { transform: scale(1); filter: drop-shadow(0 0 5px #FFD700); }
+            75% { transform: scale(1.05); filter: drop-shadow(0 0 15px #FFA500); }
+            
+            /* Saída Explosiva - Zoom na câmera */
+            90% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+                filter: drop-shadow(0 0 30px #FF4500) brightness(1.5);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(5) rotate(5deg); /* Zoom gigante para transição */
+                filter: blur(20px);
+            }
         }
 
         @keyframes shineMoveFullScreen {
