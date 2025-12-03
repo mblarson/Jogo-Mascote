@@ -1,0 +1,21 @@
+{
+  "name": "ZéO & FlappyMats",
+  "short_name": "ZéO Game",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#87CEEB",
+  "theme_color": "#87CEEB",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "./mascoteuma.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./mascoteuma.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
