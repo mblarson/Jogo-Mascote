@@ -1,6 +1,6 @@
 {
-  "name": "ZéO & FlappyMats",
-  "short_name": "ZéO Game",
+  "name": "Umademats Game",
+  "short_name": "Umademats Game",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#87CEEB",
