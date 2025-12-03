@@ -36,7 +36,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            touch-action: none;
+            /* CORREÇÃO: Removemos o touch-action: none daqui para liberar os botões */
             background-color: #87CEEB;
             -webkit-user-select: none;
             user-select: none;
@@ -153,6 +153,13 @@
                 align-items: center;
                 flex-direction: column;
                 transition: opacity 1s ease-out; 
+                /* CORREÇÃO: Permite clicar através dele enquanto fade out acontece */
+                pointer-events: none; 
+            }
+            
+            /* Reativa pointer events apenas para o loader enquanto visível */
+            #mobile-loader-overlay.active {
+                pointer-events: auto;
             }
 
             .loader-container {
@@ -234,6 +241,9 @@
                 0 0 40px rgba(255, 0, 0, 0.3),
                 inset 0 0 20px rgba(255, 0, 0, 0.2);
             animation: pulseBorder 2s infinite alternate;
+            
+            /* CORREÇÃO: O bloqueio de touch fica APENAS aqui, onde é necessário para o jogo */
+            touch-action: none;
         }
         
         @keyframes pulseBorder {
@@ -642,7 +652,7 @@
 </head>
 <body>
     
-    <div id="mobile-loader-overlay">
+    <div id="mobile-loader-overlay" class="active">
         <div class="fullscreen-shine"></div>
         <div class="loader-container">
             <img src="image.PNG" alt="Carregando" class="logo-img">
@@ -678,6 +688,7 @@
         Seu navegador não suporta áudio.
     </audio>
 
+    <!-- Script do Loader -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (window.innerWidth <= 768) {
@@ -686,6 +697,7 @@
                     setTimeout(() => {
                         loader.style.opacity = '0'; 
                         setTimeout(() => {
+                            loader.classList.remove('active'); // Remove a classe que bloqueia cliques
                             loader.style.display = 'none';
                         }, 1000);
                     }, 6000); 
@@ -1011,41 +1023,47 @@
         let isAudioInitialized = false;
 
         function initAudio() {
-            if (!isAudioInitialized) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
-                isAudioInitialized = true;
-            }
-            
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+            try {
+                if (!isAudioInitialized) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                    isAudioInitialized = true;
+                }
+                
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch(e) {
+                console.warn("Audio init warning:", e);
             }
             
             playMusicSafe();
         }
 
-        // --- CORREÇÃO PWA: DESBLOQUEIO DE ÁUDIO ---
         function unlockAudio() {
-            if (!isAudioInitialized) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
-                isAudioInitialized = true;
+            try {
+                if (!isAudioInitialized) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                    isAudioInitialized = true;
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const buffer = audioCtx.createBuffer(1, 1, 22050);
+                const source = audioCtx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioCtx.destination);
+                source.start(0);
+
+                playMusicSafe();
+
+                document.removeEventListener('click', unlockAudio);
+                document.removeEventListener('touchstart', unlockAudio);
+            } catch(e) {
+                console.warn("Unlock audio warning:", e);
             }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            // Toca um buffer silencioso para aquecer o audio engine no iOS
-            const buffer = audioCtx.createBuffer(1, 1, 22050);
-            const source = audioCtx.createBufferSource();
-            source.buffer = buffer;
-            source.connect(audioCtx.destination);
-            source.start(0);
-
-            playMusicSafe();
-
-            document.removeEventListener('click', unlockAudio);
-            document.removeEventListener('touchstart', unlockAudio);
         }
 
         function playMusicSafe() {
@@ -1344,6 +1362,239 @@
         // Ativa o desbloqueio de áudio em qualquer toque na página
         document.addEventListener('touchstart', unlockAudio);
         document.addEventListener('click', unlockAudio);
+        
+        let introDismissed = false;
+
+        function checkScreenSizeAndInit() {
+            try {
+                resizeCanvas();
+                if (introDismissed || gameRunning) return;
+
+                if (window.innerWidth < 1024) {
+                    if (introScreen) introScreen.style.display = 'flex';
+                    if (startScreen) startScreen.style.display = 'none';
+                    if (startScreenFlappy) startScreenFlappy.style.display = 'none';
+                } else {
+                    if (introScreen) introScreen.style.display = 'none';
+                    if (selectedGameMode === MODE_FLAPPY) {
+                        startScreenFlappy.style.display = 'flex';
+                    } else {
+                        startScreen.style.display = 'flex';
+                    }
+                }
+            } catch (e) {
+                console.error("Erro na inicialização da UI:", e);
+                if (startScreen) startScreen.style.display = 'flex';
+            }
+        }
+
+        // Função auxiliar para adicionar listeners híbridos (Touch + Click)
+        function addBtnListener(element, callback) {
+            if (!element) return;
+            // O click é padrão
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                callback(e);
+            });
+            // O touchstart garante resposta imediata no mobile
+            element.addEventListener('touchstart', (e) => {
+                e.preventDefault(); 
+                callback(e);
+            }, {passive: false});
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkScreenSizeAndInit();
+            activeTable = TABLE_RUNNER;
+            fetchRankingToCache(); 
+            
+            if (introScreen) {
+                addBtnListener(introScreen, () => {
+                    initAudio();
+                });
+            }
+
+            // BOTÕES COM INTERAÇÃO HÍBRIDA
+            addBtnListener(introStartBtn, () => {
+                initAudio();
+                playSound('ui-click'); 
+                introDismissed = true; 
+                selectedGameMode = MODE_RUNNER;
+                
+                introScreen.style.display = 'none';
+                startScreenFlappy.style.display = 'none';
+                if (startScreen) startScreen.style.display = 'flex';
+            });
+
+            addBtnListener(introFlappyBtn, () => {
+                initAudio();
+                playSound('ui-click'); 
+                introDismissed = true;
+                selectedGameMode = MODE_FLAPPY;
+                
+                introScreen.style.display = 'none';
+                startScreen.style.display = 'none';
+                if (startScreenFlappy) startScreenFlappy.style.display = 'flex';
+            });
+
+            addBtnListener(startBtn, () => {
+                handleStartClick();
+            });
+
+            addBtnListener(startBtnFlappy, () => {
+                handleStartClick();
+            });
+            
+            addBtnListener(confirmNameBtn, () => {
+                const name = playerNameInput.value.trim();
+                if (name === "") {
+                    // Alert pode bloquear em alguns iOS, melhor usar log ou nada
+                    console.log("Nome vazio");
+                    return;
+                }
+                playSound('ui-click'); 
+                playerName = name;
+                nameModal.style.display = 'none';
+                startCountdown();
+            });
+
+            addBtnListener(modalRestartBtn, () => {
+                playSound('ui-click'); 
+                restartGame();
+            });
+        });
+        
+        function handleStartClick() {
+            initAudio();
+            playSound('ui-click'); 
+            startScreen.style.display = 'none'; 
+            startScreenFlappy.style.display = 'none';
+            
+            if (nameModal) {
+                nameModal.style.display = 'flex'; 
+                if (playerNameInput) playerNameInput.focus();
+            } else {
+                startGame();
+            }
+        }
+
+        window.addEventListener('resize', checkScreenSizeAndInit);
+        
+        function startCountdown() {
+            startScreen.style.display = 'none';
+            startScreenFlappy.style.display = 'none';
+            nameModal.style.display = 'none'; 
+            newGameOverModal.style.display = 'none'; 
+            countdownScreen.style.display = 'flex';
+            let count = 3;
+            countdownElement.textContent = count;
+            playSound('start'); 
+            const countdownInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownElement.textContent = count;
+                    playSound('ui-click'); 
+                } else {
+                    clearInterval(countdownInterval);
+                    countdownScreen.style.display = 'none';
+                    startGame();
+                }
+            }, 1000);
+        }
+        
+        function startGame() {
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+            initGame();
+            gameRunning = true;
+            lastTime = performance.now();
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+        
+        function startLevelTransition() {
+            gameState = 'TRANSITION';
+            transitionPhase = 'fade-out';
+            transitionTimer = 0;
+            transitionAlpha = 0;
+            
+            if (bgMusic) bgMusic.volume = 0.1;
+        }
+
+        function updateTransition(deltaFactor) {
+            const dt = deltaFactor / 60; 
+
+            if (transitionPhase === 'fade-out') {
+                transitionAlpha += dt * 2; 
+                if (transitionAlpha >= 1) {
+                    transitionAlpha = 1;
+                    transitionPhase = 'fade-in';
+                    
+                    currentLevel++;
+                    nextLevelScore += 500;
+                    obstacles = []; 
+                    player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2; 
+                    player.velocityY = 0;
+                }
+            } else if (transitionPhase === 'fade-in') {
+                transitionAlpha -= dt * 2;
+                if (transitionAlpha <= 0) {
+                    transitionAlpha = 0;
+                    transitionPhase = 'countdown';
+                    transitionCountdown = 3;
+                    transitionTimer = 0;
+                }
+            } else if (transitionPhase === 'countdown') {
+                transitionTimer += dt;
+                if (transitionTimer >= 1.0) { 
+                    transitionCountdown--;
+                    transitionTimer = 0;
+                    if (transitionCountdown > 0) {
+                         playSound('ui-click'); 
+                    } else {
+                        gameState = 'WAITING_FLAPPY_START';
+                        transitionPhase = 'none';
+                        lastTime = performance.now(); 
+                        if (bgMusic) bgMusic.volume = 0.4;
+                        gameMessage.textContent = "TOQUE PARA VOAR!";
+                        gameMessage.style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        function renderTransition() {
+            if (gameState !== 'TRANSITION') return;
+
+            const width = canvas.width / (window.devicePixelRatio || 1);
+            const height = canvas.height / (window.devicePixelRatio || 1);
+
+            if (transitionPhase === 'fade-out' || transitionPhase === 'fade-in') {
+                ctx.fillStyle = `rgba(0, 0, 0, ${transitionAlpha})`;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            if (transitionPhase === 'countdown') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                ctx.fillRect(0, 0, width, height);
+                
+                ctx.save();
+                ctx.fillStyle = '#FFD700';
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 4;
+                ctx.font = 'bold 100px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'black';
+                ctx.shadowBlur = 20;
+                ctx.strokeText(transitionCountdown, width / 2, height / 2);
+                ctx.fillText(transitionCountdown, width / 2, height / 2);
+                
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 24px Arial';
+                ctx.shadowBlur = 5;
+                ctx.fillText("PREPARE-SE...", width / 2, height / 2 + 80);
+                ctx.restore();
+            }
+        }
         
         function renderSkyBackground() {
             const width = canvas.width / (window.devicePixelRatio || 1);
