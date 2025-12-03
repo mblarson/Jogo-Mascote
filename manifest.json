@@ -1,6 +1,6 @@
 {
-  "name": "Umademats Game",
-  "short_name": "UmadeGAMES",
+  "name": "UMADEMATS GAME",
+  "short_name": "UMADEGAMES",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#87CEEB",
@@ -10,12 +10,12 @@
     {
       "src": "./iconejogo.JPG",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpeg"
     },
     {
       "src": "./iconejogo.JPG",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ]
 }
