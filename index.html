@@ -43,6 +43,45 @@
         }
 
         /* ========================================= */
+        /* CSS DO AVISO DE NAVEGADOR (ANDROID)      */
+        /* ========================================= */
+        #browser-warning {
+            display: none; /* Oculto por padrão */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(90deg, #FF8C00, #FFA500);
+            color: white;
+            z-index: 999999;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            font-size: 14px;
+            font-weight: bold;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        #browser-warning button {
+            background: #fff;
+            color: #FF8C00;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* ========================================= */
         /* CSS DO LOADER MOBILE (GOLD LUXO)     */
         /* ========================================= */
         
@@ -575,6 +614,12 @@
         </div>
     </div>
     
+    <!-- NOVO: BARRA DE AVISO PARA ABRIR NO NAVEGADOR (ANDROID) -->
+    <div id="browser-warning">
+        📱 Melhore sua experiência!
+        <button onclick="openInSystemBrowser()">ABRIR NO NAVEGADOR</button>
+    </div>
+    
     <!-- Inicia script do loader (Remove ele após 4 segundos) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -705,6 +750,48 @@
     </div>
 
     <script>
+        // --- FUNÇÕES DE DETECÇÃO DE NAVEGADOR EM APP (In-App Browser) ---
+        function detectInAppBrowser() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            // Detecta Instagram, Facebook, LinkedIn e WebViews genéricas no Android
+            const isInstagram = (ua.indexOf('Instagram') > -1);
+            const isFacebook = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1);
+            const isAndroid = (ua.indexOf('Android') > -1);
+            
+            // Se for Android E estiver dentro de um desses apps
+            if (isAndroid && (isInstagram || isFacebook)) {
+                return true;
+            }
+            return false;
+        }
+
+        // Função chamada pelo botão "Abrir no Navegador"
+        function openInSystemBrowser() {
+            const currentUrl = window.location.href;
+            // Remove o protocolo para montar a intent limpa
+            const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+            
+            // Monta a Intent do Android para "Forçar" a abertura
+            // scheme=https garante que vai tentar abrir num navegador seguro
+            // package=com.android.chrome tenta forçar o Chrome (opcional, mas recomendado para compatibilidade PWA)
+            // S.browser_fallback_url garante que se falhar, ele tenta abrir a URL normalmente
+            const intentUrl = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;S.browser_fallback_url=${currentUrl};end`;
+            
+            window.location.href = intentUrl;
+        }
+
+        // Executa a verificação ao carregar a página
+        window.addEventListener('load', function() {
+            if (detectInAppBrowser()) {
+                const warningBanner = document.getElementById('browser-warning');
+                if (warningBanner) {
+                    warningBanner.style.display = 'block';
+                }
+            }
+        });
+
+        // -----------------------------------------------------------------
+
         const SUPABASE_URL = 'https://ngeofumxwasfkaathwbu.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nZW9mdW14d2FzZmthYXRod2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MzU3MzQsImV4cCI6MjA4MDAxMTczNH0._kT-LZlXDdNY3Kr4PEC-3yO3a3I7CupEDklj_rGSlnE';
         
