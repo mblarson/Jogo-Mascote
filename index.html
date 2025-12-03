@@ -2,13 +2,14 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>UMADEMATS GAME</title>
 
     <!-- CONFIGURAÇÕES PWA -->
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/jpeg" href="./iconejogo.JPG">
     <link rel="apple-touch-icon" href="./iconejogo.JPG">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="UmadeGAMES">
@@ -16,11 +17,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             background-image: url('./backgournd.png'), url('./background.png');
@@ -39,7 +36,7 @@
             user-select: none;
         }
 
-        /* --- CONTAINER DO JOGO (RESTAURADO AO PADRÃO ORIGINAL) --- */
+        /* --- CONTAINER DO JOGO --- */
         #gameContainer {
             position: relative;
             width: 100%;
@@ -50,10 +47,7 @@
             overflow: hidden;
             border: 3px solid #FF0000;
             border-radius: 10px;
-            box-shadow: 
-                0 0 20px rgba(255, 0, 0, 0.5),
-                0 0 40px rgba(255, 0, 0, 0.3),
-                inset 0 0 20px rgba(255, 0, 0, 0.2);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5), 0 0 40px rgba(255, 0, 0, 0.3), inset 0 0 20px rgba(255, 0, 0, 0.2);
             animation: pulseBorder 2s infinite alternate;
             touch-action: none;
         }
@@ -70,7 +64,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.4); animation: slideDown 0.5s ease-out;
         }
 
-        /* Aviso Android restaurado para tela cheia */
         #android-browser-warning {
             top: 0; left: 0; height: 100vh; background: rgba(0, 0, 0, 0.95);
             color: white; display: none; flex-direction: column;
@@ -98,7 +91,7 @@
         @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        /* LOADER (Mantido o novo efeito de Spin que você gostou) */
+        /* LOADER */
         #mobile-loader-overlay { display: none; }
         @media (max-width: 768px) {
             #mobile-loader-overlay {
@@ -199,29 +192,16 @@
         
         #introContent .neo-pop-tilted-button { margin-left: 0; max-width: 250px; align-self: flex-start; }
         
-        /* RESTAURAÇÃO DO LAYOUT ORIGINAL (VERTICAL E À ESQUERDA) */
         .intro-btn-group {
             display: flex;
             flex-direction: column;
             gap: 15px;
-            align-items: flex-start; /* Original do seu arquivo */
+            align-items: flex-start; /* Restaurado alinhamento à esquerda */
             margin-top: auto;
             margin-bottom: 100px;
         }
 
         @media (max-width: 480px) {
-            .game-over-layout { flex-direction: column; border: none; align-items: center; }
-            .result-column { border-right: none; border-bottom: 1px solid #444; padding-bottom: 15px; padding-right: 0; width: 100%; margin-bottom: 15px; }
-            .ranking-column { width: 100%; }
-            #gameInfo { font-size: 14px; }
-            #gameMessage { font-size: 20px; padding: 15px 25px; }
-            #gameLogo { width: 200px; margin-bottom: -20px; margin-top: -20px; }
-            h1 { font-size: 24px; }
-            p { font-size: 14px; margin-bottom: 15px; }
-            .neo-pop-tilted-button { font-size: 0.9rem; }
-            .neo-pop-tilted-button span { padding: 0.7rem 1.5rem; }
-            #countdown { font-size: 60px; }
-            #countdownMessage { font-size: 16px; }
             #introContent .neo-pop-tilted-button { font-size: 1.1rem; letter-spacing: 0.1rem; padding: 0; }
             #introContent .neo-pop-tilted-button span { padding: 0.8rem 2rem; }
             .intro-btn-group { margin-bottom: 120px; }
@@ -272,8 +252,8 @@
     <div id="ios-iab-warning" class="system-warning-banner">
         <div class="ios-instruction-box">
             <div class="ios-icon">⚠️</div>
-            <h3 style="color:#FFA500; margin-bottom:10px;">ABRA NO SAFARI</h3>
-            <p style="font-size:14px; line-height:1.5;">Para jogar, abra este site no navegador Safari.</p>
+            <h3>ABRA NO SAFARI</h3>
+            <p>Para jogar, abra este site no navegador Safari.</p>
         </div>
     </div>
 
@@ -281,7 +261,6 @@
         <p>Instale o App para jogar melhor! 📲</p>
     </div>
     
-    <!-- AUDIO: Preload auto ajuda a carregar buffer -->
     <audio id="bgMusic" loop preload="auto">
         <source src="./musica.mp3" type="audio/mpeg">
         Seu navegador não suporta áudio.
@@ -301,8 +280,7 @@
         
         <div id="nameModal" class="custom-modal">
             <div class="modal-content">
-                <h2 style="color: #FFA500; margin-bottom: 10px;">QUEM VAI JOGAR?</h2>
-                <p>Digite seu nome para entrar no Ranking:</p>
+                <h2 style="color: #FFA500;">QUEM VAI JOGAR?</h2>
                 <input type="text" id="playerNameInput" placeholder="Seu Nome" maxlength="12" autocomplete="off">
                 <button id="confirmNameBtn" class="neo-pop-tilted-button"><span>CONFIRMAR</span></button>
             </div>
@@ -310,80 +288,53 @@
 
         <div id="newGameOverModal" class="custom-modal">
             <div class="modal-content">
-                <h2 style="color: #FF4500; margin-bottom: -25px; border-bottom: -1px solid #444; padding-bottom: 10px;">FIM DE JOGO</h2>
-                
+                <h2 style="color: #FF4500;">FIM DE JOGO</h2>
                 <div class="game-over-layout">
                     <div class="result-column">
                         <div id="finalPlayerName" class="player-name-display">JOGADOR</div>
                         <div class="score-display-big" id="finalScoreDisplay">0</div>
-                        <div style="font-size: 14px; color: #AAA; margin-top: 5px;">PONTOS</div>
-                        
-                        <div id="playerRankDisplay" style="display: none; margin-top: 10px; color: #FFD700; font-weight: bold; font-size: 0.75em; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px;"></div>
-                        
-                        <button id="modalRestartBtn" class="neo-pop-tilted-button" style="margin-top: 20px;">
-                            <span>JOGAR NOVAMENTE</span>
-                        </button>
+                        <div style="font-size: 14px; color: #AAA;">PONTOS</div>
+                        <div id="playerRankDisplay" style="display: none; color: #FFD700;"></div>
+                        <button id="modalRestartBtn" class="neo-pop-tilted-button"><span>JOGAR NOVAMENTE</span></button>
                     </div>
-
                     <div class="ranking-column">
                         <div class="ranking-title">🏆 TOP 3 RANKING</div>
-                        <ul id="rankingList" class="ranking-list">
-                            <li style="color: #888; font-style: italic;">Carregando...</li>
-                        </ul>
+                        <ul id="rankingList" class="ranking-list"><li style="color:#888;">Carregando...</li></ul>
                     </div>
                 </div>
-
-                <div class="modal-footer">
-                    POSTE SUA PONTUAÇÃO NO INSTAGRAM E MARQUE A <span class="instagram-tag">@UMADEMATS</span>
-                </div>
+                <div class="modal-footer">POSTE NO INSTAGRAM <span class="instagram-tag">@UMADEMATS</span></div>
             </div>
         </div>
         
         <div id="introScreen">
             <div id="introWrapper">
                 <div id="introContent">
-                    <div class="volume-warning">
-                        <span>🔊</span> AUMENTE O SOM PARA JOGAR
-                    </div>
-
+                    <div class="volume-warning"><span>🔊</span> AUMENTE O SOM</div>
                     <div class="intro-btn-group">
-                        <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy">
-                            <span>FLAPPYMATS</span>
-                        </button>
-
-                        <button id="introStartBtn" class="neo-pop-tilted-button">
-                            <span>RUNNERMATS</span>
-                        </button>
+                        <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy"><span>FLAPPYMATS</span></button>
+                        <button id="introStartBtn" class="neo-pop-tilted-button"><span>RUNNERMATS</span></button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TELA PRÉ-INÍCIO (RUNNER) -->
         <div id="startScreen">
-            <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
-                onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'16\' text-anchor=\'middle\' fill=\'white\'>MATIZINHO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
+            <img id="gameLogo" src="./mascoteuma.png" alt="Logo">
             <h1>AS AVENTURAS DE MATIZINHO</h1>
-            <p>Toque na tela para fazer o Matizinho pular e desviar das pedras brilhantes!</p>
-            <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
-            <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
+            <p>Toque para pular e desviar!</p>
+            <button id="startBtn" class="neo-pop-tilted-button"><span>INICIAR JOGO</span></button>
         </div>
 
-        <!-- NOVA TELA PRÉ-INÍCIO (FLAPPYMATS) -->
         <div id="startScreenFlappy">
-            <img id="flappyLogo" src="./mascoteaviao.png" alt="Mascote Aviao" 
-                 style="width: 150px; height: auto; margin-bottom: 10px;">
+            <img id="flappyLogo" src="./mascoteaviao.png" style="width: 150px; height: auto;">
             <h1 style="color: #00FFFF;">FLAPPYMATS</h1>
-            <p>O jogador controla o mascote que deve voar através de canos verdes empilhados sem tocá-los.</p>
-            <p>A mecânica é básica: tocar na tela faz o mascote levantar voo para se manter no ar, enquanto a gravidade o puxa para baixo.</p>
+            <p>Toque para voar e desviar dos canos.</p>
             <button id="startBtnFlappy" class="neo-pop-tilted-button btn-flappy"><span>INICIAR JOGO</span></button>
         </div>
         
         <div id="countdownScreen">
             <div id="countdown">3</div>
-            <div id="countdownMessage">
-                <p>Atenção: Toque apenas dentro da área iluminada do jogo!</p>
-            </div>
+            <div id="countdownMessage"><p>Prepare-se!</p></div>
         </div>
     </div>
 
@@ -439,9 +390,34 @@
                 if (!deferredPrompt) {
                     return;
                 }
+                
+                // MUDANÇA DE ESTADO: FEEDBACK "INSTALANDO..."
+                installBtn.disabled = true;
+                const span = installBtn.querySelector('span');
+                if(span) {
+                    span.textContent = "INSTALANDO...";
+                    span.style.backgroundColor = "#555";
+                    span.style.color = "#DDD";
+                }
+                installBtn.style.animation = "none";
+                installBtn.style.opacity = "0.7";
+
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 console.log(`User response to the install prompt: ${outcome}`);
+                
+                // Se o usuário cancelar, restaura o botão
+                if (outcome === 'dismissed') {
+                    installBtn.disabled = false;
+                    if(span) {
+                        span.textContent = "INSTALAR AGORA";
+                        span.style.backgroundColor = "#3DDC84";
+                        span.style.color = "white";
+                    }
+                    installBtn.style.animation = "pulseVolume 1s infinite";
+                    installBtn.style.opacity = "1";
+                }
+                
                 deferredPrompt = null;
             });
         }
@@ -563,7 +539,7 @@
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 12; 
         
-        const FLAPPY_LEVEL_START_RUNNER = 11; 
+        // REMOVIDO: const FLAPPY_LEVEL_START_RUNNER = 11; // Não muda mais para Flappy
         
         let lastTime = 0;
         const TARGET_FPS = 60;
@@ -872,15 +848,34 @@
         }
 
         function calculateDifficultyParams(deltaFactor) {
-            
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || selectedGameMode === MODE_FLAPPY) {
                 gameSpeed = 4.0; 
                 currentDensityFactor = 2.0; 
                 return; 
             }
 
-            const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[10];
+            // Lógica melhorada para níveis > 10 (Runner Infinito)
+            let config;
+            if (currentLevel <= 10) {
+                config = LEVEL_CONFIG[currentLevel];
+            } else {
+                // A partir do nível 11, aumenta velocidade em 0.7 por nível
+                // Base Nível 10 = 11.5
+                // Nível 11 = 11.5 + 0.7 = 12.2
+                const extraLevels = currentLevel - 10;
+                const extraSpeed = extraLevels * 0.7;
+                
+                // Limite de segurança para não quebrar a física (aprox 22)
+                let newTargetSpeed = 11.5 + extraSpeed;
+                if (newTargetSpeed > 22) newTargetSpeed = 22;
+
+                config = { 
+                    targetSpeed: newTargetSpeed, 
+                    densityFactor: 5.0 + (extraLevels * 0.2) // Aumenta levemente a densidade também
+                };
+            }
             
+            // Suavização da aceleração
             if (gameSpeed < config.targetSpeed) gameSpeed += 0.005 * deltaFactor; 
             else gameSpeed = config.targetSpeed; 
 
@@ -1234,12 +1229,19 @@
                     if (transitionCountdown > 0) {
                          playSound('ui-click'); 
                     } else {
-                        gameState = 'WAITING_FLAPPY_START';
+                        // FIX: Agora reinicia como RUNNER após transição, não FLAPPY
+                        if (selectedGameMode === MODE_RUNNER) {
+                            gameState = 'RUNNER'; // Mantém como runner
+                            player.grounded = false; // Começa no ar caindo suave
+                        } else {
+                            gameState = 'WAITING_FLAPPY_START';
+                            gameMessage.textContent = "TOQUE PARA VOAR!";
+                            gameMessage.style.display = 'block';
+                        }
+                        
                         transitionPhase = 'none';
                         lastTime = performance.now(); 
                         if (bgMusic) bgMusic.volume = 0.4;
-                        gameMessage.textContent = "TOQUE PARA VOAR!";
-                        gameMessage.style.display = 'block';
                     }
                 }
             }
@@ -1315,7 +1317,7 @@
                     renderGround();
                     renderPlayer(); 
                 } else {
-                    renderSkyBackground();
+                    renderSkyBackground(); // Pode mudar o céu aqui se quiser indicar nível avançado
                     renderClouds(); 
                     renderPlayer(); 
                 }
@@ -1468,15 +1470,11 @@
         
         function checkLevelProgression() {
             if (selectedGameMode === MODE_RUNNER && score >= nextLevelScore) {
+                // Alteração: Apenas avança o nível, sem mudar para Flappy
+                // if (currentLevel === FLAPPY_LEVEL_START_RUNNER - 1) ... (REMOVIDO)
                 
-                if (currentLevel === FLAPPY_LEVEL_START_RUNNER - 1) {
-                    startLevelTransition();
-                } else {
-                    currentLevel++; 
-                    nextLevelScore += 500;
-                    showMessage(`NÍVEL ${currentLevel}!`, 2000);
-                    playSound('levelup');
-                }
+                // Dispara transição visual de nível
+                startLevelTransition();
             }
         }
         
@@ -1656,5 +1654,3 @@
     </script>
 </body>
 </html>
-
-
