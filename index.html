@@ -71,8 +71,8 @@
             /* Container da Imagem */
             .loader-container {
                 position: relative;
-                width: 70%; /* Largura responsiva (70% da tela do celular) */
-                max-width: 300px;
+                width: 90%; /* AUMENTADO: De 70% para 90% da tela */
+                max-width: 500px; /* AUMENTADO: De 300px para 500px */
                 height: auto;
                 z-index: 100001; /* Acima do brilho */
             }
@@ -571,7 +571,7 @@
         <div class="fullscreen-shine"></div>
         <div class="loader-container">
             <!-- Usa a imagem que você acabou de subir -->
-            <img src="image.PNG" alt="Carregando" class="logo-img">
+            <img src="image.png" alt="Carregando" class="logo-img">
         </div>
     </div>
     
@@ -589,7 +589,7 @@
                         setTimeout(() => {
                             loader.style.display = 'none';
                         }, 1000);
-                    }, 4000);
+                    }, 6000); // Alterado de 4000 para 6000 para 3 ciclos
                 }
             }
         });
@@ -1582,7 +1582,7 @@
         }
         
         function updateClouds(deltaFactor) {
-            const maxClouds = (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START') ? 8 : 5;
+            const maxClouds = (gameState === 'WAITING_FLAPPY_START') ? 8 : 5;
             
             if (clouds.length < maxClouds && Math.random() < 0.02) createCloud();
             for (let i = clouds.length - 1; i >= 0; i--) {
