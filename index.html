@@ -46,9 +46,8 @@
         /* CSS DOS AVISOS DE NAVEGADOR (PWA/IAB)    */
         /* ========================================= */
         
-        /* Container geral dos avisos */
         .system-warning-banner {
-            display: none; /* Oculto por padrão, ativado via JS */
+            display: none; 
             position: fixed;
             z-index: 999999;
             width: 100%;
@@ -58,7 +57,6 @@
             animation: slideDown 0.5s ease-out;
         }
 
-        /* Estilo Android: Barra no topo */
         #android-browser-warning {
             top: 0;
             left: 0;
@@ -83,11 +81,10 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Estilo iOS (In-App Browser): Overlay escuro com instrução */
         #ios-iab-warning {
             top: 0;
             left: 0;
-            height: 100vh; /* Tela inteira para focar na instrução */
+            height: 100vh; 
             background: rgba(0, 0, 0, 0.95);
             color: white;
             display: none;
@@ -111,7 +108,6 @@
             margin-bottom: 10px;
         }
 
-        /* Estilo iOS (Safari PWA): Banner inferior discreto */
         #ios-pwa-install-hint {
             bottom: 0;
             left: 0;
@@ -139,69 +135,60 @@
         /* CSS DO LOADER MOBILE (GOLD LUXO)     */
         /* ========================================= */
         
-        /* Por padrão, escondido em Desktop */
         #mobile-loader-overlay {
             display: none; 
         }
 
-        /* APENAS PARA CELULARES (max-width: 768px) */
         @media (max-width: 768px) {
             #mobile-loader-overlay {
-                display: flex; /* Ativa o Flexbox no mobile */
+                display: flex; 
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: #000000; /* Fundo Preto */
-                z-index: 99999; /* Fica na frente de TODO o jogo */
+                background-color: #000000; 
+                z-index: 99999; 
                 justify-content: center;
                 align-items: center;
                 flex-direction: column;
-                transition: opacity 1s ease-out; /* Fade out suave ao terminar */
+                transition: opacity 1s ease-out; 
             }
 
-            /* Container da Imagem */
             .loader-container {
                 position: relative;
-                width: 90%; /* AUMENTADO: De 70% para 90% da tela */
-                max-width: 500px; /* AUMENTADO: De 300px para 500px */
+                width: 90%; 
+                max-width: 500px; 
                 height: auto;
-                z-index: 100001; /* Acima do brilho */
+                z-index: 100001; 
             }
 
-            /* O Logo com Animação */
             .logo-img {
                 width: 100%;
                 height: auto;
                 display: block;
                 opacity: 0;
-                /* Animação: 2s duração, Repete Infinito (controlado via JS) */
                 animation: appear 6s ease-in-out infinite;
             }
 
-            /* Camada de Brilho (Tela Inteira) */
             .fullscreen-shine {
                 position: absolute;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                z-index: 100002; /* Acima do logo para iluminá-lo */
+                z-index: 100002; 
                 pointer-events: none;
                 overflow: hidden;
             }
 
-            /* O Feixe de Luz Dourado */
             .fullscreen-shine::after {
                 content: '';
                 position: absolute;
                 top: 0;
                 left: -100%;
-                width: 60%; /* Feixe um pouco mais largo no mobile */
+                width: 60%; 
                 height: 100%;
-                
-                /* Gradiente Ouro e Branco */
                 background: linear-gradient(
                     to right,
                     rgba(255, 255, 255, 0) 0%,
@@ -210,13 +197,11 @@
                     rgba(255, 215, 0, 0.1) 60%,
                     rgba(255, 255, 255, 0) 100%
                 );
-                
                 transform: skewX(-20deg);
                 animation: shineMoveFullScreen 2s ease-in-out infinite;
             }
         }
 
-        /* Keyframes das Animações */
         @keyframes appear {
             0% { opacity: 0; transform: scale(0.95); }
             20% { opacity: 1; }
@@ -523,7 +508,7 @@
         /* TELA PRÉ-JOGO (FlappyMats) */
         #startScreenFlappy {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); /* Um pouco mais escuro para diferenciar */
+            background: rgba(0, 0, 0, 0.85); 
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto;
             display: none; 
@@ -657,18 +642,14 @@
 </head>
 <body>
     
-    <!-- ============================================ -->
-    <!--  ESTRUTURA DO LOADER MOBILE (Início Body)    -->
-    <!-- ============================================ -->
     <div id="mobile-loader-overlay">
         <div class="fullscreen-shine"></div>
         <div class="loader-container">
-            <!-- Usa a imagem que você acabou de subir -->
             <img src="image.PNG" alt="Carregando" class="logo-img">
         </div>
     </div>
     
-    <!-- AVISO ANDROID: ESCAPAR DO INSTAGRAM/FB -->
+    <!-- AVISO ANDROID -->
     <div id="android-browser-warning" class="system-warning-banner">
         📱 Melhore sua experiência!
         <button onclick="openInSystemBrowserAndroid()">ABRIR NO NAVEGADOR</button>
@@ -686,40 +667,32 @@
         </div>
     </div>
 
-    <!-- AVISO IOS: INSTALAR PWA (Se já estiver no Safari) -->
+    <!-- AVISO IOS: INSTALAR PWA -->
     <div id="ios-pwa-install-hint" class="system-warning-banner">
         <p style="margin-bottom:5px; font-weight:bold;">Instale o App para jogar melhor! 📲</p>
         <p style="font-size:12px; color:#555;">Toque em <span style="font-size:16px">share</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
     </div>
     
-    <!-- AUDIO DO JOGO (Importante: O arquivo precisa se chamar musica.mp3 e estar na mesma pasta) -->
     <audio id="bgMusic" loop>
         <source src="./musica.mp3" type="audio/mpeg">
         Seu navegador não suporta áudio.
     </audio>
 
-    <!-- Inicia script do loader (Remove ele após 4 segundos) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Verifica se está em mobile (largura < 768px)
             if (window.innerWidth <= 768) {
                 const loader = document.getElementById('mobile-loader-overlay');
                 if(loader) {
-                    // Mantém o loader visível por 4 segundos (2 loops da animação)
                     setTimeout(() => {
-                        loader.style.opacity = '0'; // Inicia fade-out
-                        // Aguarda 1 segundo do fade-out e remove da tela (display: none)
+                        loader.style.opacity = '0'; 
                         setTimeout(() => {
                             loader.style.display = 'none';
                         }, 1000);
-                    }, 6000); // Alterado de 4000 para 6000 para 3 ciclos
+                    }, 6000); 
                 }
             }
         });
     </script>
-    <!-- ============================================ -->
-    <!--          FIM DA ESTRUTURA DO LOADER          -->
-    <!-- ============================================ -->
 
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
@@ -781,7 +754,6 @@
                     </div>
 
                     <div class="intro-btn-group">
-                        <!-- NOVO BOTÃO FLAPPYMATS -->
                         <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy">
                             <span>FLAPPYMATS</span>
                         </button>
@@ -823,46 +795,35 @@
     </div>
 
     <script>
-        // --- FUNÇÕES DE DETECÇÃO AVANÇADA DE NAVEGADOR ---
-        
         function getMobileOperatingSystem() {
             var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-            // Windows Phone deve vir primeiro porque seu UA pode conter "Android"
             if (/windows phone/i.test(userAgent)) return "Windows Phone";
             if (/android/i.test(userAgent)) return "Android";
-            // iOS detection from: stackoverflow.com/a/9039885/177710
             if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return "iOS";
-
             return "unknown";
         }
 
         function isInAppBrowser(os) {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
-            
-            // Lista de assinaturas de WebViews conhecidas (In-App Browsers)
             const rules = [
                 'WebView',
-                '(iPhone|iPod|iPad)(?!.*Safari\/)', // iOS WebView sem Safari
-                'Android.*(wv|\.0\.0\.0)', // Android WebView antiga
-                'Instagram', // Instagram IAB
-                'FBAN',      // Facebook IAB
-                'FBAV',      // Facebook IAB
-                'Twitter',   // Twitter IAB
-                'LinkedIn',  // LinkedIn IAB
-                'WhatsApp'   // WhatsApp IAB
+                '(iPhone|iPod|iPad)(?!.*Safari\/)', 
+                'Android.*(wv|\.0\.0\.0)', 
+                'Instagram', 
+                'FBAN', 
+                'FBAV', 
+                'Twitter', 
+                'LinkedIn', 
+                'WhatsApp'
             ];
-            
             const regex = new RegExp(`(${rules.join('|')})`, 'ig');
             return Boolean(ua.match(regex));
         }
 
         function isStandalone() {
-            // Verifica se o app já está instalado (PWA mode)
             return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
         }
 
-        // Função chamada pelo botão "Abrir no Navegador" (Android)
         function openInSystemBrowserAndroid() {
             const currentUrl = window.location.href;
             const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
@@ -870,33 +831,24 @@
             window.location.href = intentUrl;
         }
 
-        // --- LÓGICA PRINCIPAL DE EXECUÇÃO ---
         window.addEventListener('load', function() {
             const os = getMobileOperatingSystem();
             const inApp = isInAppBrowser(os);
             const installed = isStandalone();
 
-            // 1. Cenário Android em In-App Browser
             if (os === 'Android' && inApp) {
                 const banner = document.getElementById('android-browser-warning');
                 if (banner) banner.style.display = 'block';
             }
-
-            // 2. Cenário iOS em In-App Browser (Instagram/Facebook)
             else if (os === 'iOS' && inApp) {
                 const modal = document.getElementById('ios-iab-warning');
                 if (modal) {
-                    modal.style.display = 'flex'; // Overlay Bloqueante
-                    // Impede o scroll de fundo para focar na instrução
+                    modal.style.display = 'flex'; 
                     document.body.style.overflow = 'hidden'; 
                 }
             }
-
-            // 3. Cenário iOS no Safari (Navegador real) mas NÃO instalado
             else if (os === 'iOS' && !inApp && !installed) {
-                // Mostra dica para instalar/adicionar à home
                 const hint = document.getElementById('ios-pwa-install-hint');
-                // Pequeno delay para não ser intrusivo logo de cara
                 setTimeout(() => {
                     if (hint) hint.style.display = 'flex';
                 }, 2000);
@@ -908,14 +860,13 @@
         const SUPABASE_URL = 'https://ngeofumxwasfkaathwbu.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nZW9mdW14d2FzZmthYXRod2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MzU3MzQsImV4cCI6MjA4MDAxMTczNH0._kT-LZlXDdNY3Kr4PEC-3yO3a3I7CupEDklj_rGSlnE';
         
-        // --- GERENCIAMENTO DE MODO DE JOGO ---
         const MODE_RUNNER = 'RUNNER';
-        const MODE_FLAPPY = 'FLAPPY_SOLO'; // Modo Flappy independente
+        const MODE_FLAPPY = 'FLAPPY_SOLO'; 
         
         const TABLE_RUNNER = 'ranking';
         const TABLE_FLAPPY = 'ranking_flappy';
 
-        let selectedGameMode = MODE_RUNNER; // Default
+        let selectedGameMode = MODE_RUNNER; 
         let activeTable = TABLE_RUNNER;
 
         let _supabase = null;
@@ -938,7 +889,6 @@
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 12; 
         
-        // O Flappy começa apenas no nível 11 do Runner
         const FLAPPY_LEVEL_START_RUNNER = 11; 
         
         let lastTime = 0;
@@ -963,26 +913,22 @@
         
         const bgMusic = document.getElementById('bgMusic');
         
-        // Telas
         const introScreen = document.getElementById('introScreen');
-        const startScreen = document.getElementById('startScreen'); // Runner Pre-start
-        const startScreenFlappy = document.getElementById('startScreenFlappy'); // Flappy Pre-start
+        const startScreen = document.getElementById('startScreen'); 
+        const startScreenFlappy = document.getElementById('startScreenFlappy'); 
         const countdownScreen = document.getElementById('countdownScreen');
         
-        // Botões
-        const introStartBtn = document.getElementById('introStartBtn'); // Intro -> Runner
-        const introFlappyBtn = document.getElementById('introFlappyBtn'); // Intro -> Flappy
-        const startBtn = document.getElementById('startBtn'); // Iniciar Runner
-        const startBtnFlappy = document.getElementById('startBtnFlappy'); // Iniciar Flappy
+        const introStartBtn = document.getElementById('introStartBtn'); 
+        const introFlappyBtn = document.getElementById('introFlappyBtn'); 
+        const startBtn = document.getElementById('startBtn'); 
+        const startBtnFlappy = document.getElementById('startBtnFlappy'); 
         
-        // UI Jogo
         const countdownElement = document.getElementById('countdown');
         const gameMessage = document.getElementById('gameMessage');
         const scoreDisplay = document.getElementById('score');
         const highScoreDisplay = document.getElementById('highScore');
         const levelDisplay = document.getElementById('level');
         
-        // Modais
         const nameModal = document.getElementById('nameModal');
         const playerNameInput = document.getElementById('playerNameInput');
         const confirmNameBtn = document.getElementById('confirmNameBtn');
@@ -992,7 +938,6 @@
         const modalRestartBtn = document.getElementById('modalRestartBtn');
         const rankingList = document.getElementById('rankingList');
         
-        // Carrega o ranking correto baseado na tabela ativa
         async function fetchRankingToCache() {
             if (!_supabase) return;
             try {
@@ -1014,7 +959,7 @@
             if (!_supabase) return;
             try {
                 const { error } = await _supabase
-                    .from(activeTable) // Salva na tabela ativa (runner ou flappy)
+                    .from(activeTable) 
                     .insert([{ nome: nome, pontos: pontos }]);
                 if (error) console.error('Erro salvar:', error);
             } catch (err) {
@@ -1066,36 +1011,58 @@
         let isAudioInitialized = false;
 
         function initAudio() {
-            // CORREÇÃO: Força o navegador a desbloquear o áudio no toque
             if (!isAudioInitialized) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
                 isAudioInitialized = true;
             }
-            // iOS Fix: Retoma o contexto se ele estiver suspenso
-            if (audioCtx && audioCtx.state === 'suspended') {
+            
+            if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
+            
             playMusicSafe();
+        }
+
+        // --- CORREÇÃO PWA: DESBLOQUEIO DE ÁUDIO ---
+        function unlockAudio() {
+            if (!isAudioInitialized) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                isAudioInitialized = true;
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            // Toca um buffer silencioso para aquecer o audio engine no iOS
+            const buffer = audioCtx.createBuffer(1, 1, 22050);
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start(0);
+
+            playMusicSafe();
+
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('touchstart', unlockAudio);
         }
 
         function playMusicSafe() {
             if (!bgMusic) return;
             bgMusic.volume = 0.4;
             if (!bgMusic.paused) return;
-            
-            // Tenta tocar e captura erro (comum em browsers modernos)
             var playPromise = bgMusic.play();
             if (playPromise !== undefined) {
                 playPromise.then(_ => {}).catch(error => {
-                    console.log("Autoplay bloqueado. Aguardando toque do usuário.");
+                    console.log("Aguardando interação para áudio.");
                 });
             }
         }
 
         function playSound(type) {
             if (!audioCtx) return;
-            // Se estiver suspenso (comum no iOS), tenta acordar
+            
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
@@ -1217,7 +1184,6 @@
 
         function calculateDifficultyParams(deltaFactor) {
             
-            // Se estiver em modo Flappy (seja solo ou dentro do runner)
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || selectedGameMode === MODE_FLAPPY) {
                 gameSpeed = 4.0; 
                 currentDensityFactor = 2.0; 
@@ -1245,7 +1211,6 @@
             currentDensityFactor = LEVEL_CONFIG[1].densityFactor;
             
             resizeCanvas();
-            // Posição padrão (chão)
             player.y = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
             player.velocityY = 0;
             player.grounded = true;
@@ -1256,28 +1221,20 @@
             gameStartTime = Date.now();
             firstObstacleCreated = false;
             
-            // Lógica de Inicialização por Modo
             if (selectedGameMode === MODE_FLAPPY) {
-                // MODO FLAPPY INDEPENDENTE
-                // Define o estado de espera "Toque para Voar"
                 gameState = 'WAITING_FLAPPY_START';
                 activeTable = TABLE_FLAPPY;
-                // ALTERADO: de zeoHighScoreFlappy para matizinhoHighScoreFlappy
                 highScore = localStorage.getItem('matizinhoHighScoreFlappy') || 0;
                 
-                // Posiciona o jogador no meio da tela (ar) e flutuando
                 player.y = (canvas.height / (window.devicePixelRatio || 1)) / 3; 
                 player.velocityY = 0; 
                 
-                // Exibe mensagem de instrução
                 gameMessage.textContent = "TOQUE PARA VOAR!";
                 gameMessage.style.display = 'block';
 
             } else {
-                // MODO RUNNER CLÁSSICO
                 gameState = 'RUNNER';
                 activeTable = TABLE_RUNNER;
-                // ALTERADO: de zeoHighScore para matizinhoHighScore
                 highScore = localStorage.getItem('matizinhoHighScore') || 0;
             }
             highScoreDisplay.textContent = Math.floor(highScore);
@@ -1288,7 +1245,7 @@
             updateUI();
             for (let i = 0; i < 5; i++) createCloud();
             playMusicSafe();
-            fetchRankingToCache(); // Atualiza cache com a tabela correta
+            fetchRankingToCache(); 
         }
         
         function createCloud() {
@@ -1360,14 +1317,10 @@
             
             if (gameState === 'TRANSITION') return;
 
-            // ESTADO DE ESPERA DO FLAPPY (Início do jogo ou pós-transição)
             if (gameState === 'WAITING_FLAPPY_START') {
                 gameState = 'FLAPPY';
-                // PULO AUTOMÁTICO INICIAL
-                // Dá um impulso para cima imediatamente ao começar
                 player.velocityY = -FLAPPY_JUMP_POWER; 
                 playSound('jump');
-                // Esconde a mensagem "TOQUE PARA VOAR"
                 gameMessage.style.display = 'none'; 
                 return;
             }
@@ -1385,259 +1338,12 @@
             }
         }
         
-        // CORREÇÃO: Listener para desbloquear áudio em qualquer toque inicial
-        function unlockAudio() {
-            initAudio();
-            // Remove os listeners após o primeiro desbloqueio
-            document.removeEventListener('click', unlockAudio);
-            document.removeEventListener('touchstart', unlockAudio);
-        }
-        
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, {passive: false});
         canvas.addEventListener('mousedown', jump);
         
-        // Adiciona desbloqueio global para garantir som no primeiro toque
-        document.addEventListener('click', unlockAudio);
+        // Ativa o desbloqueio de áudio em qualquer toque na página
         document.addEventListener('touchstart', unlockAudio);
-        
-        let introDismissed = false;
-
-        function checkScreenSizeAndInit() {
-            try {
-                resizeCanvas();
-                if (introDismissed || gameRunning) return;
-
-                if (window.innerWidth < 1024) {
-                    if (introScreen) introScreen.style.display = 'flex';
-                    // Esconde pré-inícios
-                    if (startScreen) startScreen.style.display = 'none';
-                    if (startScreenFlappy) startScreenFlappy.style.display = 'none';
-                } else {
-                    if (introScreen) introScreen.style.display = 'none';
-                    // Mostra o pré-início apropriado se já tiver escolhido
-                    if (selectedGameMode === MODE_FLAPPY) {
-                        startScreenFlappy.style.display = 'flex';
-                    } else {
-                        startScreen.style.display = 'flex';
-                    }
-                }
-            } catch (e) {
-                console.error("Erro na inicialização da UI:", e);
-                if (startScreen) startScreen.style.display = 'flex';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            checkScreenSizeAndInit();
-            // Inicia cache com Runner por padrão, será trocado se user escolher Flappy
-            activeTable = TABLE_RUNNER;
-            fetchRankingToCache(); 
-            
-            if (introScreen) {
-                const enableAudio = () => {
-                    initAudio();
-                    introScreen.removeEventListener('click', enableAudio);
-                    introScreen.removeEventListener('touchstart', enableAudio);
-                };
-                introScreen.addEventListener('click', enableAudio);
-                introScreen.addEventListener('touchstart', enableAudio);
-            }
-
-            // BOTÃO: JOGUE AGORA (RUNNER)
-            if (introStartBtn) {
-                introStartBtn.addEventListener('click', () => {
-                    initAudio();
-                    playSound('ui-click'); 
-                    introDismissed = true; 
-                    selectedGameMode = MODE_RUNNER;
-                    
-                    introScreen.style.display = 'none';
-                    startScreenFlappy.style.display = 'none';
-                    if (startScreen) startScreen.style.display = 'flex';
-                });
-            }
-
-            // BOTÃO: FLAPPYMATS (NOVO)
-            if (introFlappyBtn) {
-                introFlappyBtn.addEventListener('click', () => {
-                    initAudio();
-                    playSound('ui-click'); 
-                    introDismissed = true;
-                    selectedGameMode = MODE_FLAPPY;
-                    
-                    introScreen.style.display = 'none';
-                    startScreen.style.display = 'none';
-                    if (startScreenFlappy) startScreenFlappy.style.display = 'flex';
-                });
-            }
-
-            // INICIAR: RUNNER
-            if (startBtn) {
-                 startBtn.addEventListener('click', () => {
-                    handleStartClick();
-                 });
-            }
-
-            // INICIAR: FLAPPY
-            if (startBtnFlappy) {
-                startBtnFlappy.addEventListener('click', () => {
-                    handleStartClick();
-                });
-            }
-            
-            if (confirmNameBtn) {
-                confirmNameBtn.addEventListener('click', () => {
-                    const name = playerNameInput.value.trim();
-                    if (name === "") {
-                        alert("Por favor, digite seu nome!");
-                        return;
-                    }
-                    playSound('ui-click'); 
-                    playerName = name;
-                    nameModal.style.display = 'none';
-                    startCountdown();
-                });
-            }
-
-            if (modalRestartBtn) {
-                modalRestartBtn.addEventListener('click', () => {
-                    playSound('ui-click'); 
-                    restartGame();
-                });
-            }
-        });
-        
-        function handleStartClick() {
-            initAudio();
-            playSound('ui-click'); 
-            startScreen.style.display = 'none'; 
-            startScreenFlappy.style.display = 'none';
-            
-            if (nameModal) {
-                nameModal.style.display = 'flex'; 
-                if (playerNameInput) playerNameInput.focus();
-            } else {
-                startGame();
-            }
-        }
-
-        window.addEventListener('resize', checkScreenSizeAndInit);
-        
-        function startCountdown() {
-            startScreen.style.display = 'none';
-            startScreenFlappy.style.display = 'none';
-            nameModal.style.display = 'none'; 
-            newGameOverModal.style.display = 'none'; 
-            countdownScreen.style.display = 'flex';
-            let count = 3;
-            countdownElement.textContent = count;
-            playSound('start'); 
-            const countdownInterval = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    countdownElement.textContent = count;
-                    playSound('ui-click'); 
-                } else {
-                    clearInterval(countdownInterval);
-                    countdownScreen.style.display = 'none';
-                    startGame();
-                }
-            }, 1000);
-        }
-        
-        function startGame() {
-            if (gameLoopId) cancelAnimationFrame(gameLoopId);
-            initGame();
-            gameRunning = true;
-            lastTime = performance.now();
-            gameLoopId = requestAnimationFrame(gameLoop);
-        }
-        
-        function startLevelTransition() {
-            gameState = 'TRANSITION';
-            transitionPhase = 'fade-out';
-            transitionTimer = 0;
-            transitionAlpha = 0;
-            
-            if (bgMusic) bgMusic.volume = 0.1;
-        }
-
-        function updateTransition(deltaFactor) {
-            const dt = deltaFactor / 60; 
-
-            if (transitionPhase === 'fade-out') {
-                transitionAlpha += dt * 2; 
-                if (transitionAlpha >= 1) {
-                    transitionAlpha = 1;
-                    transitionPhase = 'fade-in';
-                    
-                    currentLevel++;
-                    nextLevelScore += 500;
-                    obstacles = []; 
-                    player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2; 
-                    player.velocityY = 0;
-                }
-            } else if (transitionPhase === 'fade-in') {
-                transitionAlpha -= dt * 2;
-                if (transitionAlpha <= 0) {
-                    transitionAlpha = 0;
-                    transitionPhase = 'countdown';
-                    transitionCountdown = 3;
-                    transitionTimer = 0;
-                }
-            } else if (transitionPhase === 'countdown') {
-                transitionTimer += dt;
-                if (transitionTimer >= 1.0) { 
-                    transitionCountdown--;
-                    transitionTimer = 0;
-                    if (transitionCountdown > 0) {
-                         playSound('ui-click'); 
-                    } else {
-                        gameState = 'WAITING_FLAPPY_START';
-                        transitionPhase = 'none';
-                        lastTime = performance.now(); 
-                        if (bgMusic) bgMusic.volume = 0.4;
-                        gameMessage.textContent = "TOQUE PARA VOAR!";
-                        gameMessage.style.display = 'block';
-                    }
-                }
-            }
-        }
-
-        function renderTransition() {
-            if (gameState !== 'TRANSITION') return;
-
-            const width = canvas.width / (window.devicePixelRatio || 1);
-            const height = canvas.height / (window.devicePixelRatio || 1);
-
-            if (transitionPhase === 'fade-out' || transitionPhase === 'fade-in') {
-                ctx.fillStyle = `rgba(0, 0, 0, ${transitionAlpha})`;
-                ctx.fillRect(0, 0, width, height);
-            }
-
-            if (transitionPhase === 'countdown') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-                ctx.fillRect(0, 0, width, height);
-                
-                ctx.save();
-                ctx.fillStyle = '#FFD700';
-                ctx.strokeStyle = '#FFFFFF';
-                ctx.lineWidth = 4;
-                ctx.font = 'bold 100px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.shadowColor = 'black';
-                ctx.shadowBlur = 20;
-                ctx.strokeText(transitionCountdown, width / 2, height / 2);
-                ctx.fillText(transitionCountdown, width / 2, height / 2);
-                
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = 'bold 24px Arial';
-                ctx.shadowBlur = 5;
-                ctx.fillText("PREPARE-SE...", width / 2, height / 2 + 80);
-                ctx.restore();
-            }
-        }
+        document.addEventListener('click', unlockAudio);
         
         function renderSkyBackground() {
             const width = canvas.width / (window.devicePixelRatio || 1);
@@ -1682,7 +1388,6 @@
                 renderTransition();
                 
             } else if (gameState === 'WAITING_FLAPPY_START') {
-                // RENDERIZAÇÃO ESTÁTICA ENQUANTO ESPERA O CLIQUE
                 renderSkyBackground();
                 updateClouds(deltaFactor * 0.2); 
                 renderClouds();
@@ -1784,10 +1489,8 @@
                         // --- AJUSTE LEVEL 7+: VARIAÇÃO DE OBSTÁCULOS ---
                         let maxGap = Math.max(minSafeGap + 100, 600 / currentDensityFactor);
                         
-                        // Se for nível 7 ou maior, introduz mais aleatoriedade no espaço máximo
-                        // para que as pedras não venham sempre no mesmo ritmo "metrônomo"
                         if (currentLevel >= 7) {
-                            const randomVariation = Math.random() * 200; // Variação extra
+                            const randomVariation = Math.random() * 200; 
                             maxGap += randomVariation;
                         }
 
@@ -1829,10 +1532,8 @@
         }
         
         function checkLevelProgression() {
-            // Em modo Runner, avança de nível
             if (selectedGameMode === MODE_RUNNER && score >= nextLevelScore) {
                 
-                // Transição para Flappy (se for o level 11 do runner)
                 if (currentLevel === FLAPPY_LEVEL_START_RUNNER - 1) {
                     startLevelTransition();
                 } else {
@@ -1842,9 +1543,6 @@
                     playSound('levelup');
                 }
             }
-            // Em modo Flappy Solo, não há níveis "numéricos" que mudam a mecânica drasticamente,
-            // mas podemos mostrar mensagem a cada 500 pontos se quiser.
-            // Por enquanto, deixamos infinito sem interrupções.
         }
         
         function checkCollisions() {
@@ -1878,8 +1576,6 @@
         
         function gameOver() {
             gameRunning = false;
-            // Se estava no Flappy (seja solo ou no runner), continua como Game Over normal
-            // mas precisamos garantir que o restart volte pro modo correto.
             
             gameState = 'GAME_OVER';
             cancelAnimationFrame(gameLoopId);
@@ -1889,8 +1585,6 @@
             
             let finalScore = Math.floor(score);
 
-            // Salva recorde local dependendo do modo
-            // ALTERADO: chaves de armazenamento atualizadas para "matizinho"
             if (selectedGameMode === MODE_FLAPPY) {
                 if (finalScore > highScore) {
                     highScore = finalScore;
@@ -1971,7 +1665,6 @@
             ctx.shadowColor = '#FFA500'; ctx.shadowBlur = 10;
             
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || (gameState === 'TRANSITION' && transitionPhase !== 'fade-out')) {
-                // DIMENSÕES FLAPPY: 90x80
                 const flappyWidth = 90;
                 const flappyHeight = 100;
 
@@ -1986,7 +1679,6 @@
                 } else {
                     ctx.fillStyle = '#FFA500'; ctx.fillRect(player.x, player.y, player.width, player.height);
                     ctx.fillStyle = 'white'; ctx.font = '16px Arial'; ctx.textAlign = 'center';
-                    // ALTERADO: de Zéo para Matizinho (usando fonte menor ou apenas texto se não couber no placeholder)
                     ctx.fillText('Matizinho', player.x + player.width/2, player.y + player.height/2 + 5); 
                 }
             }
@@ -2029,3 +1721,5 @@
     </script>
 </body>
 </html>
+
+
