@@ -6,16 +6,19 @@
   "background_color": "#87CEEB",
   "theme_color": "#87CEEB",
   "orientation": "portrait",
+  "scope": "./",
   "icons": [
     {
       "src": "./iconejogo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpeg"
     },
     {
       "src": "./iconejogo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ]
 }
+
+
