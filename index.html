@@ -688,10 +688,16 @@
 
     <!-- AVISO IOS: INSTALAR PWA (Se já estiver no Safari) -->
     <div id="ios-pwa-install-hint" class="system-warning-banner">
-        <p style="margin-bottom:5px; color:#555; font-weight:bold;">Instale o App para jogar melhor! 📲</p>
-        <p style="font-size:12px; color:#555;">Toque em <span style="font-size:16px">COMPARTILHAR</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
+        <p style="margin-bottom:5px; font-weight:bold;">Instale o App para jogar melhor! 📲</p>
+        <p style="font-size:12px; color:#555;">Toque em <span style="font-size:16px">share</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
     </div>
     
+    <!-- AUDIO DO JOGO (Importante: O arquivo precisa se chamar musica.mp3 e estar na mesma pasta) -->
+    <audio id="bgMusic" loop>
+        <source src="./musica.mp3" type="audio/mpeg">
+        Seu navegador não suporta áudio.
+    </audio>
+
     <!-- Inicia script do loader (Remove ele após 4 segundos) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -723,11 +729,6 @@
             <div>Recorde: <span id="highScore">0</span></div>
             <div>Nível: <span id="level">1</span></div>
         </div>
-        
-        <audio id="bgMusic" loop>
-            <source src="./musica.mp3" type="audio/mpeg">
-            Seu navegador não suporta áudio.
-        </audio>
         
         <div id="debugInfo"></div>
         <div id="gameMessage"></div>
@@ -1065,10 +1066,15 @@
         let isAudioInitialized = false;
 
         function initAudio() {
+            // CORREÇÃO: Força o navegador a desbloquear o áudio no toque
             if (!isAudioInitialized) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
                 isAudioInitialized = true;
+            }
+            // iOS Fix: Retoma o contexto se ele estiver suspenso
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
             }
             playMusicSafe();
         }
@@ -1077,16 +1083,23 @@
             if (!bgMusic) return;
             bgMusic.volume = 0.4;
             if (!bgMusic.paused) return;
+            
+            // Tenta tocar e captura erro (comum em browsers modernos)
             var playPromise = bgMusic.play();
             if (playPromise !== undefined) {
                 playPromise.then(_ => {}).catch(error => {
-                    if (error.name !== 'AbortError') console.log("Aguardando interação.");
+                    console.log("Autoplay bloqueado. Aguardando toque do usuário.");
                 });
             }
         }
 
         function playSound(type) {
             if (!audioCtx) return;
+            // Se estiver suspenso (comum no iOS), tenta acordar
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             osc.connect(gainNode);
@@ -1372,8 +1385,20 @@
             }
         }
         
+        // CORREÇÃO: Listener para desbloquear áudio em qualquer toque inicial
+        function unlockAudio() {
+            initAudio();
+            // Remove os listeners após o primeiro desbloqueio
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('touchstart', unlockAudio);
+        }
+        
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, {passive: false});
         canvas.addEventListener('mousedown', jump);
+        
+        // Adiciona desbloqueio global para garantir som no primeiro toque
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio);
         
         let introDismissed = false;
 
