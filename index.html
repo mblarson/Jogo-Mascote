@@ -746,104 +746,124 @@
         });
     </script>
 
-    <div id="gameContainer">
-        <canvas id="gameCanvas"></canvas>
-        
-        <div id="gameInfo">
-            <div>Pontos: <span id="score">0</span></div>
-            <div>Recorde: <span id="highScore">0</span></div>
-            <div>Nível: <span id="level">1</span></div>
-        </div>
-        
-        <div id="debugInfo"></div>
-        <div id="gameMessage"></div>
-        
-        <div id="nameModal" class="custom-modal">
-            <div class="modal-content">
-                <h2 style="color: #FFA500; margin-bottom: 10px;">QUEM VAI JOGAR?</h2>
-                <p>Digite seu nome para entrar no Ranking:</p>
-                <input type="text" id="playerNameInput" placeholder="Seu Nome" maxlength="12" autocomplete="off">
-                <button id="confirmNameBtn" class="neo-pop-tilted-button"><span>CONFIRMAR</span></button>
+    <!-- WRAPPER PRINCIPAL PARA ALINHAMENTO DO JOGO E BOTÃO DE RETORNO -->
+    <div id="main-layout-wrapper" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <div id="gameContainer">
+            <canvas id="gameCanvas"></canvas>
+            
+            <div id="gameInfo">
+                <div>Pontos: <span id="score">0</span></div>
+                <div>Recorde: <span id="highScore">0</span></div>
+                <div>Nível: <span id="level">1</span></div>
             </div>
-        </div>
-
-        <div id="newGameOverModal" class="custom-modal">
-            <div class="modal-content">
-                <h2 style="color: #FF4500; margin-bottom: -25px; border-bottom: -1px solid #444; padding-bottom: 10px;">FIM DE JOGO</h2>
-                
-                <div class="game-over-layout">
-                    <div class="result-column">
-                        <div id="finalPlayerName" class="player-name-display">JOGADOR</div>
-                        <div class="score-display-big" id="finalScoreDisplay">0</div>
-                        <div style="font-size: 14px; color: #AAA; margin-top: 5px;">PONTOS</div>
-                        
-                        <div id="playerRankDisplay" style="display: none; margin-top: 10px; color: #FFD700; font-weight: bold; font-size: 0.75em; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px;"></div>
-                        
-                        <button id="modalRestartBtn" class="neo-pop-tilted-button" style="margin-top: 20px;">
-                            <span>JOGAR NOVAMENTE</span>
-                        </button>
-                    </div>
-
-                    <div class="ranking-column">
-                        <div class="ranking-title">🏆 TOP 3 RANKING</div>
-                        <ul id="rankingList" class="ranking-list">
-                            <li style="color: #888; font-style: italic;">Carregando...</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    POSTE SUA PONTUAÇÃO NO INSTAGRAM E MARQUE A <span class="instagram-tag">@UMADEMATS</span>
+            
+            <div id="debugInfo"></div>
+            <div id="gameMessage"></div>
+            
+            <div id="nameModal" class="custom-modal">
+                <div class="modal-content">
+                    <h2 style="color: #FFA500; margin-bottom: 10px;">QUEM VAI JOGAR?</h2>
+                    <p>Digite seu nome para entrar no Ranking:</p>
+                    <input type="text" id="playerNameInput" placeholder="Seu Nome" maxlength="12" autocomplete="off">
+                    <button id="confirmNameBtn" class="neo-pop-tilted-button"><span>CONFIRMAR</span></button>
                 </div>
             </div>
-        </div>
-        
-        <div id="introScreen">
-            <div id="introWrapper">
-                <div id="introContent">
-                    <div class="volume-warning">
-                        <span>🔊</span> AUMENTE O SOM PARA JOGAR
+
+            <div id="newGameOverModal" class="custom-modal">
+                <div class="modal-content">
+                    <h2 style="color: #FF4500; margin-bottom: -25px; border-bottom: -1px solid #444; padding-bottom: 10px;">FIM DE JOGO</h2>
+                    
+                    <div class="game-over-layout">
+                        <div class="result-column">
+                            <div id="finalPlayerName" class="player-name-display">JOGADOR</div>
+                            <div class="score-display-big" id="finalScoreDisplay">0</div>
+                            <div style="font-size: 14px; color: #AAA; margin-top: 5px;">PONTOS</div>
+                            
+                            <div id="playerRankDisplay" style="display: none; margin-top: 10px; color: #FFD700; font-weight: bold; font-size: 0.75em; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px;"></div>
+                            
+                            <button id="modalRestartBtn" class="neo-pop-tilted-button" style="margin-top: 20px;">
+                                <span>JOGAR NOVAMENTE</span>
+                            </button>
+                        </div>
+
+                        <div class="ranking-column">
+                            <div class="ranking-title">🏆 TOP 3 RANKING</div>
+                            <ul id="rankingList" class="ranking-list">
+                                <li style="color: #888; font-style: italic;">Carregando...</li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <div class="intro-btn-group">
-                        <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy">
-                            <span>FLAPPYMATS</span>
-                        </button>
-
-                        <button id="introStartBtn" class="neo-pop-tilted-button">
-                            <span>RUNNERMATS</span>
-                        </button>
+                    <div class="modal-footer">
+                        POSTE SUA PONTUAÇÃO NO INSTAGRAM E MARQUE A <span class="instagram-tag">@UMADEMATS</span>
                     </div>
                 </div>
             </div>
-        </div>
+            
+            <!-- NOVO MODAL: CONFIRMAÇÃO DE RETORNO -->
+            <div id="returnConfirmationModal" class="custom-modal">
+                <div class="modal-content">
+                    <h2 style="color: #FFA500; margin-bottom: 15px;">TEM CERTEZA?</h2>
+                    <p>Deseja realmente retornar ao menu principal?</p>
+                    <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+                         <button id="confirmReturnBtn" class="neo-pop-tilted-button"><span>SIM</span></button>
+                         <button id="cancelReturnBtn" class="neo-pop-tilted-button" style="background-color: #888;"><span>NÃO</span></button>
+                    </div>
+                </div>
+            </div>
 
-        <!-- TELA PRÉ-INÍCIO (RUNNER) -->
-        <div id="startScreen">
-            <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
-                onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'16\' text-anchor=\'middle\' fill=\'white\'>MATIZINHO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
-            <h1>AS AVENTURAS DE MATIZINHO</h1>
-            <p>Toque na tela para fazer o Matizinho pular e desviar das pedras brilhantes!</p>
-            <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
-            <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
-        </div>
+            <div id="introScreen">
+                <div id="introWrapper">
+                    <div id="introContent">
+                        <div class="volume-warning">
+                            <span>🔊</span> AUMENTE O SOM PARA JOGAR
+                        </div>
 
-        <!-- NOVA TELA PRÉ-INÍCIO (FLAPPYMATS) -->
-        <div id="startScreenFlappy">
-            <img id="flappyLogo" src="./mascoteaviao.png" alt="Mascote Aviao" 
-                 style="width: 150px; height: auto; margin-bottom: 10px;">
-            <h1 style="color: #00FFFF;">FLAPPYMATS</h1>
-            <p>O jogador controla o mascote que deve voar através de canos verdes empilhados sem tocá-los.</p>
-            <p>A mecânica é básica: tocar na tela faz o mascote levantar voo para se manter no ar, enquanto a gravidade o puxa para baixo.</p>
-            <button id="startBtnFlappy" class="neo-pop-tilted-button btn-flappy"><span>INICIAR JOGO</span></button>
-        </div>
-        
-        <div id="countdownScreen">
-            <div id="countdown">3</div>
-            <div id="countdownMessage">
-                <p>Atenção: Toque apenas dentro da área iluminada do jogo!</p>
+                        <div class="intro-btn-group">
+                            <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy">
+                                <span>FLAPPYMATS</span>
+                            </button>
+
+                            <button id="introStartBtn" class="neo-pop-tilted-button">
+                                <span>RUNNERMATS</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TELA PRÉ-INÍCIO (RUNNER) -->
+            <div id="startScreen">
+                <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
+                    onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'16\' text-anchor=\'middle\' fill=\'white\'>MATIZINHO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
+                <h1>AS AVENTURAS DE MATIZINHO</h1>
+                <p>Toque na tela para fazer o Matizinho pular e desviar das pedras brilhantes!</p>
+                <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
+                <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
+            </div>
+
+            <!-- NOVA TELA PRÉ-INÍCIO (FLAPPYMATS) -->
+            <div id="startScreenFlappy">
+                <img id="flappyLogo" src="./mascoteaviao.png" alt="Mascote Aviao" 
+                     style="width: 150px; height: auto; margin-bottom: 10px;">
+                <h1 style="color: #00FFFF;">FLAPPYMATS</h1>
+                <p>O jogador controla o mascote que deve voar através de canos verdes empilhados sem tocá-los.</p>
+                <p>A mecânica é básica: tocar na tela faz o mascote levantar voo para se manter no ar, enquanto a gravidade o puxa para baixo.</p>
+                <button id="startBtnFlappy" class="neo-pop-tilted-button btn-flappy"><span>INICIAR JOGO</span></button>
+            </div>
+            
+            <div id="countdownScreen">
+                <div id="countdown">3</div>
+                <div id="countdownMessage">
+                    <p>Atenção: Toque apenas dentro da área iluminada do jogo!</p>
+                </div>
             </div>
         </div>
+        
+        <!-- NOVO BOTÃO: RETORNAR AO MENU -->
+        <button id="returnMenuBtn" class="neo-pop-tilted-button" style="margin-top: 25px; z-index: 5; width: auto; min-width: 200px;">
+            <span>RETORNAR AO MENU PRINCIPAL</span>
+        </button>
     </div>
 
     <script>
@@ -1587,6 +1607,66 @@
                 playSound('ui-click'); 
                 restartGame();
             });
+
+            // --- FUNCIONALIDADE: RETORNAR AO MENU ---
+            const returnMenuBtn = document.getElementById('returnMenuBtn');
+            const returnConfirmationModal = document.getElementById('returnConfirmationModal');
+            const confirmReturnBtn = document.getElementById('confirmReturnBtn');
+            const cancelReturnBtn = document.getElementById('cancelReturnBtn');
+            let pausedForMenu = false;
+
+            if(returnMenuBtn) {
+                addBtnListener(returnMenuBtn, () => {
+                    // Pausa o jogo se estiver rodando para evitar que o player morra enquanto decide
+                    if (gameRunning) {
+                        gameRunning = false;
+                        cancelAnimationFrame(gameLoopId);
+                        pausedForMenu = true;
+                    } else {
+                        pausedForMenu = false;
+                    }
+                    returnConfirmationModal.style.display = 'flex';
+                });
+            }
+
+            if(confirmReturnBtn) {
+                addBtnListener(confirmReturnBtn, () => {
+                    playSound('ui-click');
+                    returnConfirmationModal.style.display = 'none';
+                    
+                    // Garante que o jogo pare
+                    gameRunning = false;
+                    cancelAnimationFrame(gameLoopId);
+                    
+                    // Reseta estados de UI para mostrar o Intro
+                    introDismissed = false;
+                    
+                    // Esconde telas de jogo
+                    if(startScreen) startScreen.style.display = 'none';
+                    if(startScreenFlappy) startScreenFlappy.style.display = 'none';
+                    if(newGameOverModal) newGameOverModal.style.display = 'none';
+                    if(countdownScreen) countdownScreen.style.display = 'none';
+                    if(nameModal) nameModal.style.display = 'none';
+                    if(gameMessage) gameMessage.style.display = 'none';
+                    
+                    // Mostra intro
+                    if(introScreen) introScreen.style.display = 'flex';
+                });
+            }
+
+            if(cancelReturnBtn) {
+                addBtnListener(cancelReturnBtn, () => {
+                    playSound('ui-click');
+                    returnConfirmationModal.style.display = 'none';
+                    
+                    // Se estava rodando antes, volta a rodar
+                    if (pausedForMenu) {
+                        gameRunning = true;
+                        lastTime = performance.now();
+                        gameLoopId = requestAnimationFrame(gameLoop);
+                    }
+                });
+            }
         });
         
         function handleStartClick() {
