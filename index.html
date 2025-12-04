@@ -9,8 +9,10 @@
     <!-- CONFIGURAÇÕES DE ÍCONE E APP MOBILE (PWA)  -->
     <!-- ========================================== -->
     <link rel="manifest" href="./manifest.json">
-    <!-- CORREÇÃO: Tipo ajustado para image/jpeg para combinar com o arquivo .JPG e o manifest.json -->
-    <link rel="icon" type="image/jpeg" href="./iconejogo.png">
+    
+    <!-- FAVICON DO SISTEMA -->
+    <link rel="icon" type="image/png" href="iconejogo.png">
+    
     <link rel="apple-touch-icon" href="./iconejogo.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -155,11 +157,10 @@
 
             .loader-container {
                 position: relative;
-                width: 90%; 
-                max-width: 500px; 
+                width: 85%; 
+                max-width: 450px; 
                 height: auto;
                 z-index: 100001;
-                /* Perspectiva para dar profundidade ao giro */
                 perspective: 1000px; 
             }
 
@@ -168,10 +169,9 @@
                 height: auto;
                 display: block;
                 opacity: 0;
-                /* NOVA ANIMAÇÃO: Estilo Intro de Game */
-                /* Duração sincronizada com o JS (6s), mas a ação acontece antes */
-                animation: gameEntranceSpin 5.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-                filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0));
+                /* NOVA ANIMAÇÃO: Luxury Fade In */
+                /* Mais lenta e suave (6s) */
+                animation: luxuryFadeIn 6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
             }
 
             .fullscreen-shine {
@@ -185,65 +185,57 @@
                 overflow: hidden;
             }
 
+            /* Efeito de brilho sutil passando */
             .fullscreen-shine::after {
                 content: '';
                 position: absolute;
                 top: 0;
-                left: -100%;
-                width: 60%; 
+                left: -150%;
+                width: 100%; 
                 height: 100%;
                 background: linear-gradient(
                     to right,
                     rgba(255, 255, 255, 0) 0%,
-                    rgba(255, 215, 0, 0.1) 40%,
-                    rgba(255, 255, 255, 0.4) 50%,
-                    rgba(255, 215, 0, 0.1) 60%,
+                    rgba(255, 215, 0, 0.05) 40%,
+                    rgba(255, 255, 255, 0.2) 50%,
+                    rgba(255, 215, 0, 0.05) 60%,
                     rgba(255, 255, 255, 0) 100%
                 );
-                transform: skewX(-20deg);
-                animation: shineMoveFullScreen 2s ease-in-out infinite;
+                transform: skewX(-25deg);
+                animation: shineLuxury 4s ease-in-out infinite;
             }
         }
 
-        /* --- NOVOS KEYFRAMES ESTILO GAME INTRO --- */
-        @keyframes gameEntranceSpin {
+        /* --- NOVOS KEYFRAMES: LUXURY FADE IN --- */
+        @keyframes luxuryFadeIn {
             0% {
                 opacity: 0;
-                transform: scale(0) rotate(-720deg); /* Começa minúsculo girando muito */
-                filter: blur(10px) drop-shadow(0 0 0px #FFD700);
-            }
-            20% {
-                opacity: 1;
-                transform: scale(1.1) rotate(10deg); /* Overshoot (passa um pouco do tamanho) */
-                filter: blur(0px) drop-shadow(0 0 20px #FFD700); /* Brilho forte no impacto */
+                transform: scale(0.92); /* Começa levemente menor */
+                filter: blur(8px) brightness(0.5); /* Desfocado e escuro */
             }
             30% {
-                transform: scale(1) rotate(0deg); /* Estabiliza */
-                filter: drop-shadow(0 0 5px #FFD700);
-            }
-            
-            /* Fase de "Respiração" / Loading enquanto aguarda */
-            45% { transform: scale(1.05); filter: drop-shadow(0 0 15px #FFA500); }
-            60% { transform: scale(1); filter: drop-shadow(0 0 5px #FFD700); }
-            75% { transform: scale(1.05); filter: drop-shadow(0 0 15px #FFA500); }
-            
-            /* Saída Explosiva - Zoom na câmera */
-            90% {
                 opacity: 1;
-                transform: scale(1) rotate(0deg);
-                filter: drop-shadow(0 0 30px #FF4500) brightness(1.5);
+                transform: scale(1);
+                filter: blur(0px) brightness(1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.3)); /* Foco nítido */
+            }
+            80% {
+                /* Fase de "Exibição": Respira levemente e aumenta o brilho dourado */
+                opacity: 1;
+                transform: scale(1.02);
+                filter: blur(0px) brightness(1.1) drop-shadow(0 0 25px rgba(255, 215, 0, 0.6));
             }
             100% {
+                /* Saída Elegante: Fade out suave enquanto cresce um pouco mais */
                 opacity: 0;
-                transform: scale(5) rotate(5deg); /* Zoom gigante para transição */
-                filter: blur(20px);
+                transform: scale(1.05);
+                filter: blur(4px) brightness(1.2);
             }
         }
 
-        @keyframes shineMoveFullScreen {
-            0% { left: -100%; opacity: 0; }
-            20% { opacity: 1; }
-            100% { left: 200%; opacity: 0; }
+        @keyframes shineLuxury {
+            0% { left: -150%; opacity: 0; }
+            40% { opacity: 1; }
+            100% { left: 250%; opacity: 0; }
         }
 
         /* ========================================= */
