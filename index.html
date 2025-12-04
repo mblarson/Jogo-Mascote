@@ -2,14 +2,16 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>UMADEMATS GAME</title>
 
-    <!-- CONFIGURAÇÕES PWA -->
+    <!-- ========================================== -->
+    <!-- CONFIGURAÇÕES DE ÍCONE E APP MOBILE (PWA)  -->
+    <!-- ========================================== -->
     <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/jpeg" href="./iconejogo.JPG">
-    <link rel="apple-touch-icon" href="./iconejogo.JPG">
-    
+    <!-- CORREÇÃO: Tipo ajustado para image/jpeg para combinar com o arquivo .JPG e o manifest.json -->
+    <link rel="icon" type="image/jpeg" href="./iconejogo.png">
+    <link rel="apple-touch-icon" href="./iconejogo.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="UmadeGAMES">
@@ -17,7 +19,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
         body {
             background-image: url('./backgournd.png'), url('./background.png');
@@ -31,12 +37,219 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            /* CORREÇÃO: Removemos o touch-action: none daqui para liberar os botões */
             background-color: #87CEEB;
             -webkit-user-select: none;
             user-select: none;
         }
 
-        /* --- CONTAINER DO JOGO --- */
+        /* ========================================= */
+        /* CSS DOS AVISOS DE NAVEGADOR (PWA/IAB)    */
+        /* ========================================= */
+        
+        .system-warning-banner {
+            display: none; 
+            position: fixed;
+            z-index: 999999;
+            width: 100%;
+            text-align: center;
+            font-family: sans-serif;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        /* CONFIGURAÇÃO DO AVISO ANDROID (Tela Cheia) */
+        #android-browser-warning {
+            top: 0;
+            left: 0;
+            height: 100vh; 
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #ios-iab-warning {
+            top: 0;
+            left: 0;
+            height: 100vh; 
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .ios-instruction-box {
+            background: #1a1a1a;
+            border: 2px solid #FFA500;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        .ios-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        #ios-pwa-install-hint {
+            bottom: 0;
+            left: 0;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* ========================================= */
+        /* CSS DO LOADER MOBILE (GOLD LUXO)     */
+        /* ========================================= */
+        
+        #mobile-loader-overlay {
+            display: none; 
+        }
+
+        @media (max-width: 768px) {
+            #mobile-loader-overlay {
+                display: flex; 
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000000; 
+                z-index: 99999; 
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                transition: opacity 1s ease-out; 
+                /* CORREÇÃO: Permite clicar através dele enquanto fade out acontece */
+                pointer-events: none; 
+            }
+            
+            /* Reativa pointer events apenas para o loader enquanto visível */
+            #mobile-loader-overlay.active {
+                pointer-events: auto;
+            }
+
+            .loader-container {
+                position: relative;
+                width: 90%; 
+                max-width: 500px; 
+                height: auto;
+                z-index: 100001;
+                /* Perspectiva para dar profundidade ao giro */
+                perspective: 1000px; 
+            }
+
+            .logo-img {
+                width: 100%;
+                height: auto;
+                display: block;
+                opacity: 0;
+                /* NOVA ANIMAÇÃO: Estilo Intro de Game */
+                /* Duração sincronizada com o JS (6s), mas a ação acontece antes */
+                animation: gameEntranceSpin 5.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0));
+            }
+
+            .fullscreen-shine {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 100002; 
+                pointer-events: none;
+                overflow: hidden;
+            }
+
+            .fullscreen-shine::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 60%; 
+                height: 100%;
+                background: linear-gradient(
+                    to right,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 215, 0, 0.1) 40%,
+                    rgba(255, 255, 255, 0.4) 50%,
+                    rgba(255, 215, 0, 0.1) 60%,
+                    rgba(255, 255, 255, 0) 100%
+                );
+                transform: skewX(-20deg);
+                animation: shineMoveFullScreen 2s ease-in-out infinite;
+            }
+        }
+
+        /* --- NOVOS KEYFRAMES ESTILO GAME INTRO --- */
+        @keyframes gameEntranceSpin {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-720deg); /* Começa minúsculo girando muito */
+                filter: blur(10px) drop-shadow(0 0 0px #FFD700);
+            }
+            20% {
+                opacity: 1;
+                transform: scale(1.1) rotate(10deg); /* Overshoot (passa um pouco do tamanho) */
+                filter: blur(0px) drop-shadow(0 0 20px #FFD700); /* Brilho forte no impacto */
+            }
+            30% {
+                transform: scale(1) rotate(0deg); /* Estabiliza */
+                filter: drop-shadow(0 0 5px #FFD700);
+            }
+            
+            /* Fase de "Respiração" / Loading enquanto aguarda */
+            45% { transform: scale(1.05); filter: drop-shadow(0 0 15px #FFA500); }
+            60% { transform: scale(1); filter: drop-shadow(0 0 5px #FFD700); }
+            75% { transform: scale(1.05); filter: drop-shadow(0 0 15px #FFA500); }
+            
+            /* Saída Explosiva - Zoom na câmera */
+            90% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+                filter: drop-shadow(0 0 30px #FF4500) brightness(1.5);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(5) rotate(5deg); /* Zoom gigante para transição */
+                filter: blur(20px);
+            }
+        }
+
+        @keyframes shineMoveFullScreen {
+            0% { left: -100%; opacity: 0; }
+            20% { opacity: 1; }
+            100% { left: 200%; opacity: 0; }
+        }
+
+        /* ========================================= */
+        /* FIM DO CSS DO LOADER             */
+        /* ========================================= */
+        
         #gameContainer {
             position: relative;
             width: 100%;
@@ -52,6 +265,8 @@
                 0 0 40px rgba(255, 0, 0, 0.3),
                 inset 0 0 20px rgba(255, 0, 0, 0.2);
             animation: pulseBorder 2s infinite alternate;
+            
+            /* CORREÇÃO: O bloqueio de touch fica APENAS aqui, onde é necessário para o jogo */
             touch-action: none;
         }
         
@@ -59,141 +274,363 @@
             from { box-shadow: 0 0 20px rgba(255, 0, 0, 0.5), 0 0 40px rgba(255, 0, 0, 0.3), inset 0 0 20px rgba(255, 0, 0, 0.2); }
             to { box-shadow: 0 0 30px rgba(255, 0, 0, 0.8), 0 0 60px rgba(255, 0, 0, 0.5), inset 0 0 30px rgba(255, 0, 0, 0.3); }
         }
-
-        /* AVISOS DE NAVEGADOR */
-        .system-warning-banner {
-            display: none; position: fixed; z-index: 999999; width: 100%;
-            text-align: center; font-family: sans-serif;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4); animation: slideDown 0.5s ease-out;
-        }
-
-        #android-browser-warning {
-            top: 0; left: 0; height: 100vh; background: rgba(0, 0, 0, 0.95);
-            color: white; display: none; flex-direction: column;
-            justify-content: center; align-items: center; padding: 20px;
-        }
-
-        #ios-iab-warning {
-            top: 0; left: 0; height: 100vh; background: rgba(0, 0, 0, 0.95);
-            color: white; display: none; flex-direction: column;
-            justify-content: center; align-items: center; padding: 20px;
-        }
-
-        .ios-instruction-box {
-            background: #1a1a1a; border: 2px solid #FFA500; border-radius: 15px;
-            padding: 20px; max-width: 320px; text-align: center;
-        }
-        .ios-icon { font-size: 30px; margin-bottom: 10px; }
-
-        #ios-pwa-install-hint {
-            bottom: 0; left: 0; background: rgba(255, 255, 255, 0.95); color: #333;
-            padding: 15px; border-top: 1px solid #ddd; display: none;
-            flex-direction: column; align-items: center; animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        /* LOADER */
-        #mobile-loader-overlay { display: none; }
-        @media (max-width: 768px) {
-            #mobile-loader-overlay {
-                display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background-color: #000000; z-index: 99999; 
-                justify-content: center; align-items: center; flex-direction: column;
-                transition: opacity 1s ease-out; pointer-events: none; 
-            }
-            #mobile-loader-overlay.active { pointer-events: auto; }
-            .loader-container {
-                position: relative; width: 90%; max-width: 500px; height: auto;
-                z-index: 100001; perspective: 1000px; 
-            }
-            .logo-img {
-                width: 100%; height: auto; display: block; opacity: 0;
-                animation: gameEntranceSpin 5.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-                filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0));
-            }
-            .fullscreen-shine {
-                position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-                z-index: 100002; pointer-events: none; overflow: hidden;
-            }
-            .fullscreen-shine::after {
-                content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
-                background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 215, 0, 0.1) 40%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 215, 0, 0.1) 60%, rgba(255, 255, 255, 0) 100%);
-                transform: skewX(-20deg); animation: shineMoveFullScreen 2s ease-in-out infinite;
-            }
-        }
-        @keyframes gameEntranceSpin {
-            0% { opacity: 0; transform: scale(0) rotate(-720deg); filter: blur(10px) drop-shadow(0 0 0px #FFD700); }
-            20% { opacity: 1; transform: scale(1.1) rotate(10deg); filter: blur(0px) drop-shadow(0 0 20px #FFD700); }
-            30% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 5px #FFD700); }
-            45% { transform: scale(1.05); filter: drop-shadow(0 0 15px #FFA500); }
-            60% { transform: scale(1); filter: drop-shadow(0 0 5px #FFD700); }
-            75% { transform: scale(1.05); filter: drop-shadow(0 0 15px #FFA500); }
-            90% { opacity: 1; transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 30px #FF4500) brightness(1.5); }
-            100% { opacity: 0; transform: scale(5) rotate(5deg); filter: blur(20px); }
-        }
-        @keyframes shineMoveFullScreen { 0% { left: -100%; opacity: 0; } 20% { opacity: 1; } 100% { left: 200%; opacity: 0; } }
-
-        #gameCanvas { width: 100%; height: 100%; display: block; background: transparent; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
         
-        #gameInfo { position: absolute; top: 10px; left: 10px; color: white; font-size: 16px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); z-index: 10; }
-        #gameInfo div { background: rgba(0, 0, 0, 0.5); padding: 5px 10px; border-radius: 5px; margin-bottom: 5px; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); display: inline-block; }
-        #gameInfo span { font-weight: bold; color: #FFD700; }
-        #debugInfo { display: none; position: absolute; top: 10px; right: 10px; color: lime; font-family: monospace; font-size: 10px; background: rgba(0,0,0,0.8); padding: 5px; z-index: 10; }
-        #gameMessage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 20px 40px; border-radius: 10px; font-size: 24px; text-align: center; display: none; z-index: 20; border: 2px solid rgba(255, 255, 255, 0.3); box-shadow: 0 0 15px rgba(0, 0, 0, 0.7); white-space: nowrap; }
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: transparent;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
         
-        .custom-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 200; justify-content: center; align-items: center; flex-direction: column; }
-        .modal-content { background: #1a1a1a; border: 3px solid #FFA500; border-radius: 15px; padding: 20px; width: 85%; max-width: 500px; color: white; text-align: center; box-shadow: 0 0 25px rgba(255, 165, 0, 0.4); display: flex; flex-direction: column; gap: 15px; }
-        #playerNameInput { padding: 12px; font-size: 18px; border-radius: 8px; border: 2px solid #555; background: #333; color: white; width: 80%; align-self: center; outline: none; text-align: center; }
-        #playerNameInput:focus { border-color: #FFA500; }
+        #gameInfo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 16px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            z-index: 10;
+        }
+        
+        #gameInfo div {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            display: inline-block;
+        }
+        
+        #gameInfo span {
+            font-weight: bold;
+            color: #FFD700;
+        }
 
-        .game-over-layout { display: flex; flex-direction: row; gap: 15px; margin-bottom: 10px; justify-content: space-between; align-items: flex-start; text-align: left; }
-        .result-column { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #444; padding-right: 10px; }
-        .ranking-column { flex: 1; display: flex; flex-direction: column; }
-        .ranking-title { font-size: 14px; color: #FFD700; margin-bottom: 8px; text-transform: uppercase; text-align: center; border-bottom: 1px solid #444; padding-bottom: 5px; }
-        .ranking-list { list-style: none; padding: 0; font-size: 13px; max-height: 120px; overflow-y: hidden; }
-        .ranking-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #333; }
-        .ranking-item:nth-child(1) { color: #FFD700; font-weight: bold; font-size: 1.1em; }
-        .ranking-item:nth-child(2) { color: #C0C0C0; }
-        .ranking-item:nth-child(3) { color: #CD7F32; }
-        .current-player-rank { background: rgba(255, 215, 0, 0.15); border: 1px solid #FFD700; border-radius: 4px; padding: 2px 5px !important; margin: 2px 0; }
-        .score-display-big { font-size: 28px; font-weight: bold; color: #FFA500; }
-        .player-name-display { font-size: 18px; color: #FFF; margin-bottom: 5px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .modal-footer { margin-top: 5px; font-size: 11px; color: #888; border-top: 1px solid #333; padding-top: 10px; }
-        .instagram-tag { color: #FFD700; font-weight: bold; text-transform: uppercase; }
-        .volume-warning { color: #FFD700; font-size: 14px; font-weight: bold; margin-bottom: 20px; animation: pulseVolume 1.5s infinite; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 20px; border: 1px solid #FFD700; }
-        @keyframes pulseVolume { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 10px #FFD700; } 100% { transform: scale(1); opacity: 0.8; } }
+        #debugInfo {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: lime;
+            font-family: monospace;
+            font-size: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 5px;
+            z-index: 10;
+        }
+        
+        #gameMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            display: none;
+            z-index: 20;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+            white-space: nowrap;
+        }
+        
+        /* --- ESTILOS DOS MODAIS --- */
+        .custom-modal {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
 
-        #introScreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; color: white; text-align: center; padding: 0; overflow: hidden; }
-        #introWrapper { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        #introWrapper::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://raw.githubusercontent.com/mblarson/jogo-mascote/main/imagemabertura.JPG'); background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.85; z-index: 0; }
-        #introWrapper::after { content: ""; position: absolute; top: 0; left: 60%; width: 35%; height: 100%; background: linear-gradient(to right, rgba(255, 255, 255, 0.8) 5px, rgba(255, 255, 255, 0) 5px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 0.8) 2px); animation: shimmer 5.5s infinite linear; z-index: 1; }
-        #introContent { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; width: 100%; height: 100%; padding: 20px; }
+        .modal-content {
+            background: #1a1a1a;
+            border: 3px solid #FFA500;
+            border-radius: 15px;
+            padding: 20px;
+            width: 85%;
+            max-width: 500px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(255, 165, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #playerNameInput {
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 2px solid #555;
+            background: #333;
+            color: white;
+            width: 80%;
+            align-self: center;
+            outline: none;
+            text-align: center;
+        }
+        #playerNameInput:focus {
+            border-color: #FFA500;
+        }
+
+        .game-over-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            margin-bottom: 10px;
+            justify-content: space-between;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .result-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid #444;
+            padding-right: 10px;
+        }
+
+        .ranking-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ranking-title {
+            font-size: 14px;
+            color: #FFD700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            text-align: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .ranking-list {
+            list-style: none;
+            padding: 0;
+            font-size: 13px;
+            max-height: 120px;
+            overflow-y: hidden; 
+        }
+
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+        .ranking-item:nth-child(1) { color: #FFD700; font-weight: bold; font-size: 1.1em; } 
+        .ranking-item:nth-child(2) { color: #C0C0C0; } 
+        .ranking-item:nth-child(3) { color: #CD7F32; } 
         
-        #startScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto; }
-        #startScreenFlappy { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto; }
-        #countdownScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 40; color: white; text-align: center; padding: 20px; }
+        .current-player-rank {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid #FFD700;
+            border-radius: 4px;
+            padding: 2px 5px !important;
+            margin: 2px 0;
+        }
+
+        .score-display-big {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FFA500;
+        }
+        .player-name-display {
+            font-size: 18px;
+            color: #FFF;
+            margin-bottom: 5px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .modal-footer {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #888;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+        .instagram-tag {
+            color: #FFD700;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .volume-warning {
+            color: #FFD700;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: pulseVolume 1.5s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #FFD700;
+        }
+
+        @keyframes pulseVolume {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 10px #FFD700; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
         
-        #countdown { font-size: 80px; font-weight: bold; color: #FF0000; text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); margin: 20px 0; }
-        #countdownMessage { font-size: 18px; max-width: 90%; line-height: 1.5; margin-bottom: 20px; }
-        #gameLogo { width: 320px; height: auto; margin-top: -30px; margin-bottom: -50px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; max-width: 90%; z-index: 1; }
-        h1 { font-size: 28px; margin-bottom: 15px; color: #FFA500; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); line-height: 1.2; position: relative; z-index: 2; }
-        p { font-size: 16px; margin-bottom: 20px; max-width: 90%; line-height: 1.4; position: relative; z-index: 2; color: white; }
+        /* ESTILOS DE TELA DE INTRODUÇÃO */
+        #introScreen {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 50; color: white; text-align: center; padding: 0; overflow: hidden;
+        }
         
-        .neo-pop-tilted-button { border: 0.1px; padding-bottom: 6px; box-shadow: 1px 5px 7px #494a4b; position: relative; overflow: hidden; background-color: #b7a81d; color: #000000; font-size: 1rem; font-weight: 600; cursor: pointer; transform: perspective(180px) rotateX(30deg) translateY(2px); transition: transform 0.3s ease, background-color 0.3s ease; margin-top: 10px; }
-        .neo-pop-tilted-button::before { content: ""; position: absolute; top: 0; left: 60%; width: 35%; height: 100%; background: linear-gradient(to right, rgba(196, 196, 196, 0.8) 5px, rgba(196, 196, 196, 0) 5px, rgba(196, 196, 196, 0) 10px, rgba(196, 196, 196, 0.8) 2px); animation: shimmer 5.5s infinite linear; }
-        .neo-pop-tilted-button span::before { content: ""; position: absolute; top: 0; left: 60%; width: 35%; height: 100%; background: linear-gradient(to right, rgba(255, 255, 255, 1) 5px, rgba(255, 255, 255, 0) 5px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 1) 2px); animation: shimmer 5.5s infinite linear; }
-        .btn-flappy { background-color: #008B8B; }
-        .btn-flappy span { background: #00FFFF; color: #000; }
+        #introWrapper {
+            width: 100%; height: 100%; position: relative;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        
+        #introWrapper::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://raw.githubusercontent.com/mblarson/jogo-mascote/main/imagemabertura.JPG');
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            opacity: 0.85; z-index: 0;
+        }
+        
+        #introWrapper::after {
+            content: ""; position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.8) 5px, rgba(255, 255, 255, 0) 5px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 0.8) 2px);
+            animation: shimmer 5.5s infinite linear; z-index: 1;
+        }
+
+        #introContent {
+            position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end;
+            align-items: center; width: 100%; height: 100%; padding: 20px;
+        }
+        
+        /* TELA PRÉ-JOGO (Runner) */
+        #startScreen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto;
+            display: none; 
+        }
+
+        /* TELA PRÉ-JOGO (FlappyMats) */
+        #startScreenFlappy {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto;
+            display: none; 
+        }
+        
+        #countdownScreen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 40; color: white; text-align: center; padding: 20px;
+        }
+        
+        #countdown {
+            font-size: 80px; font-weight: bold; color: #FF0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); margin: 20px 0;
+        }
+        
+        #countdownMessage {
+            font-size: 18px; max-width: 90%; line-height: 1.5; margin-bottom: 20px;
+        }
+        
+        #gameLogo {
+            width: 320px;
+            height: auto; 
+            margin-top: -30px;
+            margin-bottom: -50px;
+            image-rendering: -webkit-optimize-contrast; 
+            image-rendering: crisp-edges; 
+            max-width: 90%;
+            z-index: 1;
+        }
+        
+        h1 {
+            font-size: 28px; margin-bottom: 15px; color: #FFA500;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); line-height: 1.2;
+            position: relative; z-index: 2;
+        }
+        
+        p {
+            font-size: 16px; margin-bottom: 20px; max-width: 90%; line-height: 1.4;
+            position: relative; z-index: 2; color: white;
+        }
+        
+        /* BOTÕES */
+        .neo-pop-tilted-button {
+          border: 0.1px; padding-bottom: 6px; box-shadow: 1px 5px 7px #494a4b;
+          position: relative; overflow: hidden; background-color: #b7a81d; color: #000000;
+          font-size: 1rem; font-weight: 600; cursor: pointer;
+          transform: perspective(180px) rotateX(30deg) translateY(2px);
+          transition: transform 0.3s ease, background-color 0.3s ease; margin-top: 10px;
+        }
+
+        .neo-pop-tilted-button::before {
+          content: ""; position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
+          background: linear-gradient(to right, rgba(196, 196, 196, 0.8) 5px, rgba(196, 196, 196, 0) 5px, rgba(196, 196, 196, 0) 10px, rgba(196, 196, 196, 0.8) 2px);
+          animation: shimmer 5.5s infinite linear;
+        }
+
+        .neo-pop-tilted-button span::before {
+          content: ""; position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
+          background: linear-gradient(to right, rgba(255, 255, 255, 1) 5px, rgba(255, 255, 255, 0) 5px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 1) 2px);
+          animation: shimmer 5.5s infinite linear;
+        }
+        
+        /* Botão específico para Flappy (Ciano para diferenciar) */
+        .btn-flappy {
+            background-color: #008B8B;
+        }
+        .btn-flappy span {
+            background: #00FFFF;
+            color: #000;
+        }
         .btn-flappy:focus-visible { box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.5); }
+
         @keyframes shimmer { 0% { transform: translateX(-1950%); } 100% { transform: translateX(100%); } }
-        .neo-pop-tilted-button span { background: #ffeb34; padding: 0.8rem 2rem; position: relative; z-index: 1; display: block; border-radius: 0px; border: 1px solid #494a4b; }
+
+        .neo-pop-tilted-button span {
+          background: #ffeb34; padding: 0.8rem 2rem; position: relative;
+          z-index: 1; display: block; border-radius: 0px; border: 1px solid #494a4b;
+        }
+
         .neo-pop-tilted-button:focus { outline: none; }
         .neo-pop-tilted-button:focus-visible { box-shadow: 0 0 0 3px rgba(255, 235, 52, 0.5); }
         .neo-pop-tilted-button:active { transform: perspective(170px) rotateX(36deg) translateY(5px); }
         
-        #introContent .neo-pop-tilted-button { margin-left: 0; max-width: 250px; align-self: flex-start; }
+        #introContent .neo-pop-tilted-button {
+            margin-left: 0; max-width: 250px; align-self: flex-start;
+        }
         
         .intro-btn-group {
             display: flex;
@@ -205,10 +642,23 @@
         }
 
         @media (max-width: 480px) {
+            .game-over-layout { flex-direction: column; border: none; align-items: center; }
+            .result-column { border-right: none; border-bottom: 1px solid #444; padding-bottom: 15px; padding-right: 0; width: 100%; margin-bottom: 15px; }
+            .ranking-column { width: 100%; }
+            #gameInfo { font-size: 14px; }
+            #gameMessage { font-size: 20px; padding: 15px 25px; }
+            #gameLogo { width: 200px; margin-bottom: -20px; margin-top: -20px; }
+            h1 { font-size: 24px; }
+            p { font-size: 14px; margin-bottom: 15px; }
+            .neo-pop-tilted-button { font-size: 0.9rem; }
+            .neo-pop-tilted-button span { padding: 0.7rem 1.5rem; }
+            #countdown { font-size: 60px; }
+            #countdownMessage { font-size: 16px; }
             #introContent .neo-pop-tilted-button { font-size: 1.1rem; letter-spacing: 0.1rem; padding: 0; }
             #introContent .neo-pop-tilted-button span { padding: 0.8rem 2rem; }
             .intro-btn-group { margin-bottom: 120px; }
         }
+        
         @media (max-height: 600px) {
             h1 { font-size: 22px; margin-bottom: 10px; }
             p { font-size: 14px; margin-bottom: 15px; max-width: 95%; }
@@ -216,6 +666,7 @@
             #countdown { font-size: 50px; }
             #countdownMessage { font-size: 14px; }
         }
+
         @media (min-width: 1024px) {
             #introScreen { display: none !important; box-shadow: none; transform: none; }
             #introWrapper::before, #introWrapper::after { content: none; }
@@ -234,40 +685,66 @@
     
     <!-- AVISO ANDROID: OBRIGATÓRIO INSTALAR -->
     <div id="android-browser-warning" class="system-warning-banner">
-        <div class="ios-instruction-box" style="border-color:#3DDC84;">
+        <div class="ios-instruction-box" style="border-color:#3DDC84;"> <!-- Cor Verde do Android -->
             <div class="ios-icon">📲</div>
             <h3 style="color:#3DDC84; margin-bottom:10px;">INSTALE O APP</h3>
             <p style="font-size:14px; line-height:1.5;">Para jogar, é necessário instalar o aplicativo.</p>
             
+            <!-- BOTÃO DE INSTALAÇÃO AUTOMÁTICA (Inicialmente oculto) -->
             <button id="pwa-install-btn" class="neo-pop-tilted-button" style="display:none; margin: 15px auto; background-color: #3DDC84;">
                 <span style="background-color: #3DDC84; color: white; border: 1px solid #2eaf69;">INSTALAR AGORA</span>
             </button>
 
             <div id="manual-install-instructions">
                 <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
-                <p style="font-size:13px; color:#ccc;">1. Toque nos <b>três pontos (⋮)</b>.</p>
-                <p style="font-size:13px; color:#ccc;">2. Escolha <b>"Adicionar à Tela Inicial"</b>.</p>
+                <p style="font-size:13px; color:#ccc;">1. Toque nos <b>três pontos (⋮)</b> do navegador.</p>
+                <p style="font-size:13px; color:#ccc;">2. Escolha <b>"Adicionar à Tela Inicial"</b> ou <b>"Instalar Aplicativo"</b>.</p>
+                <br>
+                <p style="font-size:12px; color:#888;">*Se não aparecer, abra no Google Chrome.</p>
             </div>
         </div>
     </div>
     
-    <!-- AVISO IOS -->
+    <!-- AVISO IOS: ESCAPAR DO INSTAGRAM/FB -->
     <div id="ios-iab-warning" class="system-warning-banner">
         <div class="ios-instruction-box">
             <div class="ios-icon">⚠️</div>
-            <h3>ABRA NO SAFARI</h3>
-            <p>Para jogar, abra este site no navegador Safari.</p>
+            <h3 style="color:#FFA500; margin-bottom:10px;">ABRA NO SAFARI</h3>
+            <p style="font-size:14px; line-height:1.5;">Para jogar sem travamentos e em tela cheia, você precisa sair do navegador do aplicativo.</p>
+            <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
+            <p style="font-size:13px; color:#ccc;">1. Toque nos <b>três pontos (...)</b> ou em <b>Compartilhar</b>.</p>
+            <p style="font-size:13px; color:#ccc;">2. Escolha <b>"Abrir no Safari"</b> ou <b>"Abrir no Navegador"</b>.</p>
         </div>
     </div>
 
+    <!-- AVISO IOS: INSTALAR PWA -->
     <div id="ios-pwa-install-hint" class="system-warning-banner">
-        <p>Instale o App para jogar melhor! 📲</p>
+        <p style="margin-bottom:5px; color:#555; font-weight:bold;">Instale o App para jogar melhor! 📲</p>
+        <p style="font-size:12px; color:#555;">Toque nos <b>três pontos (...)</b>  > <span style="font-size:13px">COMPARTILHAR</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
     </div>
     
-    <audio id="bgMusic" loop preload="auto">
+    <audio id="bgMusic" loop>
         <source src="./musica.mp3" type="audio/mpeg">
         Seu navegador não suporta áudio.
     </audio>
+
+    <!-- Script do Loader -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.innerWidth <= 768) {
+                const loader = document.getElementById('mobile-loader-overlay');
+                if(loader) {
+                    setTimeout(() => {
+                        loader.style.opacity = '0'; 
+                        setTimeout(() => {
+                            loader.classList.remove('active'); // Remove a classe que bloqueia cliques
+                            loader.style.display = 'none';
+                        }, 1000);
+                    }, 6000); 
+                }
+            }
+        });
+    </script>
 
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
@@ -283,7 +760,8 @@
         
         <div id="nameModal" class="custom-modal">
             <div class="modal-content">
-                <h2 style="color: #FFA500;">QUEM VAI JOGAR?</h2>
+                <h2 style="color: #FFA500; margin-bottom: 10px;">QUEM VAI JOGAR?</h2>
+                <p>Digite seu nome para entrar no Ranking:</p>
                 <input type="text" id="playerNameInput" placeholder="Seu Nome" maxlength="12" autocomplete="off">
                 <button id="confirmNameBtn" class="neo-pop-tilted-button"><span>CONFIRMAR</span></button>
             </div>
@@ -291,53 +769,80 @@
 
         <div id="newGameOverModal" class="custom-modal">
             <div class="modal-content">
-                <h2 style="color: #FF4500;">FIM DE JOGO</h2>
+                <h2 style="color: #FF4500; margin-bottom: -25px; border-bottom: -1px solid #444; padding-bottom: 10px;">FIM DE JOGO</h2>
+                
                 <div class="game-over-layout">
                     <div class="result-column">
                         <div id="finalPlayerName" class="player-name-display">JOGADOR</div>
                         <div class="score-display-big" id="finalScoreDisplay">0</div>
-                        <div style="font-size: 14px; color: #AAA;">PONTOS</div>
-                        <div id="playerRankDisplay" style="display: none; color: #FFD700;"></div>
-                        <button id="modalRestartBtn" class="neo-pop-tilted-button"><span>JOGAR NOVAMENTE</span></button>
+                        <div style="font-size: 14px; color: #AAA; margin-top: 5px;">PONTOS</div>
+                        
+                        <div id="playerRankDisplay" style="display: none; margin-top: 10px; color: #FFD700; font-weight: bold; font-size: 0.75em; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px;"></div>
+                        
+                        <button id="modalRestartBtn" class="neo-pop-tilted-button" style="margin-top: 20px;">
+                            <span>JOGAR NOVAMENTE</span>
+                        </button>
                     </div>
+
                     <div class="ranking-column">
                         <div class="ranking-title">🏆 TOP 3 RANKING</div>
-                        <ul id="rankingList" class="ranking-list"><li style="color:#888;">Carregando...</li></ul>
+                        <ul id="rankingList" class="ranking-list">
+                            <li style="color: #888; font-style: italic;">Carregando...</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="modal-footer">POSTE NO INSTAGRAM <span class="instagram-tag">@UMADEMATS</span></div>
+
+                <div class="modal-footer">
+                    POSTE SUA PONTUAÇÃO NO INSTAGRAM E MARQUE A <span class="instagram-tag">@UMADEMATS</span>
+                </div>
             </div>
         </div>
         
         <div id="introScreen">
             <div id="introWrapper">
                 <div id="introContent">
-                    <div class="volume-warning"><span>🔊</span> AUMENTE O SOM</div>
+                    <div class="volume-warning">
+                        <span>🔊</span> AUMENTE O SOM PARA JOGAR
+                    </div>
+
                     <div class="intro-btn-group">
-                        <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy"><span>FLAPPYMATS</span></button>
-                        <button id="introStartBtn" class="neo-pop-tilted-button"><span>RUNNERMATS</span></button>
+                        <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy">
+                            <span>FLAPPYMATS</span>
+                        </button>
+
+                        <button id="introStartBtn" class="neo-pop-tilted-button">
+                            <span>RUNNERMATS</span>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- TELA PRÉ-INÍCIO (RUNNER) -->
         <div id="startScreen">
-            <img id="gameLogo" src="./mascoteuma.png" alt="Logo">
+            <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
+                onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'16\' text-anchor=\'middle\' fill=\'white\'>MATIZINHO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
             <h1>AS AVENTURAS DE MATIZINHO</h1>
-            <p>Toque para pular e desviar!</p>
-            <button id="startBtn" class="neo-pop-tilted-button"><span>INICIAR JOGO</span></button>
+            <p>Toque na tela para fazer o Matizinho pular e desviar das pedras brilhantes!</p>
+            <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
+            <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
         </div>
 
+        <!-- NOVA TELA PRÉ-INÍCIO (FLAPPYMATS) -->
         <div id="startScreenFlappy">
-            <img id="flappyLogo" src="./mascoteaviao.png" style="width: 150px; height: auto;">
+            <img id="flappyLogo" src="./mascoteaviao.png" alt="Mascote Aviao" 
+                 style="width: 150px; height: auto; margin-bottom: 10px;">
             <h1 style="color: #00FFFF;">FLAPPYMATS</h1>
-            <p>Toque para voar e desviar dos canos.</p>
+            <p>O jogador controla o mascote que deve voar através de canos verdes empilhados sem tocá-los.</p>
+            <p>A mecânica é básica: tocar na tela faz o mascote levantar voo para se manter no ar, enquanto a gravidade o puxa para baixo.</p>
             <button id="startBtnFlappy" class="neo-pop-tilted-button btn-flappy"><span>INICIAR JOGO</span></button>
         </div>
         
         <div id="countdownScreen">
             <div id="countdown">3</div>
-            <div id="countdownMessage"><p>Prepare-se!</p></div>
+            <div id="countdownMessage">
+                <p>Atenção: Toque apenas dentro da área iluminada do jogo!</p>
+            </div>
         </div>
     </div>
 
@@ -355,26 +860,36 @@
             });
         }
         
+        // -------------------------------------------------------------
+        // LOGICA DE INSTALAÇÃO PWA (BEFOREINSTALLPROMPT + APP INSTALADO)
+        // -------------------------------------------------------------
         let deferredPrompt;
         
         window.addEventListener('beforeinstallprompt', (e) => {
+            // Previne o Chrome de mostrar o mini-infobar automaticamente
             e.preventDefault();
+            // Salva o evento para usar depois
             deferredPrompt = e;
             console.log('beforeinstallprompt disparado!');
             
+            // Se o overlay de Android já estiver visível, mostra o botão de instalação
             const installBtn = document.getElementById('pwa-install-btn');
             if (installBtn) {
                 installBtn.style.display = 'block';
+                // Adiciona uma animação para chamar atenção
                 installBtn.style.animation = 'pulseVolume 1s infinite';
             }
         });
 
-        // Evento de instalação concluída
+        // Evento que detecta que o app foi instalado com sucesso
         window.addEventListener('appinstalled', (evt) => {
             console.log('App instalado com sucesso!');
+            
+            // Esconder botão de instalar
             const installBtn = document.getElementById('pwa-install-btn');
             if(installBtn) installBtn.style.display = 'none';
             
+            // Alterar o conteúdo da caixa de aviso para Sucesso
             const instructionBox = document.querySelector('#android-browser-warning .ios-instruction-box');
             if(instructionBox) {
                 instructionBox.innerHTML = `
@@ -387,57 +902,26 @@
             }
         });
 
+        // Configura o clique no botão de instalação
         const installBtn = document.getElementById('pwa-install-btn');
         if (installBtn) {
             installBtn.addEventListener('click', async () => {
                 if (!deferredPrompt) {
                     return;
                 }
-                
-                // MUDANÇA DE ESTADO: FEEDBACK "AGUARDANDO..."
-                installBtn.disabled = true;
-                const span = installBtn.querySelector('span');
-                if(span) {
-                    span.textContent = "AGUARDANDO...";
-                    span.style.backgroundColor = "#FFD700"; // Amarelo
-                    span.style.color = "#000";
-                }
-                installBtn.style.animation = "pulseVolume 0.5s infinite"; // Pulsa mais rápido
-                
+                // Mostra o prompt nativo
                 deferredPrompt.prompt();
+                
+                // Espera a escolha do usuário
                 const { outcome } = await deferredPrompt.userChoice;
                 console.log(`User response to the install prompt: ${outcome}`);
                 
-                // Se o usuário cancelar, restaura o botão
-                if (outcome === 'dismissed') {
-                    installBtn.disabled = false;
-                    if(span) {
-                        span.textContent = "INSTALAR AGORA";
-                        span.style.backgroundColor = "#3DDC84";
-                        span.style.color = "white";
-                    }
-                    installBtn.style.animation = "pulseVolume 1s infinite";
-                }
-                
+                // Limpa o prompt, pois só pode ser usado uma vez
                 deferredPrompt = null;
             });
         }
 
-        // Script do Loader
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.innerWidth <= 768) {
-                const loader = document.getElementById('mobile-loader-overlay');
-                if(loader) {
-                    setTimeout(() => {
-                        loader.style.opacity = '0'; 
-                        setTimeout(() => {
-                            loader.classList.remove('active'); 
-                            loader.style.display = 'none';
-                        }, 1000);
-                    }, 6000); 
-                }
-            }
-        });
+        // -------------------------------------------------------------
 
         function getMobileOperatingSystem() {
             var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -468,17 +952,21 @@
             return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
         }
 
+        // Função do Android (OpenInBrowser) removida pois não será mais usada.
+
         window.addEventListener('load', function() {
             const os = getMobileOperatingSystem();
             const inApp = isInAppBrowser(os);
             const installed = isStandalone();
 
-            // AVISO ANDROID
+            // AVISO ANDROID: Se for Android e NÃO estiver instalado (app), bloqueia.
             if (os === 'Android' && !installed) {
                 const androidWarning = document.getElementById('android-browser-warning');
                 if (androidWarning) {
-                    androidWarning.style.display = 'flex'; 
-                    document.body.style.overflow = 'hidden'; 
+                    androidWarning.style.display = 'flex'; // Torna visível (overlay)
+                    document.body.style.overflow = 'hidden'; // Bloqueia scroll
+                    
+                    // Se o evento deferredPrompt já foi capturado antes do load, mostra o botão agora
                     if (deferredPrompt) {
                         const installBtn = document.getElementById('pwa-install-btn');
                         if (installBtn) {
@@ -504,8 +992,6 @@
             }
         });
 
-        // -----------------------------------------------------------------
-        // ÁUDIO E LÓGICA DO JOGO
         // -----------------------------------------------------------------
 
         const SUPABASE_URL = 'https://ngeofumxwasfkaathwbu.supabase.co';
@@ -539,6 +1025,8 @@
         const FLAPPY_JUMP_POWER = 12; 
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 12; 
+        
+        const FLAPPY_LEVEL_START_RUNNER = 11; 
         
         let lastTime = 0;
         const TARGET_FPS = 60;
@@ -658,7 +1146,6 @@
 
         let audioCtx;
         let isAudioInitialized = false;
-        let isAudioUnlocked = false;
 
         function initAudio() {
             try {
@@ -678,37 +1165,29 @@
             playMusicSafe();
         }
 
-        // FUNÇÃO ROBUSTA PARA DESBLOQUEAR ÁUDIO NO IOS
-        function unlockAudioIOS() {
-            if (isAudioUnlocked) return;
-            
-            initAudio();
-            
-            if (audioCtx) {
+        function unlockAudio() {
+            try {
+                if (!isAudioInitialized) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                    isAudioInitialized = true;
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
                 const buffer = audioCtx.createBuffer(1, 1, 22050);
                 const source = audioCtx.createBufferSource();
                 source.buffer = buffer;
                 source.connect(audioCtx.destination);
                 source.start(0);
-                
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-            }
 
-            if (bgMusic) {
-                bgMusic.volume = 0.4;
-                bgMusic.play().then(() => {
-                    console.log("Áudio desbloqueado com sucesso.");
-                    isAudioUnlocked = true;
-                }).catch((e) => {
-                    console.log("Aguardando mais interação para áudio:", e);
-                });
-            }
-            
-            if (isAudioUnlocked) {
-                document.removeEventListener('touchstart', unlockAudioIOS);
-                document.removeEventListener('click', unlockAudioIOS);
+                playMusicSafe();
+
+                document.removeEventListener('click', unlockAudio);
+                document.removeEventListener('touchstart', unlockAudio);
+            } catch(e) {
+                console.warn("Unlock audio warning:", e);
             }
         }
 
@@ -725,9 +1204,11 @@
         }
 
         function playSound(type) {
-            if (!audioCtx) initAudio();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             if (!audioCtx) return;
+            
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
 
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
@@ -852,35 +1333,17 @@
                 return; 
             }
 
-            // CORREÇÃO: Lógica para níveis > 10 (Runner Infinito)
-            let config;
-            let targetSpeed;
+            const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[10];
             
-            if (currentLevel <= 10) {
-                config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[1];
-                targetSpeed = config.targetSpeed;
-                currentDensityFactor = config.densityFactor;
-            } else {
-                // A partir do nível 11, aumenta velocidade em 0.7 por nível
-                // Base Nível 10 = 11.5
-                const extraLevels = currentLevel - 10;
-                targetSpeed = 11.5 + (extraLevels * 0.7);
-                
-                // Limite de segurança para não quebrar a física (aprox 25)
-                if (targetSpeed > 25) targetSpeed = 25;
+            if (gameSpeed < config.targetSpeed) gameSpeed += 0.005 * deltaFactor; 
+            else gameSpeed = config.targetSpeed; 
 
-                // Aumenta levemente a densidade também
-                currentDensityFactor = 5.0 + (extraLevels * 0.2);
-            }
-            
-            // Suavização da aceleração
-            if (gameSpeed < targetSpeed) gameSpeed += 0.005 * deltaFactor; 
-            else gameSpeed = targetSpeed; 
-
+            let density = config.densityFactor;
             if (deathCount > 3) {
-                currentDensityFactor *= 0.8;
+                density *= 0.8;
                 if (Math.random() < (0.001 * deltaFactor)) deathCount = 0; 
             }
+            currentDensityFactor = density;
         }
 
         function initGame() {
@@ -921,9 +1384,6 @@
             
             transitionPhase = 'none';
             if (bgMusic) bgMusic.volume = 0.4;
-
-            // Garante desbloqueio de áudio ao iniciar o jogo
-            unlockAudioIOS();
 
             updateUI();
             for (let i = 0; i < 5; i++) createCloud();
@@ -1021,20 +1481,12 @@
             }
         }
         
-        canvas.addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            unlockAudioIOS(); // Garante tentativa de desbloqueio em cada toque
-            jump(); 
-        }, {passive: false});
-        
-        canvas.addEventListener('mousedown', (e) => {
-            unlockAudioIOS();
-            jump();
-        });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, {passive: false});
+        canvas.addEventListener('mousedown', jump);
         
         // Ativa o desbloqueio de áudio em qualquer toque na página
-        document.addEventListener('touchstart', unlockAudioIOS, {passive: false});
-        document.addEventListener('click', unlockAudioIOS);
+        document.addEventListener('touchstart', unlockAudio);
+        document.addEventListener('click', unlockAudio);
         
         let introDismissed = false;
 
@@ -1090,7 +1542,6 @@
             // BOTÕES COM INTERAÇÃO HÍBRIDA
             addBtnListener(introStartBtn, () => {
                 initAudio();
-                unlockAudioIOS(); // Trigger extra
                 playSound('ui-click'); 
                 introDismissed = true; 
                 selectedGameMode = MODE_RUNNER;
@@ -1102,7 +1553,6 @@
 
             addBtnListener(introFlappyBtn, () => {
                 initAudio();
-                unlockAudioIOS(); // Trigger extra
                 playSound('ui-click'); 
                 introDismissed = true;
                 selectedGameMode = MODE_FLAPPY;
@@ -1225,19 +1675,12 @@
                     if (transitionCountdown > 0) {
                          playSound('ui-click'); 
                     } else {
-                        // FIX: Agora reinicia como RUNNER após transição, não FLAPPY
-                        if (selectedGameMode === MODE_RUNNER) {
-                            gameState = 'RUNNER'; // Mantém como runner
-                            player.grounded = false; // Começa no ar caindo suave
-                        } else {
-                            gameState = 'WAITING_FLAPPY_START';
-                            gameMessage.textContent = "TOQUE PARA VOAR!";
-                            gameMessage.style.display = 'block';
-                        }
-                        
+                        gameState = 'WAITING_FLAPPY_START';
                         transitionPhase = 'none';
                         lastTime = performance.now(); 
                         if (bgMusic) bgMusic.volume = 0.4;
+                        gameMessage.textContent = "TOQUE PARA VOAR!";
+                        gameMessage.style.display = 'block';
                     }
                 }
             }
@@ -1466,11 +1909,15 @@
         
         function checkLevelProgression() {
             if (selectedGameMode === MODE_RUNNER && score >= nextLevelScore) {
-                // Alteração: Apenas avança o nível, sem mudar para Flappy
-                // if (currentLevel === FLAPPY_LEVEL_START_RUNNER - 1) ... (REMOVIDO)
                 
-                // Dispara transição visual de nível
-                startLevelTransition();
+                if (currentLevel === FLAPPY_LEVEL_START_RUNNER - 1) {
+                    startLevelTransition();
+                } else {
+                    currentLevel++; 
+                    nextLevelScore += 500;
+                    showMessage(`NÍVEL ${currentLevel}!`, 2000);
+                    playSound('levelup');
+                }
             }
         }
         
@@ -1650,5 +2097,3 @@
     </script>
 </body>
 </html>
-
-
