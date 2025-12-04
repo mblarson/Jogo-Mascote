@@ -148,18 +148,91 @@
         #playerNameInput { padding: 12px; font-size: 18px; border-radius: 8px; border: 2px solid #555; background: #333; color: white; width: 80%; align-self: center; outline: none; text-align: center; }
         #playerNameInput:focus { border-color: #FFA500; }
 
-        .game-over-layout { display: flex; flex-direction: row; gap: 15px; margin-bottom: 10px; justify-content: space-between; align-items: flex-start; text-align: left; }
-        .result-column { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #444; padding-right: 10px; }
-        .ranking-column { flex: 1; display: flex; flex-direction: column; }
-        .ranking-title { font-size: 14px; color: #FFD700; margin-bottom: 8px; text-transform: uppercase; text-align: center; border-bottom: 1px solid #444; padding-bottom: 5px; }
-        .ranking-list { list-style: none; padding: 0; font-size: 13px; max-height: 120px; overflow-y: hidden; }
-        .ranking-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #333; }
-        .ranking-item:nth-child(1) { color: #FFD700; font-weight: bold; font-size: 1.1em; }
+        /* --- NOVO LAYOUT VERTICAL PARA GAME OVER --- */
+        .game-over-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+        
+        .player-name-display {
+            font-size: 22px;
+            color: #FFF;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .score-display-big {
+            font-size: 42px;
+            font-weight: 800;
+            color: #FFA500;
+            line-height: 1;
+            text-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: #AAA;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .current-player-rank {
+            background: rgba(255, 215, 0, 0.15); 
+            border: 1px solid #FFD700; 
+            border-radius: 4px; 
+            padding: 5px 10px !important; 
+            margin: 5px 0;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .ranking-container {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #333;
+        }
+
+        .ranking-title {
+            font-size: 14px;
+            color: #FFD700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            text-align: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .ranking-list {
+            list-style: none;
+            padding: 0;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .ranking-item:last-child {
+            border-bottom: none;
+        }
+
+        .ranking-item:nth-child(1) { color: #FFD700; font-weight: bold; }
         .ranking-item:nth-child(2) { color: #C0C0C0; }
         .ranking-item:nth-child(3) { color: #CD7F32; }
-        .current-player-rank { background: rgba(255, 215, 0, 0.15); border: 1px solid #FFD700; border-radius: 4px; padding: 2px 5px !important; margin: 2px 0; }
-        .score-display-big { font-size: 28px; font-weight: bold; color: #FFA500; }
-        .player-name-display { font-size: 18px; color: #FFF; margin-bottom: 5px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
         .modal-footer { margin-top: 5px; font-size: 11px; color: #888; border-top: 1px solid #333; padding-top: 10px; }
         .instagram-tag { color: #FFD700; font-weight: bold; text-transform: uppercase; }
         .volume-warning { color: #FFD700; font-size: 14px; font-weight: bold; margin-bottom: 20px; animation: pulseVolume 1.5s infinite; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 20px; border: 1px solid #FFD700; }
@@ -290,22 +363,32 @@
             </div>
         </div>
 
+        <!-- MODAL DE FIM DE JOGO MODIFICADO -->
         <div id="newGameOverModal" class="custom-modal">
             <div class="modal-content">
-                <h2 style="color: #FF4500;">FIM DE JOGO</h2>
-                <div class="game-over-layout">
-                    <div class="result-column">
-                        <div id="finalPlayerName" class="player-name-display">JOGADOR</div>
-                        <div class="score-display-big" id="finalScoreDisplay">0</div>
-                        <div style="font-size: 14px; color: #AAA;">PONTOS</div>
-                        <div id="playerRankDisplay" style="display: none; color: #FFD700;"></div>
-                        <button id="modalRestartBtn" class="neo-pop-tilted-button"><span>JOGAR NOVAMENTE</span></button>
-                    </div>
-                    <div class="ranking-column">
+                <h2 style="color: #FF4500; font-size: 26px; border-bottom: 2px solid #333; width: 100%; padding-bottom: 10px; margin-bottom: 10px;">FIM DE JOGO</h2>
+                
+                <div class="game-over-vertical">
+                    <!-- 1. NOME -->
+                    <div id="finalPlayerName" class="player-name-display">JOGADOR</div>
+
+                    <!-- 2. PONTUAÇÃO -->
+                    <div class="score-display-big" id="finalScoreDisplay">0</div>
+                    <div class="score-label">PONTOS</div>
+
+                    <!-- 3. POSIÇÃO NO RANKING -->
+                    <div id="playerRankDisplay" style="display: none; width: 100%; text-align: center;"></div>
+                    
+                    <!-- 4. RANKING -->
+                    <div class="ranking-container">
                         <div class="ranking-title">🏆 TOP 3 RANKING</div>
-                        <ul id="rankingList" class="ranking-list"><li style="color:#888;">Carregando...</li></ul>
+                        <ul id="rankingList" class="ranking-list"><li style="color:#888; text-align: center;">Carregando...</li></ul>
                     </div>
                 </div>
+
+                <!-- BOTÃO AO FINAL -->
+                <button id="modalRestartBtn" class="neo-pop-tilted-button" style="width: 80%; margin-top: 15px;"><span>JOGAR NOVAMENTE</span></button>
+                
                 <div class="modal-footer">POSTE NO INSTAGRAM <span class="instagram-tag">@UMADEMATS</span></div>
             </div>
         </div>
@@ -543,9 +626,6 @@
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 12; 
         
-        // CORREÇÃO: Removida a constante que causava a transição para Flappy
-        // const FLAPPY_LEVEL_START_RUNNER = 11; 
-        
         let lastTime = 0;
         const TARGET_FPS = 60;
 
@@ -637,11 +717,16 @@
                 const myRankPosition = myRankIndex + 1;
                 
                 if (myRankIndex !== -1 && myRankPosition <= 3) {
-                    rankDisplay.textContent = `${myRankPosition}ª POSIÇÃO DO RANKING!`;
+                    rankDisplay.textContent = `VOCÊ ESTÁ NA ${myRankPosition}ª POSIÇÃO!`;
+                    rankDisplay.className = 'current-player-rank'; // Aplica estilo amarelo
                     rankDisplay.style.display = 'block';
                     rankDisplay.style.animation = 'pulseVolume 1s infinite'; 
                 } else {
-                    rankDisplay.style.display = 'none';
+                    rankDisplay.textContent = `SUA POSIÇÃO: ${myRankPosition}º`;
+                    rankDisplay.className = '';
+                    rankDisplay.style.color = '#AAA';
+                    rankDisplay.style.display = 'block';
+                    rankDisplay.style.animation = 'none';
                 }
             }
             
@@ -650,15 +735,17 @@
                 top3.forEach((rank, index) => {
                     const li = document.createElement('li');
                     const isCurrentPlayerEntry = (rank === currentPlayerEntry);
-                    if (isCurrentPlayerEntry) li.className = 'ranking-item current-player-rank';
-                    else li.className = 'ranking-item';
+                    // No top 3, se for o jogador, destaca
+                    if (isCurrentPlayerEntry) li.style.background = 'rgba(255, 215, 0, 0.1)';
+                    
+                    li.className = 'ranking-item';
                     
                     const pontosFormatados = Math.floor(rank.pontos).toLocaleString('pt-BR');
                     li.innerHTML = `<span>#${index+1} ${rank.nome}</span> <span>${pontosFormatados}</span>`;
                     rankingList.appendChild(li);
                 });
             } else {
-                rankingList.innerHTML = '<li style="color:#888;">Seja o primeiro!</li>';
+                rankingList.innerHTML = '<li style="color:#888; text-align: center;">Seja o primeiro!</li>';
             }
         }
 
@@ -871,12 +958,10 @@
                 // A partir do nível 11, aumenta velocidade em 0.7 por nível
                 // Base Nível 10 = 11.5
                 // Nível 11 = 11.5 + 0.7 = 12.2
+                // Aumentando 0.7 por nível acima do 10
                 const extraLevels = currentLevel - 10;
                 targetSpeed = 11.5 + (extraLevels * 0.7);
                 
-                // Limite de segurança para não quebrar a física (aprox 25)
-                if (targetSpeed > 25) targetSpeed = 25;
-
                 config = { 
                     densityFactor: 5.0 + (extraLevels * 0.2) // Aumenta levemente a densidade também
                 };
@@ -1197,6 +1282,12 @@
         }
         
         function startLevelTransition() {
+            // Se estiver no modo Runner, NÃO faz transição de tela, apenas muda o nível visualmente
+            if (selectedGameMode === MODE_RUNNER) {
+                // Não faz nada aqui, a lógica foi movida para checkLevelProgression para ser instantânea
+                return;
+            }
+
             gameState = 'TRANSITION';
             transitionPhase = 'fade-out';
             transitionTimer = 0;
@@ -1206,6 +1297,8 @@
         }
 
         function updateTransition(deltaFactor) {
+            if (selectedGameMode === MODE_RUNNER) return; // Segurança extra
+
             const dt = deltaFactor / 60; 
 
             if (transitionPhase === 'fade-out') {
@@ -1214,15 +1307,12 @@
                     transitionAlpha = 1;
                     transitionPhase = 'fade-in';
                     
+                    // No modo Flappy, reseta posições. No runner, isso não é chamado.
                     currentLevel++;
                     nextLevelScore += 500;
                     obstacles = []; 
 
-                    // Ajuste para não cair do céu se for Runner
-                    if (selectedGameMode === MODE_RUNNER) {
-                        player.y = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height; 
-                        player.grounded = true;
-                    } else {
+                    if (selectedGameMode === MODE_FLAPPY) {
                         player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2; 
                         player.velocityY = 0;
                     }
@@ -1243,10 +1333,9 @@
                     if (transitionCountdown > 0) {
                          playSound('ui-click'); 
                     } else {
-                        // FIX: Agora reinicia como RUNNER após transição, não FLAPPY
                         if (selectedGameMode === MODE_RUNNER) {
-                            gameState = 'RUNNER'; // Mantém como runner
-                            player.grounded = true; // Garante que está no chão
+                            gameState = 'RUNNER'; 
+                            player.grounded = true; 
                         } else {
                             gameState = 'WAITING_FLAPPY_START';
                             gameMessage.textContent = "TOQUE PARA VOAR!";
@@ -1325,22 +1414,18 @@
                 updateTransition(deltaFactor);
                 
                 if (transitionAlpha > 0.9) { 
-                    // Tela preta, não renderiza nada
                 } else if (transitionPhase === 'fade-out') {
-                    // Renderiza o estado anterior (RUNNER por padrão aqui se veio de level up)
                     renderBackground();
                     renderClouds();
                     renderGround();
                     renderPlayer(); 
                 } else {
-                    // FADE-IN e COUNTDOWN: Verifica qual o modo para renderizar o fundo correto
                     if (selectedGameMode === MODE_RUNNER) {
                         renderBackground();
                         renderClouds();
                         renderGround();
                         renderPlayer();
                     } else {
-                        // Se fosse modo Flappy (futuro) ou transição de modo
                         renderSkyBackground(); 
                         renderClouds(); 
                         renderPlayer(); 
@@ -1448,7 +1533,6 @@
                         const distanceToRight = canvasWidth - lastObstacle.x;
                         const minSafeGap = calculateSafeGap(); 
                         
-                        // --- AJUSTE LEVEL 7+: VARIAÇÃO DE OBSTÁCULOS ---
                         let maxGap = Math.max(minSafeGap + 100, 600 / currentDensityFactor);
                         
                         if (currentLevel >= 7) {
@@ -1495,11 +1579,15 @@
         
         function checkLevelProgression() {
             if (selectedGameMode === MODE_RUNNER && score >= nextLevelScore) {
-                // Alteração: Apenas avança o nível, sem mudar para Flappy
-                // if (currentLevel === FLAPPY_LEVEL_START_RUNNER - 1) ... (REMOVIDO)
+                // ALTERAÇÃO: Progressão direta, sem tela de transição
+                currentLevel++;
+                nextLevelScore += 500;
                 
-                // Dispara transição visual de nível
-                startLevelTransition();
+                // Feedback visual rápido sem parar o jogo
+                showMessage(`NÍVEL ${currentLevel}`, 2000);
+                playSound('levelup');
+                
+                // A velocidade é atualizada automaticamente no loop principal via calculateDifficultyParams
             }
         }
         
@@ -1622,8 +1710,6 @@
             ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
             ctx.shadowColor = '#FFA500'; ctx.shadowBlur = 10;
             
-            // LÓGICA CORRIGIDA: Só mostra o aviãozinho se realmente estiver no modo Flappy
-            // Verifica se é estado Flappy OU se é transição e o modo selecionado é FLAPPY
             const isFlappyState = gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START';
             const isTransitioningInFlappy = gameState === 'TRANSITION' && transitionPhase !== 'fade-out' && selectedGameMode === MODE_FLAPPY;
 
@@ -1684,4 +1770,3 @@
     </script>
 </body>
 </html>
-
