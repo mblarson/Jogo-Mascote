@@ -144,30 +144,46 @@
         #gameMessage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 20px 40px; border-radius: 10px; font-size: 24px; text-align: center; display: none; z-index: 20; border: 2px solid rgba(255, 255, 255, 0.3); box-shadow: 0 0 15px rgba(0, 0, 0, 0.7); white-space: nowrap; }
         
         .custom-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 200; justify-content: center; align-items: center; flex-direction: column; }
-        .modal-content { background: #1a1a1a; border: 3px solid #FFA500; border-radius: 15px; padding: 20px; width: 85%; max-width: 500px; color: white; text-align: center; box-shadow: 0 0 25px rgba(255, 165, 0, 0.4); display: flex; flex-direction: column; gap: 15px; }
+        
+        /* AJUSTE DO MODAL PARA CABER MELHOR (Reduzido padding e espaçamento) */
+        .modal-content { 
+            background: #1a1a1a; 
+            border: 3px solid #FFA500; 
+            border-radius: 12px; 
+            padding: 15px; /* Reduzido de 20px */
+            width: 90%; 
+            max-width: 450px; 
+            color: white; 
+            text-align: center; 
+            box-shadow: 0 0 25px rgba(255, 165, 0, 0.4); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; /* Reduzido de 15px */
+        }
+        
         #playerNameInput { padding: 12px; font-size: 18px; border-radius: 8px; border: 2px solid #555; background: #333; color: white; width: 80%; align-self: center; outline: none; text-align: center; }
         #playerNameInput:focus { border-color: #FFA500; }
 
-        /* --- NOVO LAYOUT VERTICAL PARA GAME OVER --- */
+        /* --- LAYOUT VERTICAL COMPACTO --- */
         .game-over-vertical {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            gap: 10px;
+            gap: 5px; /* Espaçamento bem apertado */
         }
         
         .player-name-display {
-            font-size: 22px;
+            font-size: 18px; /* Reduzido de 22px */
             color: #FFF;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .score-display-big {
-            font-size: 42px;
+            font-size: 36px; /* Reduzido de 42px */
             font-weight: 800;
             color: #FFA500;
             line-height: 1;
@@ -175,53 +191,54 @@
         }
 
         .score-label {
-            font-size: 12px;
+            font-size: 10px; /* Reduzido de 12px */
             color: #AAA;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
 
         .current-player-rank {
             background: rgba(255, 215, 0, 0.15); 
             border: 1px solid #FFD700; 
             border-radius: 4px; 
-            padding: 5px 10px !important; 
-            margin: 5px 0;
+            padding: 4px 8px !important; 
+            margin: 4px 0;
             color: #FFD700;
             font-weight: bold;
+            font-size: 13px; /* Reduzido */
         }
 
         .ranking-container {
             width: 100%;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 8px;
-            padding: 10px;
-            margin-top: 5px;
+            padding: 8px;
+            margin-top: 2px;
             border: 1px solid #333;
         }
 
         .ranking-title {
-            font-size: 14px;
+            font-size: 12px; /* Reduzido */
             color: #FFD700;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             text-transform: uppercase;
             text-align: center;
             border-bottom: 1px solid #444;
-            padding-bottom: 5px;
+            padding-bottom: 3px;
         }
 
         .ranking-list {
             list-style: none;
             padding: 0;
-            font-size: 14px;
+            font-size: 12px; /* Reduzido */
             width: 100%;
         }
 
         .ranking-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px 10px;
+            padding: 5px 8px; /* Menos padding */
             border-bottom: 1px solid #333;
         }
 
@@ -233,7 +250,7 @@
         .ranking-item:nth-child(2) { color: #C0C0C0; }
         .ranking-item:nth-child(3) { color: #CD7F32; }
 
-        .modal-footer { margin-top: 5px; font-size: 11px; color: #888; border-top: 1px solid #333; padding-top: 10px; }
+        .modal-footer { margin-top: 5px; font-size: 10px; color: #888; border-top: 1px solid #333; padding-top: 5px; }
         .instagram-tag { color: #FFD700; font-weight: bold; text-transform: uppercase; }
         .volume-warning { color: #FFD700; font-size: 14px; font-weight: bold; margin-bottom: 20px; animation: pulseVolume 1.5s infinite; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 20px; border: 1px solid #FFD700; }
         @keyframes pulseVolume { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 10px #FFD700; } 100% { transform: scale(1); opacity: 0.8; } }
@@ -249,7 +266,16 @@
         #countdownScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 40; color: white; text-align: center; padding: 20px; }
         
         #countdown { font-size: 80px; font-weight: bold; color: #FF0000; text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); margin: 20px 0; }
-        #countdownMessage { font-size: 18px; max-width: 90%; line-height: 1.5; margin-bottom: 20px; }
+        
+        /* CORREÇÃO DO PREPARE-SE QUEBRADO */
+        #countdownMessage { 
+            font-size: 18px; 
+            max-width: 90%; 
+            line-height: 1.5; 
+            margin-bottom: 20px; 
+            white-space: nowrap; /* Força o texto em uma linha */
+        }
+
         #gameLogo { width: 320px; height: auto; margin-top: -30px; margin-bottom: -50px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; max-width: 90%; z-index: 1; }
         h1 { font-size: 28px; margin-bottom: 15px; color: #FFA500; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); line-height: 1.2; position: relative; z-index: 2; }
         p { font-size: 16px; margin-bottom: 20px; max-width: 90%; line-height: 1.4; position: relative; z-index: 2; color: white; }
@@ -366,7 +392,7 @@
         <!-- MODAL DE FIM DE JOGO MODIFICADO -->
         <div id="newGameOverModal" class="custom-modal">
             <div class="modal-content">
-                <h2 style="color: #FF4500; font-size: 26px; border-bottom: 2px solid #333; width: 100%; padding-bottom: 10px; margin-bottom: 10px;">FIM DE JOGO</h2>
+                <h2 style="color: #FF4500; font-size: 22px; border-bottom: 2px solid #333; width: 100%; padding-bottom: 8px; margin-bottom: 5px;">FIM DE JOGO</h2>
                 
                 <div class="game-over-vertical">
                     <!-- 1. NOME -->
@@ -387,7 +413,7 @@
                 </div>
 
                 <!-- BOTÃO AO FINAL -->
-                <button id="modalRestartBtn" class="neo-pop-tilted-button" style="width: 80%; margin-top: 15px;"><span>JOGAR NOVAMENTE</span></button>
+                <button id="modalRestartBtn" class="neo-pop-tilted-button" style="width: 80%; margin-top: 10px;"><span>JOGAR NOVAMENTE</span></button>
                 
                 <div class="modal-footer">POSTE NO INSTAGRAM <span class="instagram-tag">@UMADEMATS</span></div>
             </div>
@@ -1770,3 +1796,5 @@
     </script>
 </body>
 </html>
+
+
