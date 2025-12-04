@@ -3,42 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>UMADEMATS GAME</title>
-
+    
     <!-- ========================================== -->
-    <!-- META TAGS PARA WHATSAPP (OPEN GRAPH)       -->
+    <!--  META TAGS DE COMPARTILHAMENTO (PRIORIDADE MÁXIMA) -->
     <!-- ========================================== -->
-    <!-- Título que aparece em negrito no Zap -->
-    <meta property="og:title" content="UMADEMATS GAME">
-    <!-- Descrição curta que aparece embaixo do título -->
-    <meta property="og:description" content="Jogue agora RunnerMats e FlappyMats! Divirta-se com o Matizinho.">
+    <!-- OBS: A imagem deve ter no mínimo 300x300px para aparecer no WhatsApp -->
     
-    <!-- A Imagem que vai aparecer no card (Thumbnail) -->
-    <!-- Atualizado para v=3 para tentar limpar o cache novamente -->
-    <meta property="og:image" content="https://raw.githubusercontent.com/mblarson/jogo-mascote/main/iconejogo.png?v=3">
-    <meta property="og:image:secure_url" content="https://raw.githubusercontent.com/mblarson/jogo-mascote/main/iconejogo.png?v=3">
-    
-    <!-- Configurações adicionais para garantir compatibilidade -->
-    <meta property="og:image:type" content="image/png">
-    
-    <!-- AJUSTE: WhatsApp prefere imagens maiores. 300x300 é o mínimo arriscado. -->
-    <!-- Estamos declarando 600x600 para forçar o reconhecimento como imagem de alta qualidade -->
-    <meta property="og:image:width" content="600">
-    <meta property="og:image:height" content="600">
+    <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website">
-    
-    <!-- Fallback para sistemas antigos -->
-    <meta itemprop="image" content="https://raw.githubusercontent.com/mblarson/jogo-mascote/main/iconejogo.png?v=3">
+    <meta property="og:title" content="UMADEMATS GAME">
+    <meta property="og:description" content="Jogue agora RunnerMats e FlappyMats! Divirta-se com o Matizinho.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/mblarson/jogo-mascote/main/iconejogo.png">
+    <meta property="og:image:secure_url" content="https://raw.githubusercontent.com/mblarson/jogo-mascote/main/iconejogo.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+
+    <!-- Twitter Card (Fallback para WhatsApp) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="UMADEMATS GAME">
+    <meta name="twitter:description" content="Jogue agora RunnerMats e FlappyMats! Divirta-se com o Matizinho.">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/mblarson/jogo-mascote/main/iconejogo.png">
+
+    <title>UMADEMATS GAME</title>
 
     <!-- ========================================== -->
     <!-- CONFIGURAÇÕES DE ÍCONE E APP MOBILE (PWA)  -->
     <!-- ========================================== -->
     <link rel="manifest" href="./manifest.json">
     
-    <!-- FAVICON DO SISTEMA -->
-    <link rel="icon" type="image/png" href="iconejogo.png">
-    
+    <!-- FAVICON (Para a aba do navegador) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./iconejogo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./iconejogo.png">
     <link rel="apple-touch-icon" href="./iconejogo.png">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="UmadeGAMES">
