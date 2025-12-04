@@ -1217,8 +1217,15 @@
                     currentLevel++;
                     nextLevelScore += 500;
                     obstacles = []; 
-                    player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2; 
-                    player.velocityY = 0;
+
+                    // Ajuste para não cair do céu se for Runner
+                    if (selectedGameMode === MODE_RUNNER) {
+                        player.y = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height; 
+                        player.grounded = true;
+                    } else {
+                        player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2; 
+                        player.velocityY = 0;
+                    }
                 }
             } else if (transitionPhase === 'fade-in') {
                 transitionAlpha -= dt * 2;
@@ -1239,7 +1246,7 @@
                         // FIX: Agora reinicia como RUNNER após transição, não FLAPPY
                         if (selectedGameMode === MODE_RUNNER) {
                             gameState = 'RUNNER'; // Mantém como runner
-                            player.grounded = false; // Começa no ar caindo suave
+                            player.grounded = true; // Garante que está no chão
                         } else {
                             gameState = 'WAITING_FLAPPY_START';
                             gameMessage.textContent = "TOQUE PARA VOAR!";
@@ -1318,15 +1325,26 @@
                 updateTransition(deltaFactor);
                 
                 if (transitionAlpha > 0.9) { 
+                    // Tela preta, não renderiza nada
                 } else if (transitionPhase === 'fade-out') {
+                    // Renderiza o estado anterior (RUNNER por padrão aqui se veio de level up)
                     renderBackground();
                     renderClouds();
                     renderGround();
                     renderPlayer(); 
                 } else {
-                    renderSkyBackground();
-                    renderClouds(); 
-                    renderPlayer(); 
+                    // FADE-IN e COUNTDOWN: Verifica qual o modo para renderizar o fundo correto
+                    if (selectedGameMode === MODE_RUNNER) {
+                        renderBackground();
+                        renderClouds();
+                        renderGround();
+                        renderPlayer();
+                    } else {
+                        // Se fosse modo Flappy (futuro) ou transição de modo
+                        renderSkyBackground(); 
+                        renderClouds(); 
+                        renderPlayer(); 
+                    }
                 }
                 
                 renderTransition();
@@ -1604,7 +1622,12 @@
             ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
             ctx.shadowColor = '#FFA500'; ctx.shadowBlur = 10;
             
-            if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || (gameState === 'TRANSITION' && transitionPhase !== 'fade-out')) {
+            // LÓGICA CORRIGIDA: Só mostra o aviãozinho se realmente estiver no modo Flappy
+            // Verifica se é estado Flappy OU se é transição e o modo selecionado é FLAPPY
+            const isFlappyState = gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START';
+            const isTransitioningInFlappy = gameState === 'TRANSITION' && transitionPhase !== 'fade-out' && selectedGameMode === MODE_FLAPPY;
+
+            if (isFlappyState || isTransitioningInFlappy) {
                 const flappyWidth = 90;
                 const flappyHeight = 100;
 
@@ -1661,5 +1684,4 @@
     </script>
 </body>
 </html>
-
 
