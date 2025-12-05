@@ -954,8 +954,9 @@
             </div>
         </div>
         
+        <!-- CORREÇÃO 1: Adicionado display: none para nascer invisível -->
         <button id="returnMenuBtn" class="neo-pop-tilted-button" style="margin-top: 25px;
-        z-index: 5; width: auto; min-width: 200px;">
+        z-index: 5; width: auto; min-width: 200px; display: none;">
             <span>RETORNAR AO MENU PRINCIPAL</span>
         </button>
     </div>
@@ -1823,6 +1824,9 @@
                     playSound('ui-click');
                     returnConfirmationModal.style.display = 'none';
                     
+                    // --- CORREÇÃO 2: Esconder botão ao voltar ao menu ---
+                    document.getElementById('returnMenuBtn').style.display = 'none';
+                    
                     // --- CORREÇÃO: CHAMA A LIMPEZA GERAL ---
                     // Isso limpa o canvas e evita que o mascote antigo fique na tela
                     resetGameAssets();
@@ -1909,6 +1913,11 @@
         function startGame() {
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
             initGame();
+            
+            // CORREÇÃO 3: Mostrar botão apenas quando jogo inicia
+            const returnBtn = document.getElementById('returnMenuBtn');
+            if(returnBtn) returnBtn.style.display = 'block';
+
             gameRunning = true;
             lastTime = performance.now();
             gameLoopId = requestAnimationFrame(gameLoop);
