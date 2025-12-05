@@ -1487,7 +1487,40 @@
             }
         }
 
+        // --- NOVA FUNÇÃO OBRIGATÓRIA: RESET GERAL ---
+        // Limpa completamente os assets e estados visuais do jogo anterior.
+        function resetGameAssets() {
+            // 1. Para o loop de jogo imediatamente
+            gameRunning = false;
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+
+            // 2. Limpa o Canvas visualmente (remove o mascote do jogo anterior)
+            // Isso garante que a tela de nome não mostre lixo do jogo passado
+            if(ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // 3. Limpa arrays de objetos
+            obstacles = [];
+            clouds = [];
+
+            // 4. Reseta posição do jogador para evitar renderização residual
+            player.y = -500; // Move para fora da tela
+            player.velocityY = 0;
+
+            // 5. Define um estado neutro para evitar que o renderPlayer desenhe algo errado
+            gameState = 'IDLE_MENU';
+
+            // 6. Reseta mensagens de UI
+            if(gameMessage) gameMessage.style.display = 'none';
+
+            // 7. Reseta transições
+            transitionPhase = 'none';
+        }
+        // --------------------------------------------
+
         function initGame() {
+            // resetGameAssets já foi chamado antes, mas reiniciamos variáveis de jogo aqui
             score = 0;
             currentLevel = 1;
             nextLevelScore = 500;
@@ -1682,8 +1715,12 @@
             // BOTÕES COM INTERAÇÃO HÍBRIDA
             addBtnListener(introStartBtn, () => {
                 initAudio();
-          
                 playSound('ui-click'); 
+                
+                // --- CORREÇÃO: Limpa assets do jogo anterior ---
+                resetGameAssets();
+                // -----------------------------------------------
+
                 introDismissed = true; 
                 selectedGameMode = MODE_RUNNER;
                 
@@ -1696,6 +1733,11 @@
             addBtnListener(introFlappyBtn, () => {
                 initAudio();
                 playSound('ui-click'); 
+                
+                // --- CORREÇÃO: Limpa assets do jogo anterior ---
+                resetGameAssets();
+                // -----------------------------------------------
+
                 introDismissed = true;
       
                   selectedGameMode = MODE_FLAPPY;
@@ -1727,6 +1769,11 @@
                });
             addBtnListener(modalRestartBtn, () => {
                 playSound('ui-click'); 
+                
+                // --- CORREÇÃO: Limpa assets antes de reiniciar ---
+                resetGameAssets();
+                // -------------------------------------------------
+                
                 restartGame();
             });
             // --- FUNCIONALIDADE: RETORNAR AO MENU ---
@@ -1756,13 +1803,12 @@
                     playSound('ui-click');
                     returnConfirmationModal.style.display = 'none';
                     
-      
-                    // Garante que o jogo pare
-                    gameRunning = false;
-                    cancelAnimationFrame(gameLoopId);
+                    // --- CORREÇÃO: CHAMA A LIMPEZA GERAL ---
+                    // Isso limpa o canvas e evita que o mascote antigo fique na tela
+                    resetGameAssets();
+                    // ---------------------------------------
                     
-                   
-                     // Reseta estados de UI para mostrar o Intro
+                    // Reseta estados de UI para mostrar o Intro
                     introDismissed = false;
                     
                     // Esconde telas de jogo
@@ -2227,6 +2273,9 @@
         }
         
         function renderPlayer() {
+            // Se estiver em estado de menu, não desenha nada para evitar glitches
+            if (gameState === 'IDLE_MENU') return;
+
             ctx.save();
             ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
             ctx.shadowColor = '#FFA500'; ctx.shadowBlur = 10;
