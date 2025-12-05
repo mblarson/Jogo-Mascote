@@ -1442,6 +1442,32 @@
         let transitionAlpha = 0;
         let transitionCountdown = 3;
         
+        // -----------------------------------------------------------------
+        // NOVA FUNÇÃO OBRIGATÓRIA: RESETA TODOS OS ASSETS E ESTADOS VISUAIS
+        // -----------------------------------------------------------------
+        function resetGameAssets() {
+            // 1. Para o loop do jogo imediatamente
+            gameRunning = false;
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+            
+            // 2. Limpa o Canvas completamente (Remove mascotes fantasmas)
+            if (ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // 3. Reseta arrays de elementos visuais
+            obstacles = [];
+            clouds = [];
+            
+            // 4. Reseta variáveis de estado para um neutro
+            gameState = 'IDLE'; 
+            score = 0;
+            
+            // 5. Garante que mensagens de tela sumam
+            if (gameMessage) gameMessage.style.display = 'none';
+        }
+        // -----------------------------------------------------------------
+
         function calculateSafeGap() {
             const jumpDurationFrames = (2 * player.jumpPower) / GRAVITY;
             const jumpDistance = jumpDurationFrames * gameSpeed;
@@ -1681,6 +1707,7 @@
 
             // BOTÕES COM INTERAÇÃO HÍBRIDA
             addBtnListener(introStartBtn, () => {
+                resetGameAssets(); // CORREÇÃO: Reseta ao trocar para RUNNER
                 initAudio();
           
                 playSound('ui-click'); 
@@ -1694,6 +1721,7 @@
             });
 
             addBtnListener(introFlappyBtn, () => {
+                resetGameAssets(); // CORREÇÃO: Reseta ao trocar para FLAPPY
                 initAudio();
                 playSound('ui-click'); 
                 introDismissed = true;
@@ -1727,6 +1755,7 @@
                });
             addBtnListener(modalRestartBtn, () => {
                 playSound('ui-click'); 
+                resetGameAssets(); // CORREÇÃO: Reseta antes de reiniciar
                 restartGame();
             });
             // --- FUNCIONALIDADE: RETORNAR AO MENU ---
@@ -1756,6 +1785,7 @@
                     playSound('ui-click');
                     returnConfirmationModal.style.display = 'none';
                     
+                    resetGameAssets(); // CORREÇÃO: Limpa assets ao voltar ao menu
       
                     // Garante que o jogo pare
                     gameRunning = false;
@@ -1797,6 +1827,8 @@
         });
         
         function handleStartClick() {
+            resetGameAssets(); // CORREÇÃO: Limpa o canvas antes de mostrar o modal de nome
+            
             initAudio();
             playSound('ui-click'); 
             
