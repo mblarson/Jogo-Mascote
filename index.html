@@ -1452,7 +1452,14 @@
         function calculateDifficultyParams(deltaFactor) {
             
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || selectedGameMode === MODE_FLAPPY) {
-                gameSpeed = 4.0;
+                // CORREÇÃO 1: PROGRESSÃO DE DIFICULDADE FLAPPY
+                // Antes: gameSpeed = 4.0;
+                
+                // Agora: Velocidade começa em 4.0 e sobe lentamente até o teto de 6.0
+                // Aumenta 0.1 a cada 50 pontos de score
+                const speedBonus = Math.min((score / 1000) * 2.0, 2.0);
+                gameSpeed = 4.0 + speedBonus;
+                
                 currentDensityFactor = 2.0; 
                 return; 
             }
@@ -1471,6 +1478,10 @@
                 const baseSpeed = LEVEL_CONFIG[10].targetSpeed;
                 const extraLevels = currentLevel - 10;
                 targetSpeed = baseSpeed + (extraLevels * 0.7);
+                
+                // CORREÇÃO 2: HARD CAP DE VELOCIDADE PARA O RUNNER
+                // Impede que a velocidade ultrapasse 16.0 para evitar impossibilidade física
+                targetSpeed = Math.min(targetSpeed, 16.0);
                 
                 // Mantém a densidade máxima do nível 10 para não tornar impossível
                 density = LEVEL_CONFIG[10].densityFactor;
@@ -1594,7 +1605,16 @@
 
         function createFlappyObstacle() {
             const width = 60;
-            const gapSize = 180; 
+            
+            // CORREÇÃO 1 (CONTINUAÇÃO): GAP DINÂMICO
+            // Antes: const gapSize = 180;
+            
+            // Agora: Diminui o gap conforme o score.
+            // Começa em 180. Reduz 1 pixel a cada 25 pontos.
+            // Teto mínimo (segurança) de 140.
+            const reduction = Math.floor(score / 25);
+            const gapSize = Math.max(140, 180 - reduction);
+
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
             const groundY = canvasHeight - GROUND_HEIGHT;
             const minPipeHeight = 50;
