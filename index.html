@@ -1068,7 +1068,7 @@
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 12; 
         
-        const FLAPPY_LEVEL_START_RUNNER = 11; 
+        // REMOVIDO: const FLAPPY_LEVEL_START_RUNNER = 11; 
         
         let lastTime = 0;
         const TARGET_FPS = 60;
@@ -1361,9 +1361,12 @@
         let transitionCountdown = 3;
         
         function calculateSafeGap() {
+            // Este cálculo garante que o gap cresça proporcionalmente à velocidade
             const jumpDurationFrames = (2 * player.jumpPower) / GRAVITY;
             const jumpDistance = jumpDurationFrames * gameSpeed;
-            const safetyMargin = (REACTION_BUFFER_FRAMES * gameSpeed) + player.width;
+            // Aumentamos ligeiramente o buffer de reação para velocidades muito altas
+            const extraBuffer = (gameSpeed > 15) ? (gameSpeed * 2) : 0;
+            const safetyMargin = (REACTION_BUFFER_FRAMES * gameSpeed) + player.width + extraBuffer;
             return jumpDistance + safetyMargin;
         }
 
@@ -1375,12 +1378,33 @@
                 return; 
             }
 
-            const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[10];
-            
-            if (gameSpeed < config.targetSpeed) gameSpeed += 0.005 * deltaFactor; 
-            else gameSpeed = config.targetSpeed; 
+            // NOVA LÓGICA DE DIFICULDADE COM PROGRESSÃO INFINITA
+            let targetSpeed = 0;
+            let density = 1.0;
 
-            let density = config.densityFactor;
+            if (currentLevel <= 10) {
+                // Comportamento original até o nível 10
+                const config = LEVEL_CONFIG[currentLevel];
+                targetSpeed = config.targetSpeed;
+                density = config.densityFactor;
+            } else {
+                // Comportamento novo para Nível 11+
+                // Pega a velocidade do nível 10 como base
+                const baseSpeed = LEVEL_CONFIG[10].targetSpeed;
+                // Calcula quantos níveis acima de 10 estamos
+                const levelsAbove10 = currentLevel - 10;
+                // Adiciona 0.7 para cada nível extra
+                targetSpeed = baseSpeed + (levelsAbove10 * 0.7);
+                
+                // Mantém a densidade controlada
+                density = LEVEL_CONFIG[10].densityFactor; 
+            }
+            
+            // Aplicação suave da velocidade
+            if (gameSpeed < targetSpeed) gameSpeed += 0.005 * deltaFactor; 
+            else gameSpeed = targetSpeed; 
+
+            // Redutor de dificuldade se morrer muito
             if (deathCount > 3) {
                 density *= 0.8;
                 if (Math.random() < (0.001 * deltaFactor)) deathCount = 0; 
@@ -1729,14 +1753,6 @@
             }, 1000);
         }
         
-        function startGame() {
-            if (gameLoopId) cancelAnimationFrame(gameLoopId);
-            initGame();
-            gameRunning = true;
-            lastTime = performance.now();
-            gameLoopId = requestAnimationFrame(gameLoop);
-        }
-        
         function startLevelTransition() {
             gameState = 'TRANSITION';
             transitionPhase = 'fade-out';
@@ -2012,14 +2028,11 @@
         function checkLevelProgression() {
             if (selectedGameMode === MODE_RUNNER && score >= nextLevelScore) {
                 
-                if (currentLevel === FLAPPY_LEVEL_START_RUNNER - 1) {
-                    startLevelTransition();
-                } else {
-                    currentLevel++; 
-                    nextLevelScore += 500;
-                    showMessage(`NÍVEL ${currentLevel}!`, 2000);
-                    playSound('levelup');
-                }
+                // MUDANÇA: PROGRESSÃO INFINITA DO MODO RUNNER
+                currentLevel++; 
+                nextLevelScore += 500;
+                showMessage(`NÍVEL ${currentLevel}!`, 2000);
+                playSound('levelup');
             }
         }
         
