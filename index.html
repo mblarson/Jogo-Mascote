@@ -1117,7 +1117,14 @@
             else if (os === 'iOS' && !inApp && !installed) {
                 const hint = document.getElementById('ios-pwa-install-hint');
                 setTimeout(() => {
-                    if (hint) hint.style.display = 'flex';
+                    if (hint) {
+                        hint.style.display = 'flex';
+                        
+                        // CORREÇÃO: Esconde o aviso do iOS após 10 segundos
+                        setTimeout(() => {
+                            hint.style.display = 'none';
+                        }, 10000);
+                    }
                 }, 2000);
             }
         });
