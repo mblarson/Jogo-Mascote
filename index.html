@@ -4,28 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- ========================================== -->
-    <!--  META TAGS WHATSAPP (SOLUÇÃO DEFINITIVA)   -->
-    <!-- ========================================== -->
-    
-    <!-- Usando o próprio domínio para maior confiabilidade -->
     <meta property="og:site_name" content="UmadeGAMES">
     <meta property="og:title" content="UMADEMATS GAME">
     <meta property="og:description" content="Jogue agora RunnerMats e FlappyMats! Divirta-se com o Matizinho.">
     <meta property="og:url" content="https://www.umadegames.com.br/">
     <meta property="og:type" content="website">
     
-    <!-- IMAGEM DIRETA DO DOMÍNIO (Mais rápido e confiável que GitHub) -->
     <meta property="og:image" content="https://www.umadegames.com.br/iconewpp.png?v=final">
     <meta property="og:image:secure_url" content="https://www.umadegames.com.br/iconewpp.png?v=final">
     <meta property="og:image:type" content="image/png">
     
-    <!-- Tamanhos declarados explicitamente -->
     <meta property="og:image:width" content="600">
     <meta property="og:image:height" content="600">
     <meta property="og:image:alt" content="Mascote Matizinho">
 
-    <!-- Fallbacks para outros sistemas -->
     <meta itemprop="image" content="https://www.umadegames.com.br/iconewpp.png?v=final">
     <link rel="image_src" href="https://www.umadegames.com.br/iconewpp.png?v=final">
     
@@ -34,12 +26,8 @@
 
     <title>UMADEMATS GAME</title>
 
-    <!-- ========================================== -->
-    <!-- CONFIGURAÇÕES DE ÍCONE E APP MOBILE (PWA)  -->
-    <!-- ========================================== -->
     <link rel="manifest" href="./manifest.json">
     
-    <!-- FAVICON (Para a aba do navegador) -->
     <link rel="icon" type="image/png" sizes="32x32" href="./iconejogo.png">
     <link rel="icon" type="image/png" sizes="192x192" href="./iconejogo.png">
     <link rel="apple-touch-icon" href="./iconejogo.png">
@@ -80,7 +68,7 @@
         /* ========================================= */
         
         .system-warning-banner {
-            display: none; 
+            display: none;
             position: fixed;
             z-index: 999999;
             width: 100%;
@@ -159,12 +147,12 @@
         /* ========================================= */
         
         #mobile-loader-overlay {
-            display: none; 
+            display: none;
         }
 
         @media (max-width: 768px) {
             #mobile-loader-overlay {
-                display: flex; 
+                display: flex;
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -177,7 +165,7 @@
                 flex-direction: column;
                 transition: opacity 1s ease-out; 
                 /* CORREÇÃO: Permite clicar através dele enquanto fade out acontece */
-                pointer-events: none; 
+                pointer-events: none;
             }
             
             /* Reativa pointer events apenas para o loader enquanto visível */
@@ -191,7 +179,7 @@
                 max-width: 450px; 
                 height: auto;
                 z-index: 100001;
-                perspective: 1000px; 
+                perspective: 1000px;
             }
 
             .logo-img {
@@ -522,68 +510,83 @@
         
         /* ESTILOS DE TELA DE INTRODUÇÃO */
         #introScreen {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
             width: 100vw; height: 100vh;
             background: rgba(0, 0, 0, 0.9);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
             z-index: 50; color: white; text-align: center; padding: 0; overflow: hidden;
         }
         
         #introWrapper {
-            width: 100%; height: 100%; position: relative;
+            width: 100%;
+            height: 100%; position: relative;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         
         #introWrapper::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            content: "";
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://raw.githubusercontent.com/mblarson/jogo-mascote/main/imagemabertura.JPG');
             background-size: cover; background-position: center; background-repeat: no-repeat;
-            opacity: 0.85; z-index: 0;
+            opacity: 0.85;
+            z-index: 0;
         }
         
         #introWrapper::after {
-            content: ""; position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
+            content: "";
+            position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
             background: linear-gradient(to right, rgba(255, 255, 255, 0.8) 5px, rgba(255, 255, 255, 0) 5px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 0.8) 2px);
             animation: shimmer 5.5s infinite linear; z-index: 1;
         }
 
         #introContent {
-            position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end;
+            position: relative;
+            z-index: 2; display: flex; flex-direction: column; justify-content: flex-end;
             align-items: center; width: 100%; height: 100%; padding: 20px;
         }
         
         /* TELA PRÉ-JOGO (Runner) */
         #startScreen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center;
             z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto;
-            display: none; 
+            display: none;
         }
 
         /* TELA PRÉ-JOGO (FlappyMats) */
         #startScreenFlappy {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); 
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center;
             z-index: 30; color: white; text-align: center; padding: 20px; overflow-y: auto;
-            display: none; 
+            display: none;
         }
         
         #countdownScreen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            display: none; flex-direction: column; justify-content: center; align-items: center;
+            display: none; flex-direction: column; justify-content: center;
+            align-items: center;
             z-index: 40; color: white; text-align: center; padding: 20px;
         }
         
         #countdown {
-            font-size: 80px; font-weight: bold; color: #FF0000;
+            font-size: 80px;
+            font-weight: bold; color: #FF0000;
             text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); margin: 20px 0;
         }
         
         #countdownMessage {
-            font-size: 18px; max-width: 90%; line-height: 1.5; margin-bottom: 20px;
+            font-size: 18px;
+            max-width: 90%; line-height: 1.5; margin-bottom: 20px;
         }
         
         #gameLogo {
@@ -598,33 +601,39 @@
         }
         
         h1 {
-            font-size: 28px; margin-bottom: 15px; color: #FFA500;
+            font-size: 28px;
+            margin-bottom: 15px; color: #FFA500;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); line-height: 1.2;
             position: relative; z-index: 2;
         }
         
         p {
-            font-size: 16px; margin-bottom: 20px; max-width: 90%; line-height: 1.4;
+            font-size: 16px;
+            margin-bottom: 20px; max-width: 90%; line-height: 1.4;
             position: relative; z-index: 2; color: white;
         }
         
         /* BOTÕES */
         .neo-pop-tilted-button {
-          border: 0.1px; padding-bottom: 6px; box-shadow: 1px 5px 7px #494a4b;
+          border: 0.1px;
+          padding-bottom: 6px; box-shadow: 1px 5px 7px #494a4b;
           position: relative; overflow: hidden; background-color: #b7a81d; color: #000000;
-          font-size: 1rem; font-weight: 600; cursor: pointer;
+          font-size: 1rem; font-weight: 600;
+          cursor: pointer;
           transform: perspective(180px) rotateX(30deg) translateY(2px);
           transition: transform 0.3s ease, background-color 0.3s ease; margin-top: 10px;
         }
 
         .neo-pop-tilted-button::before {
-          content: ""; position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
+          content: "";
+          position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
           background: linear-gradient(to right, rgba(196, 196, 196, 0.8) 5px, rgba(196, 196, 196, 0) 5px, rgba(196, 196, 196, 0) 10px, rgba(196, 196, 196, 0.8) 2px);
           animation: shimmer 5.5s infinite linear;
         }
 
         .neo-pop-tilted-button span::before {
-          content: ""; position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
+          content: "";
+          position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
           background: linear-gradient(to right, rgba(255, 255, 255, 1) 5px, rgba(255, 255, 255, 0) 5px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 1) 2px);
           animation: shimmer 5.5s infinite linear;
         }
@@ -637,21 +646,28 @@
             background: #00FFFF;
             color: #000;
         }
-        .btn-flappy:focus-visible { box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.5); }
+        .btn-flappy:focus-visible { box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.5);
+        }
 
-        @keyframes shimmer { 0% { transform: translateX(-1950%); } 100% { transform: translateX(100%); } }
+        @keyframes shimmer { 0% { transform: translateX(-1950%); } 100% { transform: translateX(100%);
+        } }
 
         .neo-pop-tilted-button span {
-          background: #ffeb34; padding: 0.8rem 2rem; position: relative;
+          background: #ffeb34;
+          padding: 0.8rem 2rem; position: relative;
           z-index: 1; display: block; border-radius: 0px; border: 1px solid #494a4b;
         }
 
-        .neo-pop-tilted-button:focus { outline: none; }
-        .neo-pop-tilted-button:focus-visible { box-shadow: 0 0 0 3px rgba(255, 235, 52, 0.5); }
-        .neo-pop-tilted-button:active { transform: perspective(170px) rotateX(36deg) translateY(5px); }
+        .neo-pop-tilted-button:focus { outline: none;
+        }
+        .neo-pop-tilted-button:focus-visible { box-shadow: 0 0 0 3px rgba(255, 235, 52, 0.5);
+        }
+        .neo-pop-tilted-button:active { transform: perspective(170px) rotateX(36deg) translateY(5px);
+        }
         
         #introContent .neo-pop-tilted-button {
-            margin-left: 0; max-width: 250px; align-self: flex-start;
+            margin-left: 0;
+            max-width: 250px; align-self: flex-start;
         }
         
         .intro-btn-group {
@@ -664,35 +680,59 @@
         }
 
         @media (max-width: 480px) {
-            .game-over-layout { flex-direction: column; border: none; align-items: center; }
-            .result-column { border-right: none; border-bottom: 1px solid #444; padding-bottom: 15px; padding-right: 0; width: 100%; margin-bottom: 15px; }
-            .ranking-column { width: 100%; }
-            #gameInfo { font-size: 14px; }
-            #gameMessage { font-size: 20px; padding: 15px 25px; }
-            #gameLogo { width: 200px; margin-bottom: -20px; margin-top: -20px; }
-            h1 { font-size: 24px; }
-            p { font-size: 14px; margin-bottom: 15px; }
-            .neo-pop-tilted-button { font-size: 0.9rem; }
-            .neo-pop-tilted-button span { padding: 0.7rem 1.5rem; }
-            #countdown { font-size: 60px; }
-            #countdownMessage { font-size: 16px; }
-            #introContent .neo-pop-tilted-button { font-size: 1.1rem; letter-spacing: 0.1rem; padding: 0; }
-            #introContent .neo-pop-tilted-button span { padding: 0.8rem 2rem; }
-            .intro-btn-group { margin-bottom: 120px; }
+            .game-over-layout { flex-direction: column;
+            border: none; align-items: center; }
+            .result-column { border-right: none;
+            border-bottom: 1px solid #444; padding-bottom: 15px; padding-right: 0; width: 100%; margin-bottom: 15px;
+            }
+            .ranking-column { width: 100%;
+            }
+            #gameInfo { font-size: 14px;
+            }
+            #gameMessage { font-size: 20px; padding: 15px 25px;
+            }
+            #gameLogo { width: 200px; margin-bottom: -20px; margin-top: -20px;
+            }
+            h1 { font-size: 24px;
+            }
+            p { font-size: 14px; margin-bottom: 15px;
+            }
+            .neo-pop-tilted-button { font-size: 0.9rem;
+            }
+            .neo-pop-tilted-button span { padding: 0.7rem 1.5rem;
+            }
+            #countdown { font-size: 60px;
+            }
+            #countdownMessage { font-size: 16px;
+            }
+            #introContent .neo-pop-tilted-button { font-size: 1.1rem; letter-spacing: 0.1rem;
+            padding: 0; }
+            #introContent .neo-pop-tilted-button span { padding: 0.8rem 2rem;
+            }
+            .intro-btn-group { margin-bottom: 120px;
+            }
         }
         
         @media (max-height: 600px) {
-            h1 { font-size: 22px; margin-bottom: 10px; }
-            p { font-size: 14px; margin-bottom: 15px; max-width: 95%; }
-            #gameLogo { width: 220px; margin-bottom: -30px; }
-            #countdown { font-size: 50px; }
-            #countdownMessage { font-size: 14px; }
+            h1 { font-size: 22px;
+            margin-bottom: 10px; }
+            p { font-size: 14px; margin-bottom: 15px;
+            max-width: 95%; }
+            #gameLogo { width: 220px; margin-bottom: -30px;
+            }
+            #countdown { font-size: 50px;
+            }
+            #countdownMessage { font-size: 14px;
+            }
         }
 
         @media (min-width: 1024px) {
-            #introScreen { display: none !important; box-shadow: none; transform: none; }
-            #introWrapper::before, #introWrapper::after { content: none; }
-            #startScreen { display: flex; }
+            #introScreen { display: none !important;
+            box-shadow: none; transform: none; }
+            #introWrapper::before, #introWrapper::after { content: none;
+            }
+            #startScreen { display: flex;
+            }
         }
     </style>
 </head>
@@ -705,44 +745,51 @@
         </div>
     </div>
     
-    <!-- AVISO ANDROID: OBRIGATÓRIO INSTALAR -->
     <div id="android-browser-warning" class="system-warning-banner">
-        <div class="ios-instruction-box" style="border-color:#3DDC84;"> <!-- Cor Verde do Android -->
-            <div class="ios-icon">📲</div>
+        <div class="ios-instruction-box" style="border-color:#3DDC84;"> <div class="ios-icon">📲</div>
             <h3 style="color:#3DDC84; margin-bottom:10px;">INSTALE O APP</h3>
             <p style="font-size:14px; line-height:1.5;">Para jogar, é necessário instalar o aplicativo.</p>
             
-            <!-- BOTÃO DE INSTALAÇÃO AUTOMÁTICA (Inicialmente oculto) -->
             <button id="pwa-install-btn" class="neo-pop-tilted-button" style="display:none; margin: 15px auto; background-color: #3DDC84;">
-                <span style="background-color: #3DDC84; color: white; border: 1px solid #2eaf69;">INSTALAR AGORA</span>
+                <span style="background-color: #3DDC84;
+                color: white; border: 1px solid #2eaf69;">INSTALAR AGORA</span>
             </button>
 
             <div id="manual-install-instructions">
-                <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
-                <p style="font-size:13px; color:#ccc;">1. Toque nos <b>três pontos (⋮)</b> do navegador.</p>
-                <p style="font-size:13px; color:#ccc;">2. Escolha <b>"Adicionar à Tela Inicial"</b> ou <b>"Instalar Aplicativo"</b>.</p>
+                <hr style="border:0;
+                border-top:1px solid #444; margin:15px 0;">
+                <p style="font-size:13px;
+                color:#ccc;">1. Toque nos <b>três pontos (⋮)</b> do navegador.</p>
+                <p style="font-size:13px;
+                color:#ccc;">2. Escolha <b>"Adicionar à Tela Inicial"</b> ou <b>"Instalar Aplicativo"</b>.</p>
                 <br>
-                <p style="font-size:12px; color:#888;">*Se não aparecer, abra no Google Chrome.</p>
+                <p style="font-size:12px;
+                color:#888;">*Se não aparecer, abra no Google Chrome.</p>
             </div>
         </div>
     </div>
     
-    <!-- AVISO IOS: ESCAPAR DO INSTAGRAM/FB -->
     <div id="ios-iab-warning" class="system-warning-banner">
         <div class="ios-instruction-box">
             <div class="ios-icon">⚠️</div>
-            <h3 style="color:#FFA500; margin-bottom:10px;">ABRA NO SAFARI</h3>
-            <p style="font-size:14px; line-height:1.5;">Para jogar sem travamentos e em tela cheia, você precisa sair do navegador do aplicativo.</p>
-            <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
-            <p style="font-size:13px; color:#ccc;">1. Toque nos <b>três pontos (...)</b> ou em <b>Compartilhar</b>.</p>
-            <p style="font-size:13px; color:#ccc;">2. Escolha <b>"Abrir no Safari"</b> ou <b>"Abrir no Navegador"</b>.</p>
+            <h3 style="color:#FFA500;
+            margin-bottom:10px;">ABRA NO SAFARI</h3>
+            <p style="font-size:14px;
+            line-height:1.5;">Para jogar sem travamentos e em tela cheia, você precisa sair do navegador do aplicativo.</p>
+            <hr style="border:0;
+            border-top:1px solid #444; margin:15px 0;">
+            <p style="font-size:13px;
+            color:#ccc;">1. Toque nos <b>três pontos (...)</b> ou em <b>Compartilhar</b>.</p>
+            <p style="font-size:13px;
+            color:#ccc;">2. Escolha <b>"Abrir no Safari"</b> ou <b>"Abrir no Navegador"</b>.</p>
         </div>
     </div>
 
-    <!-- AVISO IOS: INSTALAR PWA -->
     <div id="ios-pwa-install-hint" class="system-warning-banner">
-        <p style="margin-bottom:5px; color:#555; font-weight:bold;">Instale o App para jogar melhor! 📲</p>
-        <p style="font-size:12px; color:#555;">Toque nos <b>três pontos (...)</b>  > <span style="font-size:13px">COMPARTILHAR</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
+        <p style="margin-bottom:5px;
+        color:#555; font-weight:bold;">Instale o App para jogar melhor! 📲</p>
+        <p style="font-size:12px;
+        color:#555;">Toque nos <b>três pontos (...)</b>  > <span style="font-size:13px">COMPARTILHAR</span> e selecione <b>"Adicionar à Tela de Início"</b>.</p>
     </div>
     
     <audio id="bgMusic" loop>
@@ -750,32 +797,35 @@
         Seu navegador não suporta áudio.
     </audio>
 
-    <!-- Script do Loader -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (window.innerWidth <= 768) {
-                const loader = document.getElementById('mobile-loader-overlay');
+       
+                 const loader = document.getElementById('mobile-loader-overlay');
                 if(loader) {
                     setTimeout(() => {
                         loader.style.opacity = '0'; 
+                      
                         setTimeout(() => {
                             loader.classList.remove('active'); // Remove a classe que bloqueia cliques
                             loader.style.display = 'none';
                         }, 1000);
+      
                     }, 6000); 
                 }
             }
         });
     </script>
 
-    <!-- WRAPPER PRINCIPAL PARA ALINHAMENTO DO JOGO E BOTÃO DE RETORNO -->
-    <div id="main-layout-wrapper" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+    <div id="main-layout-wrapper" style="display: flex;
+    flex-direction: column; align-items: center; width: 100%;">
         <div id="gameContainer">
             <canvas id="gameCanvas"></canvas>
             
             <div id="gameInfo">
                 <div>Pontos: <span id="score">0</span></div>
                 <div>Recorde: <span id="highScore">0</span></div>
+            
                 <div>Nível: <span id="level">1</span></div>
             </div>
             
@@ -784,106 +834,128 @@
             
             <div id="nameModal" class="custom-modal">
                 <div class="modal-content">
-                    <h2 style="color: #FFA500; margin-bottom: 10px;">QUEM VAI JOGAR?</h2>
+ 
+                    <h2 style="color: #FFA500;
+                    margin-bottom: 10px;">QUEM VAI JOGAR?</h2>
                     <p>Digite seu nome para entrar no Ranking:</p>
                     <input type="text" id="playerNameInput" placeholder="Seu Nome" maxlength="12" autocomplete="off">
                     <button id="confirmNameBtn" class="neo-pop-tilted-button"><span>CONFIRMAR</span></button>
                 </div>
-            </div>
+       
+             </div>
 
             <div id="newGameOverModal" class="custom-modal">
                 <div class="modal-content">
-                    <h2 style="color: #FF4500; margin-bottom: -25px; border-bottom: -1px solid #444; padding-bottom: 10px;">FIM DE JOGO</h2>
+                    <h2 style="color: #FF4500;
+                    margin-bottom: -25px; border-bottom: -1px solid #444; padding-bottom: 10px;">FIM DE JOGO</h2>
                     
                     <div class="game-over-layout">
                         <div class="result-column">
+                         
                             <div id="finalPlayerName" class="player-name-display">JOGADOR</div>
                             <div class="score-display-big" id="finalScoreDisplay">0</div>
-                            <div style="font-size: 14px; color: #AAA; margin-top: 5px;">PONTOS</div>
+                            <div style="font-size: 14px;
+                            color: #AAA; margin-top: 5px;">PONTOS</div>
                             
-                            <div id="playerRankDisplay" style="display: none; margin-top: 10px; color: #FFD700; font-weight: bold; font-size: 0.75em; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px;"></div>
+                            <div id="playerRankDisplay" style="display: none;
+                            margin-top: 10px; color: #FFD700; font-weight: bold; font-size: 0.75em; white-space: nowrap; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); background: rgba(0,0,0,0.5);
+                            padding: 5px 10px; border-radius: 5px;"></div>
                             
                             <button id="modalRestartBtn" class="neo-pop-tilted-button" style="margin-top: 20px;">
                                 <span>JOGAR NOVAMENTE</span>
+   
                             </button>
                         </div>
 
                         <div class="ranking-column">
+                          
                             <div class="ranking-title">🏆 TOP 3 RANKING</div>
                             <ul id="rankingList" class="ranking-list">
-                                <li style="color: #888; font-style: italic;">Carregando...</li>
+                                <li style="color: #888;
+                                font-style: italic;">Carregando...</li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="modal-footer">
+      
                         POSTE SUA PONTUAÇÃO NO INSTAGRAM E MARQUE A <span class="instagram-tag">@UMADEMATS</span>
                     </div>
                 </div>
             </div>
             
-            <!-- NOVO MODAL: CONFIRMAÇÃO DE RETORNO -->
             <div id="returnConfirmationModal" class="custom-modal">
                 <div class="modal-content">
-                    <h2 style="color: #FFA500; margin-bottom: 15px;">TEM CERTEZA?</h2>
+                    <h2 style="color: #FFA500;
+                    margin-bottom: 15px;">TEM CERTEZA?</h2>
                     <p>Deseja realmente retornar ao menu principal?</p>
-                    <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+                    <div style="display: flex;
+                    gap: 20px; justify-content: center; margin-top: 20px;">
                          <button id="confirmReturnBtn" class="neo-pop-tilted-button"><span>SIM</span></button>
                          <button id="cancelReturnBtn" class="neo-pop-tilted-button" style="background-color: #888;"><span>NÃO</span></button>
                     </div>
                 </div>
-            </div>
+   
+             </div>
 
             <div id="introScreen">
                 <div id="introWrapper">
                     <div id="introContent">
                         <div class="volume-warning">
-                            <span>🔊</span> AUMENTE O SOM PARA JOGAR
+               
+                             <span>🔊</span> AUMENTE O SOM PARA JOGAR
                         </div>
 
                         <div class="intro-btn-group">
                             <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy">
+  
                                 <span>FLAPPYMATS</span>
                             </button>
 
                             <button id="introStartBtn" class="neo-pop-tilted-button">
+            
                                 <span>RUNNERMATS</span>
                             </button>
                         </div>
                     </div>
-                </div>
+        
+                 </div>
             </div>
 
-            <!-- TELA PRÉ-INÍCIO (RUNNER) -->
             <div id="startScreen">
                 <img id="gameLogo" src="./mascoteuma.png" alt="Logo do Jogo" 
-                    onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'16\' text-anchor=\'middle\' fill=\'white\'>MATIZINHO</text></svg>'; this.style.width='100px'; this.style.height='100px';">
+                    onerror="this.onerror=null;
+                    this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'#FFA500\'/><text x=\'50\' y=\'65\' font-size=\'16\' text-anchor=\'middle\' fill=\'white\'>MATIZINHO</text></svg>'; this.style.width='100px';
+                    this.style.height='100px';">
                 <h1>AS AVENTURAS DE MATIZINHO</h1>
                 <p>Toque na tela para fazer o Matizinho pular e desviar das pedras brilhantes!</p>
                 <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
                 <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
-            </div>
+          
+             </div>
 
-            <!-- NOVA TELA PRÉ-INÍCIO (FLAPPYMATS) -->
             <div id="startScreenFlappy">
                 <img id="flappyLogo" src="./mascoteaviao.png" alt="Mascote Aviao" 
-                     style="width: 150px; height: auto; margin-bottom: 10px;">
+                     style="width: 150px;
+                     height: auto; margin-bottom: 10px;">
                 <h1 style="color: #00FFFF;">FLAPPYMATS</h1>
                 <p>O jogador controla o mascote que deve voar através de canos verdes empilhados sem tocá-los.</p>
                 <p>A mecânica é básica: tocar na tela faz o mascote levantar voo para se manter no ar, enquanto a gravidade o puxa para baixo.</p>
-                <button id="startBtnFlappy" class="neo-pop-tilted-button btn-flappy"><span>INICIAR JOGO</span></button>
+          
+                 <button id="startBtnFlappy" class="neo-pop-tilted-button btn-flappy"><span>INICIAR JOGO</span></button>
             </div>
             
             <div id="countdownScreen">
                 <div id="countdown">3</div>
                 <div id="countdownMessage">
-                    <p>Atenção: Toque apenas dentro da área iluminada do jogo!</p>
+                   
+                     <p>Atenção: Toque apenas dentro da área iluminada do jogo!</p>
                 </div>
             </div>
         </div>
         
-        <!-- NOVO BOTÃO: RETORNAR AO MENU -->
-        <button id="returnMenuBtn" class="neo-pop-tilted-button" style="margin-top: 25px; z-index: 5; width: auto; min-width: 200px;">
+        <button id="returnMenuBtn" class="neo-pop-tilted-button" style="margin-top: 25px;
+        z-index: 5; width: auto; min-width: 200px;">
             <span>RETORNAR AO MENU PRINCIPAL</span>
         </button>
     </div>
@@ -893,11 +965,13 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
+        
+                .then(registration => {
                         console.log('Service Worker registrado com sucesso:', registration.scope);
                     })
                     .catch(error => {
-                        console.log('Falha ao registrar Service Worker:', error);
+               
+                         console.log('Falha ao registrar Service Worker:', error);
                     });
             });
         }
@@ -905,7 +979,8 @@
         // -------------------------------------------------------------
         // LOGICA DE INSTALAÇÃO PWA (BEFOREINSTALLPROMPT + APP INSTALADO)
         // -------------------------------------------------------------
-        let deferredPrompt;
+    
+         let deferredPrompt;
         
         window.addEventListener('beforeinstallprompt', (e) => {
             // Previne o Chrome de mostrar o mini-infobar automaticamente
@@ -929,17 +1004,20 @@
             
             // Esconder botão de instalar
             const installBtn = document.getElementById('pwa-install-btn');
+            
             if(installBtn) installBtn.style.display = 'none';
             
             // Alterar o conteúdo da caixa de aviso para Sucesso
             const instructionBox = document.querySelector('#android-browser-warning .ios-instruction-box');
             if(instructionBox) {
                 instructionBox.innerHTML = `
-                    <div class="ios-icon">✅</div>
+                 
+                   <div class="ios-icon">✅</div>
                     <h3 style="color:#3DDC84; margin-bottom:10px;">INSTALAÇÃO CONCLUÍDA!</h3>
                     <p style="font-size:14px; line-height:1.5;">O aplicativo foi instalado no seu dispositivo.</p>
                     <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
-                    <p style="font-size:13px; color:#ccc;">Procure o ícone <b>UmadeGAMES</b> na sua tela inicial para jogar em tela cheia.</p>
+                   
+                 <p style="font-size:13px; color:#ccc;">Procure o ícone <b>UmadeGAMES</b> na sua tela inicial para jogar em tela cheia.</p>
                 `;
             }
         });
@@ -947,17 +1025,20 @@
         // Configura o clique no botão de instalação
         const installBtn = document.getElementById('pwa-install-btn');
         if (installBtn) {
-            installBtn.addEventListener('click', async () => {
+            installBtn.addEventListener('click', 
+                async () => {
                 if (!deferredPrompt) {
                     return;
                 }
                 // Mostra o prompt nativo
                 deferredPrompt.prompt();
-                
+       
+                 
                 // Espera a escolha do usuário
                 const { outcome } = await deferredPrompt.userChoice;
                 console.log(`User response to the install prompt: ${outcome}`);
                 
+          
                 // Limpa o prompt, pois só pode ser usado uma vez
                 deferredPrompt = null;
             });
@@ -966,7 +1047,8 @@
         // -------------------------------------------------------------
 
         function getMobileOperatingSystem() {
-            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            var userAgent = navigator.userAgent ||
+            navigator.vendor || window.opera;
             if (/windows phone/i.test(userAgent)) return "Windows Phone";
             if (/android/i.test(userAgent)) return "Android";
             if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return "iOS";
@@ -974,13 +1056,15 @@
         }
 
         function isInAppBrowser(os) {
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const ua = navigator.userAgent ||
+            navigator.vendor || window.opera;
             const rules = [
                 'WebView',
                 '(iPhone|iPod|iPad)(?!.*Safari\/)', 
                 'Android.*(wv|\.0\.0\.0)', 
                 'Instagram', 
                 'FBAN', 
+          
                 'FBAV', 
                 'Twitter', 
                 'LinkedIn', 
@@ -991,11 +1075,11 @@
         }
 
         function isStandalone() {
-            return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
+            return (window.matchMedia('(display-mode: standalone)').matches) ||
+            (window.navigator.standalone === true);
         }
 
         // Função do Android (OpenInBrowser) removida pois não será mais usada.
-
         window.addEventListener('load', function() {
             const os = getMobileOperatingSystem();
             const inApp = isInAppBrowser(os);
@@ -1003,14 +1087,17 @@
 
             // AVISO ANDROID: Se for Android e NÃO estiver instalado (app), bloqueia.
             if (os === 'Android' && !installed) {
+            
                 const androidWarning = document.getElementById('android-browser-warning');
                 if (androidWarning) {
                     androidWarning.style.display = 'flex'; // Torna visível (overlay)
                     document.body.style.overflow = 'hidden'; // Bloqueia scroll
                     
+    
                     // Se o evento deferredPrompt já foi capturado antes do load, mostra o botão agora
                     if (deferredPrompt) {
                         const installBtn = document.getElementById('pwa-install-btn');
+                     
                         if (installBtn) {
                             installBtn.style.display = 'block';
                             installBtn.style.animation = 'pulseVolume 1s infinite';
@@ -1022,7 +1109,7 @@
             if (os === 'iOS' && inApp) {
                 const modal = document.getElementById('ios-iab-warning');
                 if (modal) {
-                    modal.style.display = 'flex'; 
+                    modal.style.display = 'flex';
                     document.body.style.overflow = 'hidden'; 
                 }
             }
@@ -1044,7 +1131,6 @@
         
         const TABLE_RUNNER = 'ranking';
         const TABLE_FLAPPY = 'ranking_flappy';
-
         let selectedGameMode = MODE_RUNNER; 
         let activeTable = TABLE_RUNNER;
 
@@ -1062,14 +1148,13 @@
         let playerName = "";
         let cachedRanking = []; 
 
-        const GRAVITY = 0.95; 
+        const GRAVITY = 0.95;
         const JUMP_POWER = 17;
         const FLAPPY_JUMP_POWER = 12; 
         const GROUND_HEIGHT = 50;
         const REACTION_BUFFER_FRAMES = 12; 
         
-        // REMOVIDO: const FLAPPY_LEVEL_START_RUNNER = 11; 
-        
+        const FLAPPY_LEVEL_START_RUNNER = 11;
         let lastTime = 0;
         const TARGET_FPS = 60;
 
@@ -1094,20 +1179,18 @@
         
         const introScreen = document.getElementById('introScreen');
         const startScreen = document.getElementById('startScreen'); 
-        const startScreenFlappy = document.getElementById('startScreenFlappy'); 
+        const startScreenFlappy = document.getElementById('startScreenFlappy');
         const countdownScreen = document.getElementById('countdownScreen');
         
         const introStartBtn = document.getElementById('introStartBtn'); 
         const introFlappyBtn = document.getElementById('introFlappyBtn'); 
         const startBtn = document.getElementById('startBtn'); 
-        const startBtnFlappy = document.getElementById('startBtnFlappy'); 
-        
+        const startBtnFlappy = document.getElementById('startBtnFlappy');
         const countdownElement = document.getElementById('countdown');
         const gameMessage = document.getElementById('gameMessage');
         const scoreDisplay = document.getElementById('score');
         const highScoreDisplay = document.getElementById('highScore');
         const levelDisplay = document.getElementById('level');
-        
         const nameModal = document.getElementById('nameModal');
         const playerNameInput = document.getElementById('playerNameInput');
         const confirmNameBtn = document.getElementById('confirmNameBtn');
@@ -1116,7 +1199,6 @@
         const finalScoreDisplay = document.getElementById('finalScoreDisplay');
         const modalRestartBtn = document.getElementById('modalRestartBtn');
         const rankingList = document.getElementById('rankingList');
-        
         async function fetchRankingToCache() {
             if (!_supabase) return;
             try {
@@ -1124,8 +1206,8 @@
                     .from(activeTable)
                     .select('nome, pontos')
                     .order('pontos', { ascending: false })
+           
                     .limit(10);
-                
                 if (!error && data) {
                     cachedRanking = data;
                 }
@@ -1148,7 +1230,6 @@
         
         function showInstantMixedRanking(currentScore, currentPlayerName) {
             if (!rankingList) return;
-            
             rankingList.innerHTML = '';
             let mixedRanking = [...cachedRanking];
             const currentPlayerEntry = { nome: currentPlayerName, pontos: currentScore };
@@ -1175,11 +1256,13 @@
                     const li = document.createElement('li');
                     const isCurrentPlayerEntry = (rank === currentPlayerEntry);
                     if (isCurrentPlayerEntry) li.className = 'ranking-item current-player-rank';
+    
                     else li.className = 'ranking-item';
                     
                     const pontosFormatados = Math.floor(rank.pontos).toLocaleString('pt-BR');
                     li.innerHTML = `<span>#${index+1} ${rank.nome}</span> <span>${pontosFormatados}</span>`;
-                    rankingList.appendChild(li);
+              
+                     rankingList.appendChild(li);
                 });
             } else {
                 rankingList.innerHTML = '<li style="color:#888;">Seja o primeiro!</li>';
@@ -1192,7 +1275,8 @@
         function initAudio() {
             try {
                 if (!isAudioInitialized) {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const AudioContext = window.AudioContext ||
+                    window.webkitAudioContext;
                     audioCtx = new AudioContext();
                     isAudioInitialized = true;
                 }
@@ -1210,7 +1294,8 @@
         function unlockAudio() {
             try {
                 if (!isAudioInitialized) {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const AudioContext = window.AudioContext ||
+                    window.webkitAudioContext;
                     audioCtx = new AudioContext();
                     isAudioInitialized = true;
                 }
@@ -1247,7 +1332,6 @@
 
         function playSound(type) {
             if (!audioCtx) return;
-            
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
@@ -1327,7 +1411,6 @@
         let deathCount = 0;
         let currentDensityFactor = 1.0;
         let gameLoopId;
-        
         const player = {
             x: 10, y: 0, width: 70, height: 80,
             hitboxWidth: 30, hitboxHeight: 40, hitboxOffsetX: 20, hitboxOffsetY: 30,
@@ -1345,7 +1428,6 @@
         const backgroundImage = new Image();
         backgroundImage.onload = () => { backgroundImage.loaded = true; };
         backgroundImage.src = "./cenario.png";
-        
         let backgroundPosition = 0;
         let obstacles = [];
         let clouds = [];
@@ -1361,55 +1443,48 @@
         let transitionCountdown = 3;
         
         function calculateSafeGap() {
-            // Este cálculo garante que o gap cresça proporcionalmente à velocidade
             const jumpDurationFrames = (2 * player.jumpPower) / GRAVITY;
             const jumpDistance = jumpDurationFrames * gameSpeed;
-            // Aumentamos ligeiramente o buffer de reação para velocidades muito altas
-            const extraBuffer = (gameSpeed > 15) ? (gameSpeed * 2) : 0;
-            const safetyMargin = (REACTION_BUFFER_FRAMES * gameSpeed) + player.width + extraBuffer;
+            const safetyMargin = (REACTION_BUFFER_FRAMES * gameSpeed) + player.width;
             return jumpDistance + safetyMargin;
         }
 
         function calculateDifficultyParams(deltaFactor) {
             
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || selectedGameMode === MODE_FLAPPY) {
-                gameSpeed = 4.0; 
+                gameSpeed = 4.0;
                 currentDensityFactor = 2.0; 
                 return; 
             }
 
-            // NOVA LÓGICA DE DIFICULDADE COM PROGRESSÃO INFINITA
-            let targetSpeed = 0;
-            let density = 1.0;
+            // --- NOVA LÓGICA: RUNNER INFINITO ---
+            let targetSpeed, density;
 
-            if (currentLevel <= 10) {
-                // Comportamento original até o nível 10
+            if (currentLevel <= 9) {
+                // Até o nível 9, segue a configuração manual
                 const config = LEVEL_CONFIG[currentLevel];
                 targetSpeed = config.targetSpeed;
                 density = config.densityFactor;
             } else {
-                // Comportamento novo para Nível 11+
-                // Pega a velocidade do nível 10 como base
+                // A partir do nível 10: Velocidade aumenta +0.7 por nível infinitamente
+                // Base nível 10 é 11.5
                 const baseSpeed = LEVEL_CONFIG[10].targetSpeed;
-                // Calcula quantos níveis acima de 10 estamos
-                const levelsAbove10 = currentLevel - 10;
-                // Adiciona 0.7 para cada nível extra
-                targetSpeed = baseSpeed + (levelsAbove10 * 0.7);
+                const extraLevels = currentLevel - 10;
+                targetSpeed = baseSpeed + (extraLevels * 0.7);
                 
-                // Mantém a densidade controlada
-                density = LEVEL_CONFIG[10].densityFactor; 
+                // Mantém a densidade máxima do nível 10 para não tornar impossível
+                density = LEVEL_CONFIG[10].densityFactor;
             }
             
-            // Aplicação suave da velocidade
             if (gameSpeed < targetSpeed) gameSpeed += 0.005 * deltaFactor; 
             else gameSpeed = targetSpeed; 
 
-            // Redutor de dificuldade se morrer muito
+            currentDensityFactor = density;
+
             if (deathCount > 3) {
-                density *= 0.8;
+                currentDensityFactor *= 0.8;
                 if (Math.random() < (0.001 * deltaFactor)) deathCount = 0; 
             }
-            currentDensityFactor = density;
         }
 
         function initGame() {
@@ -1429,15 +1504,13 @@
             backgroundPosition = 0;
             gameStartTime = Date.now();
             firstObstacleCreated = false;
-            
             if (selectedGameMode === MODE_FLAPPY) {
                 gameState = 'WAITING_FLAPPY_START';
                 activeTable = TABLE_FLAPPY;
                 highScore = localStorage.getItem('matizinhoHighScoreFlappy') || 0;
                 
                 player.y = (canvas.height / (window.devicePixelRatio || 1)) / 3; 
-                player.velocityY = 0; 
-                
+                player.velocityY = 0;
                 gameMessage.textContent = "TOQUE PARA VOAR!";
                 gameMessage.style.display = 'block';
 
@@ -1447,7 +1520,6 @@
                 highScore = localStorage.getItem('matizinhoHighScore') || 0;
             }
             highScoreDisplay.textContent = Math.floor(highScore);
-            
             transitionPhase = 'none';
             if (bgMusic) bgMusic.volume = 0.4;
 
@@ -1461,7 +1533,8 @@
             clouds.push({
                 x: canvas.width / (window.devicePixelRatio || 1) + Math.random() * 200,
                 y: Math.random() * (canvas.height / (window.devicePixelRatio || 1) / 3),
-                width: 60 + Math.random() * 40,
+                width: 60 + 
+                Math.random() * 40,
                 height: 30 + Math.random() * 20,
                 speed: 1 + Math.random() * 2
             });
@@ -1479,6 +1552,7 @@
                 x: xPosition,
                 y: canvasHeight - GROUND_HEIGHT - obstacleSize,
                 width: obstacleSize,
+                
                 height: obstacleSize,
                 rotation: Math.random() * Math.PI * 2,
                 glowIntensity: 0.5 + Math.random() * 0.5
@@ -1486,7 +1560,7 @@
         }
 
         function createFlappyObstacle() {
-            const width = 60; 
+            const width = 60;
             const gapSize = 180; 
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
             const groundY = canvasHeight - GROUND_HEIGHT;
@@ -1497,14 +1571,14 @@
             const topHeight = Math.max(minPipeHeight, Math.random() * maxTopHeight);
             
             const bottomY = topHeight + gapSize;
-            
             obstacles.push({
                 type: 'pipe',
                 x: canvas.width / (window.devicePixelRatio || 1),
                 width: width,
                 topHeight: topHeight,
                 bottomY: bottomY,
-                bottomHeight: availableHeight - bottomY + 100 
+           
+                 bottomHeight: availableHeight - bottomY + 100 
             });
         }
         
@@ -1523,7 +1597,6 @@
         
         function jump() {
             if (!gameRunning) return;
-            
             if (gameState === 'TRANSITION') return;
 
             if (gameState === 'WAITING_FLAPPY_START') {
@@ -1601,19 +1674,22 @@
             
             if (introScreen) {
                 addBtnListener(introScreen, () => {
-                    initAudio();
+     
+                       initAudio();
                 });
             }
 
             // BOTÕES COM INTERAÇÃO HÍBRIDA
             addBtnListener(introStartBtn, () => {
                 initAudio();
+          
                 playSound('ui-click'); 
                 introDismissed = true; 
                 selectedGameMode = MODE_RUNNER;
                 
                 introScreen.style.display = 'none';
                 startScreenFlappy.style.display = 'none';
+    
                 if (startScreen) startScreen.style.display = 'flex';
             });
 
@@ -1621,7 +1697,8 @@
                 initAudio();
                 playSound('ui-click'); 
                 introDismissed = true;
-                selectedGameMode = MODE_FLAPPY;
+      
+                  selectedGameMode = MODE_FLAPPY;
                 
                 introScreen.style.display = 'none';
                 startScreen.style.display = 'none';
@@ -1631,45 +1708,44 @@
             addBtnListener(startBtn, () => {
                 handleStartClick();
             });
-
             addBtnListener(startBtnFlappy, () => {
                 handleStartClick();
             });
-            
             addBtnListener(confirmNameBtn, () => {
                 const name = playerNameInput.value.trim();
                 if (name === "") {
                     // Alert pode bloquear em alguns iOS, melhor usar log ou nada
                     console.log("Nome vazio");
-                    return;
+      
+                  return;
                 }
                 playSound('ui-click'); 
                 playerName = name;
                 nameModal.style.display = 'none';
                 startCountdown();
-            });
-
+ 
+               });
             addBtnListener(modalRestartBtn, () => {
                 playSound('ui-click'); 
                 restartGame();
             });
-
             // --- FUNCIONALIDADE: RETORNAR AO MENU ---
             const returnMenuBtn = document.getElementById('returnMenuBtn');
             const returnConfirmationModal = document.getElementById('returnConfirmationModal');
             const confirmReturnBtn = document.getElementById('confirmReturnBtn');
             const cancelReturnBtn = document.getElementById('cancelReturnBtn');
             let pausedForMenu = false;
-
             if(returnMenuBtn) {
                 addBtnListener(returnMenuBtn, () => {
                     // Pausa o jogo se estiver rodando para evitar que o player morra enquanto decide
                     if (gameRunning) {
+                        
                         gameRunning = false;
                         cancelAnimationFrame(gameLoopId);
                         pausedForMenu = true;
                     } else {
-                        pausedForMenu = false;
+                        pausedForMenu = 
+                        false;
                     }
                     returnConfirmationModal.style.display = 'flex';
                 });
@@ -1680,21 +1756,24 @@
                     playSound('ui-click');
                     returnConfirmationModal.style.display = 'none';
                     
+      
                     // Garante que o jogo pare
                     gameRunning = false;
                     cancelAnimationFrame(gameLoopId);
                     
-                    // Reseta estados de UI para mostrar o Intro
+                   
+                     // Reseta estados de UI para mostrar o Intro
                     introDismissed = false;
                     
                     // Esconde telas de jogo
                     if(startScreen) startScreen.style.display = 'none';
-                    if(startScreenFlappy) startScreenFlappy.style.display = 'none';
+  
+                      if(startScreenFlappy) startScreenFlappy.style.display = 'none';
                     if(newGameOverModal) newGameOverModal.style.display = 'none';
                     if(countdownScreen) countdownScreen.style.display = 'none';
                     if(nameModal) nameModal.style.display = 'none';
-                    if(gameMessage) gameMessage.style.display = 'none';
-                    
+          
+                      if(gameMessage) gameMessage.style.display = 'none';
                     // Mostra intro
                     if(introScreen) introScreen.style.display = 'flex';
                 });
@@ -1705,10 +1784,12 @@
                     playSound('ui-click');
                     returnConfirmationModal.style.display = 'none';
                     
+     
                     // Se estava rodando antes, volta a rodar
                     if (pausedForMenu) {
                         gameRunning = true;
                         lastTime = performance.now();
+    
                         gameLoopId = requestAnimationFrame(gameLoop);
                     }
                 });
@@ -1718,11 +1799,17 @@
         function handleStartClick() {
             initAudio();
             playSound('ui-click'); 
+            
+            // --- CORREÇÃO: PARA O LOOP DO JOGO COMPLETAMENTE ---
+            gameRunning = false;
+            cancelAnimationFrame(gameLoopId);
+            // ---------------------------------------------------
+
             startScreen.style.display = 'none'; 
             startScreenFlappy.style.display = 'none';
             
             if (nameModal) {
-                nameModal.style.display = 'flex'; 
+                nameModal.style.display = 'flex';
                 if (playerNameInput) playerNameInput.focus();
             } else {
                 startGame();
@@ -1730,7 +1817,6 @@
         }
 
         window.addEventListener('resize', checkScreenSizeAndInit);
-        
         function startCountdown() {
             startScreen.style.display = 'none';
             startScreenFlappy.style.display = 'none';
@@ -1739,18 +1825,27 @@
             countdownScreen.style.display = 'flex';
             let count = 3;
             countdownElement.textContent = count;
-            playSound('start'); 
+            playSound('start');
             const countdownInterval = setInterval(() => {
                 count--;
                 if (count > 0) {
                     countdownElement.textContent = count;
                     playSound('ui-click'); 
+                
                 } else {
                     clearInterval(countdownInterval);
                     countdownScreen.style.display = 'none';
                     startGame();
                 }
             }, 1000);
+        }
+        
+        function startGame() {
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+            initGame();
+            gameRunning = true;
+            lastTime = performance.now();
+            gameLoopId = requestAnimationFrame(gameLoop);
         }
         
         function startLevelTransition() {
@@ -1763,10 +1858,9 @@
         }
 
         function updateTransition(deltaFactor) {
-            const dt = deltaFactor / 60; 
-
+            const dt = deltaFactor / 60;
             if (transitionPhase === 'fade-out') {
-                transitionAlpha += dt * 2; 
+                transitionAlpha += dt * 2;
                 if (transitionAlpha >= 1) {
                     transitionAlpha = 1;
                     transitionPhase = 'fade-in';
@@ -1774,7 +1868,7 @@
                     currentLevel++;
                     nextLevelScore += 500;
                     obstacles = []; 
-                    player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2; 
+                    player.y = (canvas.height / (window.devicePixelRatio || 1)) / 2;
                     player.velocityY = 0;
                 }
             } else if (transitionPhase === 'fade-in') {
@@ -1791,7 +1885,7 @@
                     transitionCountdown--;
                     transitionTimer = 0;
                     if (transitionCountdown > 0) {
-                         playSound('ui-click'); 
+                         playSound('ui-click');
                     } else {
                         gameState = 'WAITING_FLAPPY_START';
                         transitionPhase = 'none';
@@ -1806,10 +1900,8 @@
 
         function renderTransition() {
             if (gameState !== 'TRANSITION') return;
-
             const width = canvas.width / (window.devicePixelRatio || 1);
             const height = canvas.height / (window.devicePixelRatio || 1);
-
             if (transitionPhase === 'fade-out' || transitionPhase === 'fade-in') {
                 ctx.fillStyle = `rgba(0, 0, 0, ${transitionAlpha})`;
                 ctx.fillRect(0, 0, width, height);
@@ -1846,27 +1938,22 @@
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
             gradient.addColorStop(0, '#4facfe');
             gradient.addColorStop(1, '#00f2fe');
-            
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
         }
 
         function gameLoop(timestamp) {
             if (!gameRunning) return;
-            
             if (!timestamp) timestamp = performance.now();
             
             const deltaTimeInSeconds = (timestamp - lastTime) / 1000;
-            lastTime = timestamp; 
-            
+            lastTime = timestamp;
             const safeDeltaTime = Math.min(deltaTimeInSeconds, 0.1);
             const deltaFactor = safeDeltaTime * TARGET_FPS;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
             if (gameState === 'TRANSITION') {
                 updateTransition(deltaFactor);
-                
                 if (transitionAlpha > 0.9) { 
                 } else if (transitionPhase === 'fade-out') {
                     renderBackground();
@@ -1880,7 +1967,6 @@
                 }
                 
                 renderTransition();
-                
             } else if (gameState === 'WAITING_FLAPPY_START') {
                 renderSkyBackground();
                 updateClouds(deltaFactor * 0.2); 
@@ -1890,7 +1976,6 @@
             } else {
                 
                 calculateDifficultyParams(deltaFactor);
-                
                 updatePlayer(deltaFactor);
                 updateObstacles(deltaFactor); 
                 updateClouds(deltaFactor);
@@ -1902,7 +1987,6 @@
                 }
                 
                 checkCollisions();
-                
                 if (gameState === 'RUNNER') {
                     renderBackground();
                     renderClouds();
@@ -1920,31 +2004,26 @@
             }
             
             updateUI();
-            
             gameLoopId = requestAnimationFrame(gameLoop);
         }
         
         function updatePlayer(deltaFactor) {
             if (gameState === 'WAITING_FLAPPY_START') return;
-
             player.velocityY += GRAVITY * deltaFactor;
             player.y += player.velocityY * deltaFactor;
-            
             const groundY = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
-
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START') {
-                const deathY = canvas.height / (window.devicePixelRatio || 1); 
-                
+                const deathY = canvas.height / (window.devicePixelRatio || 1);
                 if (player.y > deathY) {
                     gameOver();
                 }
                 if (player.y < -50) { 
-                    player.y = -50; 
+                    player.y = -50;
                     player.velocityY = 0;
                 }
             } else {
                 if (player.y > groundY) {
-                    player.y = groundY; 
+                    player.y = groundY;
                     player.velocityY = 0; 
                     player.grounded = true;
                 }
@@ -1953,24 +2032,23 @@
         
         function updateObstacles(deltaFactor) {
             if (gameState === 'WAITING_FLAPPY_START') return;
-
             const elapsedTime = (Date.now() - gameStartTime) / 1000;
             const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
-
             if (gameState === 'FLAPPY') {
                 if (obstacles.length === 0) {
                     createFlappyObstacle();
                 } else {
                     const lastObstacle = obstacles[obstacles.length - 1];
                     const distanceToRight = canvasWidth - lastObstacle.x;
-                    const pipeGap = 350; 
+                    const pipeGap = 350;
                     if (distanceToRight > pipeGap) {
                         createFlappyObstacle();
                     }
                 }
             } else if (gameState === 'RUNNER') {
                 if (!firstObstacleCreated && elapsedTime >= 3) {
-                    createObstacle(); firstObstacleCreated = true;
+                    createObstacle();
+                    firstObstacleCreated = true;
                 }
                 if (firstObstacleCreated) {
                     if (obstacles.length === 0) {
@@ -1978,13 +2056,11 @@
                     } else {
                         const lastObstacle = obstacles[obstacles.length - 1];
                         const distanceToRight = canvasWidth - lastObstacle.x;
-                        const minSafeGap = calculateSafeGap(); 
-                        
+                        const minSafeGap = calculateSafeGap();
                         // --- AJUSTE LEVEL 7+: VARIAÇÃO DE OBSTÁCULOS ---
                         let maxGap = Math.max(minSafeGap + 100, 600 / currentDensityFactor);
-                        
                         if (currentLevel >= 7) {
-                            const randomVariation = Math.random() * 200; 
+                            const randomVariation = Math.random() * 200;
                             maxGap += randomVariation;
                         }
 
@@ -2005,7 +2081,8 @@
         }
         
         function updateClouds(deltaFactor) {
-            const maxClouds = (gameState === 'WAITING_FLAPPY_START') ? 8 : 5;
+            const maxClouds = (gameState === 'WAITING_FLAPPY_START') ?
+            8 : 5;
             
             if (clouds.length < maxClouds && Math.random() < 0.02) createCloud();
             for (let i = clouds.length - 1; i >= 0; i--) {
@@ -2028,8 +2105,10 @@
         function checkLevelProgression() {
             if (selectedGameMode === MODE_RUNNER && score >= nextLevelScore) {
                 
-                // MUDANÇA: PROGRESSÃO INFINITA DO MODO RUNNER
-                currentLevel++; 
+                // --- ALTERAÇÃO: REMOVIDA A TRANSIÇÃO PARA FLAPPY ---
+                // O jogo agora é infinito no modo Runner.
+                
+                currentLevel++;
                 nextLevelScore += 500;
                 showMessage(`NÍVEL ${currentLevel}!`, 2000);
                 playSound('levelup');
@@ -2038,14 +2117,12 @@
         
         function checkCollisions() {
             if (gameState === 'WAITING_FLAPPY_START') return;
-
             for (let i = 0; i < obstacles.length; i++) {
                 const obs = obstacles[i];
                 const pX = player.x + player.hitboxOffsetX;
                 const pY = player.y + player.hitboxOffsetY;
                 const pW = player.hitboxWidth;
                 const pH = player.hitboxHeight;
-                
                 if (obs.type === 'rock') {
                     if (pX < obs.x + obs.width && pX + pW > obs.x &&
                         pY < obs.y + obs.height && pY + pH > obs.y) {
@@ -2067,7 +2144,6 @@
         
         function gameOver() {
             gameRunning = false;
-            
             gameState = 'GAME_OVER';
             cancelAnimationFrame(gameLoopId);
             deathCount++; 
@@ -2075,7 +2151,6 @@
             if (bgMusic && !bgMusic.paused) bgMusic.pause();
             
             let finalScore = Math.floor(score);
-
             if (selectedGameMode === MODE_FLAPPY) {
                 if (finalScore > highScore) {
                     highScore = finalScore;
@@ -2091,12 +2166,10 @@
             }
             
             gameMessage.style.display = 'none';
-
             finalPlayerName.textContent = playerName || "JOGADOR";
             finalScoreDisplay.textContent = finalScore.toLocaleString('pt-BR');
             
             if (newGameOverModal) newGameOverModal.style.display = 'flex';
-
             try {
                 showInstantMixedRanking(finalScore, playerName);
                 salvarPontuacao(playerName, finalScore);
@@ -2133,7 +2206,8 @@
             for (let i = groundPosition; i < width; i += 40) ctx.fillRect(i, height - GROUND_HEIGHT + 10, 20, 5);
             ctx.strokeStyle = '#555555'; ctx.lineWidth = 2; ctx.beginPath();
             for (let i = groundPosition; i < width; i += 20) {
-                ctx.moveTo(i, height - GROUND_HEIGHT/2); ctx.lineTo(i + 10, height - GROUND_HEIGHT/2);
+                ctx.moveTo(i, height - GROUND_HEIGHT/2);
+                ctx.lineTo(i + 10, height - GROUND_HEIGHT/2);
             }
             ctx.stroke();
         }
@@ -2144,7 +2218,8 @@
                 ctx.beginPath();
                 ctx.arc(cloud.x, cloud.y, cloud.height / 2, 0, Math.PI * 2);
                 ctx.arc(cloud.x + cloud.width * 0.25, cloud.y - cloud.height * 0.2, cloud.height * 0.6, 0, Math.PI * 2);
-                ctx.arc(cloud.x + cloud.width * 0.5, cloud.y, cloud.height * 0.7, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.width * 0.5, cloud.y, cloud.height * 0.7, 0, 
+                Math.PI * 2);
                 ctx.arc(cloud.x + cloud.width * 0.75, cloud.y - cloud.height * 0.1, cloud.height * 0.5, 0, Math.PI * 2);
                 ctx.arc(cloud.x + cloud.width, cloud.y, cloud.height / 2, 0, Math.PI * 2);
                 ctx.fill();
@@ -2152,9 +2227,9 @@
         }
         
         function renderPlayer() {
-            ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+            ctx.save();
+            ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
             ctx.shadowColor = '#FFA500'; ctx.shadowBlur = 10;
-            
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || (gameState === 'TRANSITION' && transitionPhase !== 'fade-out')) {
                 const flappyWidth = 90;
                 const flappyHeight = 100;
@@ -2162,13 +2237,15 @@
                 if (flappyPlayerImage.loaded) { 
                     ctx.drawImage(flappyPlayerImage, player.x, player.y, flappyWidth, flappyHeight);
                 } else {
-                    ctx.fillStyle = '#FF4500'; ctx.fillRect(player.x, player.y, flappyWidth, flappyHeight);
+                    ctx.fillStyle = '#FF4500';
+                    ctx.fillRect(player.x, player.y, flappyWidth, flappyHeight);
                 }
             } else {
                 if (player.loaded) {
                     ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
                 } else {
-                    ctx.fillStyle = '#FFA500'; ctx.fillRect(player.x, player.y, player.width, player.height);
+                    ctx.fillStyle = '#FFA500';
+                    ctx.fillRect(player.x, player.y, player.width, player.height);
                     ctx.fillStyle = 'white'; ctx.font = '16px Arial'; ctx.textAlign = 'center';
                     ctx.fillText('Matizinho', player.x + player.width/2, player.y + player.height/2 + 5); 
                 }
@@ -2181,20 +2258,25 @@
                 ctx.save(); 
                 
                 if (obstacle.type === 'rock') {
-                    ctx.translate(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2);
+               
+                     ctx.translate(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2);
                     ctx.rotate(obstacle.rotation); ctx.shadowColor = '#FFD700'; ctx.shadowBlur = 15 * obstacle.glowIntensity;
                     ctx.fillStyle = '#C0C0C0'; ctx.beginPath();
                     ctx.moveTo(-obstacle.width/2, -obstacle.height/3); ctx.lineTo(-obstacle.width/3, -obstacle.height/2);
+                
                     ctx.lineTo(obstacle.width/4, -obstacle.height/2.5); ctx.lineTo(obstacle.width/2, -obstacle.height/4);
                     ctx.lineTo(obstacle.width/2.2, obstacle.height/6); ctx.lineTo(obstacle.width/3, obstacle.height/2.5);
                     ctx.lineTo(0, obstacle.height/2); ctx.lineTo(-obstacle.width/3, obstacle.height/3);
-                    ctx.lineTo(-obstacle.width/2.2, obstacle.height/8); ctx.closePath(); ctx.fill();
+                    ctx.lineTo(-obstacle.width/2.2, obstacle.height/8);
+                    ctx.closePath(); ctx.fill();
                     ctx.fillStyle = '#A9A9A9';
                     ctx.beginPath(); ctx.arc(-obstacle.width/4, -obstacle.height/6, obstacle.width/8, 0, Math.PI * 2); ctx.fill();
-                    ctx.beginPath(); ctx.arc(obstacle.width/5, obstacle.height/8, obstacle.width/10, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(obstacle.width/5, obstacle.height/8, obstacle.width/10, 0, Math.PI * 2); ctx.fill();
                     
                 } else if (obstacle.type === 'pipe') {
-                    ctx.shadowColor = '#000'; ctx.shadowBlur = 5;
+                    ctx.shadowColor = '#000';
+                    ctx.shadowBlur = 5;
                     ctx.fillStyle = '#228B22'; 
                     ctx.fillRect(obstacle.x, 0, obstacle.width, obstacle.topHeight);
                     ctx.fillStyle = '#006400';
@@ -2212,5 +2294,3 @@
     </script>
 </body>
 </html>
-
-
