@@ -2376,6 +2376,47 @@
                 ctx.restore();
             });
         }
+        
+        // -----------------------------------------------------------------
+        // CONTROLE DE ÁUDIO EM SEGUNDO PLANO (SOLICITADO)
+        // -----------------------------------------------------------------
+        let audioPausedBySystem = false;
+
+        function handleSystemPause() {
+            if (bgMusic && !bgMusic.paused) {
+                bgMusic.pause();
+                audioPausedBySystem = true;
+                console.log("Música pausada automaticamente (Background/Blur).");
+            }
+        }
+
+        function handleSystemResume() {
+            // Só retoma se foi o sistema que pausou E se há interação do usuário
+            if (bgMusic && audioPausedBySystem) {
+                // O play() deve ser chamado dentro de um evento de usuário,
+                // que é o caso aqui (chamado pelo listener de click/touch)
+                bgMusic.play().catch(e => console.log("Resume falhou:", e));
+                audioPausedBySystem = false;
+                console.log("Música retomada por interação.");
+            }
+        }
+
+        // Eventos de saída/ocultação
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'hidden') {
+                handleSystemPause();
+            }
+        });
+        
+        window.addEventListener("blur", handleSystemPause);
+        window.addEventListener("pagehide", handleSystemPause);
+
+        // Eventos de retorno (Interação obrigatória)
+        // Nota: O clique retoma a música SE ela foi pausada pelo sistema.
+        document.addEventListener("click", handleSystemResume);
+        document.addEventListener("touchstart", handleSystemResume, {passive: true});
+        document.addEventListener("keydown", handleSystemResume);
+        // -----------------------------------------------------------------
     </script>
 </body>
 </html>
