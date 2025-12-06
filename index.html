@@ -1156,7 +1156,10 @@
         let playerName = "";
         let cachedRanking = []; 
 
-        const GRAVITY = 0.85;
+        // CORREÇÃO: Gravidades independentes solicitadas
+        const GRAVITY_RUNNER = 0.95;
+        const GRAVITY_FLAPPY = 0.75;
+        
         const JUMP_POWER = 17;
         const FLAPPY_JUMP_POWER = 12; 
         const GROUND_HEIGHT = 50;
@@ -1451,7 +1454,8 @@
         let transitionCountdown = 3;
         
         function calculateSafeGap() {
-            const jumpDurationFrames = (2 * player.jumpPower) / GRAVITY;
+            // Usa gravidade do Runner pois essa função é específica do modo Runner
+            const jumpDurationFrames = (2 * player.jumpPower) / GRAVITY_RUNNER;
             const jumpDistance = jumpDurationFrames * gameSpeed;
             const safetyMargin = (REACTION_BUFFER_FRAMES * gameSpeed) + player.width;
             return jumpDistance + safetyMargin;
@@ -2091,7 +2095,11 @@
         
         function updatePlayer(deltaFactor) {
             if (gameState === 'WAITING_FLAPPY_START') return;
-            player.velocityY += GRAVITY * deltaFactor;
+            
+            // CORREÇÃO: Aplica gravidade específica por modo
+            const currentGravity = (gameState === 'FLAPPY') ? GRAVITY_FLAPPY : GRAVITY_RUNNER;
+
+            player.velocityY += currentGravity * deltaFactor;
             player.y += player.velocityY * deltaFactor;
             const groundY = canvas.height / (window.devicePixelRatio || 1) - GROUND_HEIGHT - player.height;
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START') {
@@ -2420,3 +2428,4 @@
     </script>
 </body>
 </html>
+
