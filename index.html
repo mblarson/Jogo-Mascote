@@ -57,7 +57,6 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            /* CORREÇÃO: Removemos o touch-action: none daqui para liberar os botões */
             background-color: #87CEEB;
             -webkit-user-select: none;
             user-select: none;
@@ -78,7 +77,6 @@
             animation: slideDown 0.5s ease-out;
         }
 
-        /* CONFIGURAÇÃO DO AVISO ANDROID (Tela Cheia) */
         #android-browser-warning {
             top: 0;
             left: 0;
@@ -164,11 +162,9 @@
                 align-items: center;
                 flex-direction: column;
                 transition: opacity 1s ease-out; 
-                /* CORREÇÃO: Permite clicar através dele enquanto fade out acontece */
                 pointer-events: none;
             }
             
-            /* Reativa pointer events apenas para o loader enquanto visível */
             #mobile-loader-overlay.active {
                 pointer-events: auto;
             }
@@ -187,8 +183,6 @@
                 height: auto;
                 display: block;
                 opacity: 0;
-                /* NOVA ANIMAÇÃO: Luxury Fade In */
-                /* Mais lenta e suave (6s) */
                 animation: luxuryFadeIn 6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
             }
 
@@ -203,7 +197,6 @@
                 overflow: hidden;
             }
 
-            /* Efeito de brilho sutil passando */
             .fullscreen-shine::after {
                 content: '';
                 position: absolute;
@@ -224,26 +217,23 @@
             }
         }
 
-        /* --- NOVOS KEYFRAMES: LUXURY FADE IN --- */
         @keyframes luxuryFadeIn {
             0% {
                 opacity: 0;
-                transform: scale(0.92); /* Começa levemente menor */
-                filter: blur(8px) brightness(0.5); /* Desfocado e escuro */
+                transform: scale(0.92);
+                filter: blur(8px) brightness(0.5);
             }
             30% {
                 opacity: 1;
                 transform: scale(1);
-                filter: blur(0px) brightness(1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.3)); /* Foco nítido */
+                filter: blur(0px) brightness(1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
             }
             80% {
-                /* Fase de "Exibição": Respira levemente e aumenta o brilho dourado */
                 opacity: 1;
                 transform: scale(1.02);
                 filter: blur(0px) brightness(1.1) drop-shadow(0 0 25px rgba(255, 215, 0, 0.6));
             }
             100% {
-                /* Saída Elegante: Fade out suave enquanto cresce um pouco mais */
                 opacity: 0;
                 transform: scale(1.05);
                 filter: blur(4px) brightness(1.2);
@@ -255,10 +245,6 @@
             40% { opacity: 1; }
             100% { left: 250%; opacity: 0; }
         }
-
-        /* ========================================= */
-        /* FIM DO CSS DO LOADER             */
-        /* ========================================= */
         
         #gameContainer {
             position: relative;
@@ -275,8 +261,6 @@
                 0 0 40px rgba(255, 0, 0, 0.3),
                 inset 0 0 20px rgba(255, 0, 0, 0.2);
             animation: pulseBorder 2s infinite alternate;
-            
-            /* CORREÇÃO: O bloqueio de touch fica APENAS aqui, onde é necessário para o jogo */
             touch-action: none;
         }
         
@@ -486,17 +470,125 @@
             text-transform: uppercase;
         }
 
+        /* ------------------------------------------------ */
+        /* --- ESTILOS DE TELA DE SELEÇÃO (NOVO) --- */
+        /* ------------------------------------------------ */
+        #introScreen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh;
+            /* NOVA IMAGEM DE FUNDO */
+            background: url('selecaojogo.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+            z-index: 50; 
+            color: white; 
+            overflow: hidden;
+            /* Animação de Entrada: Fade In + Zoom */
+            animation: luxuryEntrance 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Overlay escuro opcional para destacar os cards */
+        #introScreen::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.3); /* Leve escurecimento */
+            z-index: 0;
+        }
+
+        @keyframes luxuryEntrance {
+            0% { opacity: 0; transform: scale(1.0); }
+            100% { opacity: 1; transform: scale(1.03); }
+        }
+
+        /* Container dos Cards */
+        .selection-container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            width: 90%;
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        /* CARD INDIVIDUAL */
+        .game-card {
+            background: rgba(0, 0, 0, 0.65);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            width: 300px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Imagem dentro do Card */
+        .card-art {
+            width: 100%;
+            height: 200px; /* Altura fixa para imagem */
+            object-fit: contain;
+            transition: transform 0.4s ease;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+        }
+
+        /* EFEITO NETFLIX: HOVER NOS CARDS */
+        /* Quando passa o mouse no container, todos escurecem um pouco... */
+        .selection-container:hover .game-card {
+            opacity: 0.5;
+            filter: grayscale(0.6) blur(1px);
+            transform: scale(0.95);
+        }
+
+        /* ...exceto o que está com hover, que ganha destaque total */
+        .selection-container .game-card:hover {
+            opacity: 1;
+            filter: grayscale(0) blur(0px);
+            transform: scale(1.1);
+            border-color: #FFD700;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+            z-index: 10;
+        }
+
+        .selection-container .game-card:hover .card-art {
+            transform: scale(1.1) rotate(2deg);
+        }
+        
+        /* Ajuste do botão dentro do card */
+        .game-card .neo-pop-tilted-button {
+            width: 100%;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
         .volume-warning {
+            position: relative;
+            z-index: 2;
             color: #FFD700;
             font-size: 14px;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-top: 30px;
             animation: pulseVolume 1.5s infinite;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             padding: 8px 15px;
             border-radius: 20px;
             border: 1px solid #FFD700;
@@ -506,45 +598,6 @@
             0% { transform: scale(1); opacity: 0.8; }
             50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 10px #FFD700; }
             100% { transform: scale(1); opacity: 0.8; }
-        }
-        
-        /* ESTILOS DE TELA DE INTRODUÇÃO */
-        #introScreen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-            z-index: 50; color: white; text-align: center; padding: 0; overflow: hidden;
-        }
-        
-        #introWrapper {
-            width: 100%;
-            height: 100%; position: relative;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        
-        #introWrapper::before {
-            content: "";
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://raw.githubusercontent.com/mblarson/jogo-mascote/main/imagemabertura.JPG');
-            background-size: cover; background-position: center; background-repeat: no-repeat;
-            opacity: 0.85;
-            z-index: 0;
-        }
-        
-        #introWrapper::after {
-            content: "";
-            position: absolute; top: 0; left: 60%; width: 35%; height: 100%;
-            background: linear-gradient(to right, rgba(255, 255, 255, 0.8) 5px, rgba(255, 255, 255, 0) 5px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 0.8) 2px);
-            animation: shimmer 5.5s infinite linear; z-index: 1;
-        }
-
-        #introContent {
-            position: relative;
-            z-index: 2; display: flex; flex-direction: column; justify-content: flex-end;
-            align-items: center; width: 100%; height: 100%; padding: 20px;
         }
         
         /* TELA PRÉ-JOGO (Runner) */
@@ -665,19 +718,6 @@
         .neo-pop-tilted-button:active { transform: perspective(170px) rotateX(36deg) translateY(5px);
         }
         
-        #introContent .neo-pop-tilted-button {
-            margin-left: 0;
-            max-width: 250px; align-self: flex-start;
-        }
-        
-        .intro-btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: flex-start;
-            margin-top: auto;
-            margin-bottom: 100px;
-        }
 
         @media (max-width: 480px) {
             .game-over-layout { flex-direction: column;
@@ -705,11 +745,30 @@
             }
             #countdownMessage { font-size: 16px;
             }
-            #introContent .neo-pop-tilted-button { font-size: 1.1rem; letter-spacing: 0.1rem;
-            padding: 0; }
-            #introContent .neo-pop-tilted-button span { padding: 0.8rem 2rem;
+            
+            /* Ajustes Mobile para Seleção de Jogos */
+            .selection-container {
+                flex-direction: column;
+                gap: 20px;
+                padding-top: 50px; /* Espaço extra se necessário */
             }
-            .intro-btn-group { margin-bottom: 120px;
+            .game-card {
+                width: 260px;
+                height: 320px;
+                padding: 15px;
+            }
+            .card-art {
+                height: 160px;
+            }
+            .selection-container:hover .game-card {
+                /* No mobile, removemos o efeito de blur nos outros cards pois não há "hover" real */
+                opacity: 1;
+                filter: none;
+                transform: none;
+            }
+            .selection-container .game-card:active {
+                 /* Efeito de toque */
+                 transform: scale(0.98);
             }
         }
         
@@ -723,6 +782,18 @@
             #countdown { font-size: 50px;
             }
             #countdownMessage { font-size: 14px;
+            }
+            /* Ajuste para telas baixas (paisagem celular) */
+            .selection-container {
+                flex-direction: row;
+                gap: 15px;
+            }
+            .game-card {
+                width: 200px;
+                height: 250px;
+            }
+            .card-art {
+                height: 100px;
             }
         }
 
@@ -898,28 +969,34 @@
    
              </div>
 
+            <!-- NOVA TELA DE SELEÇÃO DE JOGO (SUBSTITUI A ANTIGA) -->
             <div id="introScreen">
-                <div id="introWrapper">
-                    <div id="introContent">
-                        <div class="volume-warning">
-               
-                             <span>🔊</span> AUMENTE O SOM PARA JOGAR
-                        </div>
-
-                        <div class="intro-btn-group">
-                            <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy">
-  
-                                <span>FLAPPYMATS</span>
-                            </button>
-
-                            <button id="introStartBtn" class="neo-pop-tilted-button">
-            
-                                <span>RUNNERMATS</span>
-                            </button>
-                        </div>
+                
+                <div class="selection-container">
+                    
+                    <!-- CARD ESQUERDO: RUNNERMATS (Mascote normal) -->
+                    <div class="game-card" id="card-runner">
+                        <img src="./mascote.png" alt="Mascote Skate Runner" class="card-art">
+                        <!-- Botão reaproveitando o ID original -->
+                        <button id="introStartBtn" class="neo-pop-tilted-button">
+                            <span>JOGAR RUNNERMATS</span>
+                        </button>
                     </div>
-        
-                 </div>
+
+                    <!-- CARD DIREITO: FLAPPYMATS (Mascote Avião) -->
+                    <div class="game-card" id="card-flappy">
+                        <img src="./mascoteaviao.png" alt="Mascote Avião Flappy" class="card-art">
+                        <!-- Botão reaproveitando o ID original -->
+                        <button id="introFlappyBtn" class="neo-pop-tilted-button btn-flappy">
+                            <span>JOGAR FLAPPYMATS</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="volume-warning">
+                    <span>🔊</span> AUMENTE O SOM PARA JOGAR
+                </div>
             </div>
 
             <div id="startScreen">
@@ -2428,3 +2505,4 @@
     </script>
 </body>
 </html>
+
