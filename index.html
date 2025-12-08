@@ -548,6 +548,8 @@
             position: relative;
             z-index: 2; display: flex; flex-direction: column; justify-content: flex-end;
             align-items: center; width: 100%; height: 100%; padding: 20px;
+            /* NOVA PROPRIEDADE: Permite que cliques passem pelo container para atingir as zonas de clique atrás */
+            pointer-events: none;
         }
         
         /* TELA PRÉ-JOGO (Runner) */
@@ -625,6 +627,8 @@
           cursor: pointer;
           transform: perspective(180px) rotateX(30deg) translateY(2px);
           transition: transform 0.3s ease, background-color 0.3s ease; margin-top: 10px;
+          /* NOVA PROPRIEDADE: Reativa cliques nos botões (pois pai tem pointer-events: none) */
+          pointer-events: auto;
         }
 
         .neo-pop-tilted-button::before {
@@ -689,7 +693,7 @@
             align-items: flex-end; /* Alinha na base */
             width: 100%;
             position: absolute;
-            bottom: 40%%; /* Sobe um pouco para ficar na área das "placas" da imagem */
+            bottom: 30%; /* Sobe um pouco para ficar na área das "placas" da imagem */
             margin: 0;
             padding: 0 10px;
         }
@@ -750,7 +754,7 @@
             }
             #countdownMessage { font-size: 14px;
             }
-            .intro-btn-group { bottom: 30%; }
+            .intro-btn-group { bottom: 12%; }
         }
 
         @media (min-width: 1024px) {
@@ -927,6 +931,14 @@
 
             <div id="introScreen">
                 <div id="introWrapper">
+                    
+                    <!-- ZONAS DE CLIQUE INVISÍVEIS PARA AS PLACAS DO FUNDO -->
+                    <!-- PLACA ESQUERDA: Abre RunnerMats -->
+                    <div id="introClickZoneLeft" style="position: absolute; top: 0; left: 0; width: 50%; height: 100%; z-index: 1; cursor: pointer;"></div>
+                    
+                    <!-- PLACA DIREITA: Abre FlappyMats -->
+                    <div id="introClickZoneRight" style="position: absolute; top: 0; right: 0; width: 50%; height: 100%; z-index: 1; cursor: pointer;"></div>
+
                     <div id="introContent">
                         <div class="volume-warning">
                
@@ -1221,7 +1233,10 @@
         const countdownScreen = document.getElementById('countdownScreen');
         
         const introStartBtn = document.getElementById('introStartBtn'); 
-        const introFlappyBtn = document.getElementById('introFlappyBtn'); 
+        const introFlappyBtn = document.getElementById('introFlappyBtn');
+        const introClickZoneLeft = document.getElementById('introClickZoneLeft'); // ZONA PLACA ESQUERDA
+        const introClickZoneRight = document.getElementById('introClickZoneRight'); // ZONA PLACA DIREITA
+        
         const startBtn = document.getElementById('startBtn'); 
         const startBtnFlappy = document.getElementById('startBtnFlappy');
         const countdownElement = document.getElementById('countdown');
@@ -1771,40 +1786,41 @@
                 });
             }
 
-            // BOTÕES COM INTERAÇÃO HÍBRIDA
-            addBtnListener(introStartBtn, () => {
+            // --- LÓGICA DE INÍCIO DOS JOGOS (Reutilizada para Botões e Placas) ---
+            
+            const iniciarRunner = () => {
                 initAudio();
                 playSound('ui-click'); 
-                
-                // --- CORREÇÃO: Limpa assets do jogo anterior ---
                 resetGameAssets();
-                // -----------------------------------------------
-
                 introDismissed = true; 
                 selectedGameMode = MODE_RUNNER;
                 
                 introScreen.style.display = 'none';
                 startScreenFlappy.style.display = 'none';
-    
                 if (startScreen) startScreen.style.display = 'flex';
-            });
+            };
 
-            addBtnListener(introFlappyBtn, () => {
+            const iniciarFlappy = () => {
                 initAudio();
                 playSound('ui-click'); 
-                
-                // --- CORREÇÃO: Limpa assets do jogo anterior ---
                 resetGameAssets();
-                // -----------------------------------------------
-
                 introDismissed = true;
-      
-                  selectedGameMode = MODE_FLAPPY;
+                selectedGameMode = MODE_FLAPPY;
                 
                 introScreen.style.display = 'none';
                 startScreen.style.display = 'none';
                 if (startScreenFlappy) startScreenFlappy.style.display = 'flex';
-            });
+            };
+
+            // BOTÕES VISÍVEIS
+            addBtnListener(introStartBtn, iniciarRunner);
+            addBtnListener(introFlappyBtn, iniciarFlappy);
+
+            // PLACAS INVISÍVEIS (Zonas de Clique do Fundo)
+            if(introClickZoneLeft) addBtnListener(introClickZoneLeft, iniciarRunner);
+            if(introClickZoneRight) addBtnListener(introClickZoneRight, iniciarFlappy);
+            
+            // ---------------------------------------------------------------------
 
             addBtnListener(startBtn, () => {
                 handleStartClick();
