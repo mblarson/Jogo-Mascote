@@ -543,6 +543,14 @@
             background: linear-gradient(to right, rgba(255, 255, 255, 0.8) 5px, rgba(255, 255, 255, 0) 5px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 0.8) 2px);
             animation: shimmer 5.5s infinite linear; z-index: 1;
         }
+        
+        /* CORREÇÃO 1: CLASSE PARA FORÇAR O RESET DA ANIMAÇÃO */
+        /* Quando essa classe é adicionada, remove a animação. Ao remover a classe, a animação reinicia. */
+        #introWrapper.anim-reset::after,
+        #introWrapper.anim-reset .neo-pop-tilted-button::before,
+        #introWrapper.anim-reset .neo-pop-tilted-button span::before {
+            animation: none !important;
+        }
 
         #introContent {
             position: relative;
@@ -629,6 +637,21 @@
           transition: transform 0.3s ease, background-color 0.3s ease; margin-top: 10px;
           /* NOVA PROPRIEDADE: Reativa cliques nos botões (pois pai tem pointer-events: none) */
           pointer-events: auto;
+        }
+        
+        /* CORREÇÃO 2: ESTILO PARA O BOTÃO RETORNAR NAS TELAS DE DESCRIÇÃO */
+        .btn-return-menu {
+            background-color: #777 !important; /* Cinza para diferenciar do iniciar */
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .btn-return-menu span {
+            background-color: #999 !important;
+            color: #fff !important;
+            padding: 0.6rem 1.5rem !important;
+        }
+        .btn-return-menu:focus-visible { 
+            box-shadow: 0 0 0 3px rgba(150, 150, 150, 0.5);
         }
 
         .neo-pop-tilted-button::before {
@@ -970,7 +993,11 @@
                 <p>Toque na tela para fazer o Penteca pular e desviar das pedras brilhantes!</p>
                 <p>O jogo fica mais difícil conforme sua pontuação aumenta.</p>
                 <button id="startBtn" class="neo-pop-tilted-button"><span>Iniciar Jogo</span></button>
-          
+                
+                <!-- CORREÇÃO 2: NOVO BOTÃO DE RETORNAR NA DESCRIÇÃO DO RUNNER -->
+                <button id="btnReturnToMenuRunner" class="neo-pop-tilted-button btn-return-menu">
+                    <span>RETORNAR MENU PRINCIPAL</span>
+                </button>
              </div>
 
             <div id="startScreenFlappy">
@@ -982,6 +1009,11 @@
                 <p>A mecânica é básica: tocar na tela faz o mascote levantar voo para se manter no ar, enquanto a gravidade o puxa para baixo.</p>
           
                  <button id="startBtnFlappy" class="neo-pop-tilted-button btn-flappy"><span>INICIAR JOGO</span></button>
+
+                <!-- CORREÇÃO 2: NOVO BOTÃO DE RETORNAR NA DESCRIÇÃO DO FLAPPY -->
+                 <button id="btnReturnToMenuFlappy" class="neo-pop-tilted-button btn-return-menu">
+                    <span>RETORNAR MENU PRINCIPAL</span>
+                </button>
             </div>
             
             <div id="countdownScreen">
@@ -1774,6 +1806,19 @@
             }, {passive: false});
         }
 
+        // --- CORREÇÃO 1: FUNÇÃO PARA RESETAR ANIMAÇÃO DO INTRO ---
+        function restartIntroAnimation() {
+            const wrapper = document.getElementById('introWrapper');
+            if (wrapper) {
+                // Adiciona a classe que remove a animação
+                wrapper.classList.add('anim-reset');
+                // Força um reflow (recalculo de layout) para o navegador perceber a mudança
+                void wrapper.offsetWidth;
+                // Remove a classe para reiniciar a animação
+                wrapper.classList.remove('anim-reset');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             checkScreenSizeAndInit();
             activeTable = TABLE_RUNNER;
@@ -1828,6 +1873,35 @@
             addBtnListener(startBtnFlappy, () => {
                 handleStartClick();
             });
+            
+            // --- CORREÇÃO 2: LISTENERS PARA OS NOVOS BOTÕES DE RETORNO NAS DESCRIÇÕES ---
+            const btnReturnRunner = document.getElementById('btnReturnToMenuRunner');
+            if(btnReturnRunner) {
+                addBtnListener(btnReturnRunner, () => {
+                    playSound('ui-click');
+                    // Esconde telas de descrição
+                    document.getElementById('startScreen').style.display = 'none';
+                    // Mostra Intro
+                    document.getElementById('introScreen').style.display = 'flex';
+                    // Reseta estado para não esconder no resize
+                    introDismissed = false;
+                    // Reseta animações
+                    restartIntroAnimation();
+                });
+            }
+
+            const btnReturnFlappy = document.getElementById('btnReturnToMenuFlappy');
+            if(btnReturnFlappy) {
+                addBtnListener(btnReturnFlappy, () => {
+                    playSound('ui-click');
+                    document.getElementById('startScreenFlappy').style.display = 'none';
+                    document.getElementById('introScreen').style.display = 'flex';
+                    introDismissed = false;
+                    restartIntroAnimation();
+                });
+            }
+            // -----------------------------------------------------------------------------
+
             addBtnListener(confirmNameBtn, () => {
                 const name = playerNameInput.value.trim();
                 if (name === "") {
@@ -1900,6 +1974,9 @@
                       if(gameMessage) gameMessage.style.display = 'none';
                     // Mostra intro
                     if(introScreen) introScreen.style.display = 'flex';
+
+                    // --- CORREÇÃO 1: GARANTE QUE A ANIMAÇÃO REINICIE TAMBÉM AQUI ---
+                    restartIntroAnimation();
                 });
             }
 
