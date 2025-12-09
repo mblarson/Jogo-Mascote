@@ -2442,7 +2442,7 @@
 
             ctx.save();
             ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-            ctx.shadowColor = '#FFA500'; ctx.shadowBlur = 10;
+            // REMOVED SHADOW BLUR FOR PERFORMANCE
             if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || (gameState === 'TRANSITION' && transitionPhase !== 'fade-out')) {
                 const flappyWidth = 90;
                 const flappyHeight = 100;
@@ -2473,7 +2473,8 @@
                 if (obstacle.type === 'rock') {
                
                      ctx.translate(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2);
-                    ctx.rotate(obstacle.rotation); ctx.shadowColor = '#FFD700'; ctx.shadowBlur = 15 * obstacle.glowIntensity;
+                    ctx.rotate(obstacle.rotation); 
+                    // REMOVED SHADOW BLUR FOR PERFORMANCE
                     ctx.fillStyle = '#C0C0C0'; ctx.beginPath();
                     ctx.moveTo(-obstacle.width/2, -obstacle.height/3); ctx.lineTo(-obstacle.width/3, -obstacle.height/2);
                 
@@ -2488,8 +2489,7 @@
                     ctx.arc(obstacle.width/5, obstacle.height/8, obstacle.width/10, 0, Math.PI * 2); ctx.fill();
                     
                 } else if (obstacle.type === 'pipe') {
-                    ctx.shadowColor = '#000';
-                    ctx.shadowBlur = 5;
+                    // REMOVED SHADOW BLUR FOR PERFORMANCE
                     ctx.fillStyle = '#228B22'; 
                     ctx.fillRect(obstacle.x, 0, obstacle.width, obstacle.topHeight);
                     ctx.fillStyle = '#006400';
