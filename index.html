@@ -1033,6 +1033,7 @@
     </div>
 
     <script>
+    (function() {
         // REGISTRO DO SERVICE WORKER (PWA)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -2545,6 +2546,7 @@
         document.addEventListener("touchstart", handleSystemResume, {passive: true});
         document.addEventListener("keydown", handleSystemResume);
         // -----------------------------------------------------------------
+    })();
     </script>
 </body>
 </html>
