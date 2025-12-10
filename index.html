@@ -2,14 +2,15 @@
 <html lang="pt-BR">
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HBD4Z5D5SS"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBD4Z5D5SS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-HBD4Z5D5SS');
-</script>
+      gtag('config', 'G-HBD4Z5D5SS');
+    </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 
@@ -66,7 +67,6 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            /* CORREÇÃO: Removemos o touch-action: none daqui para liberar os botões */
             background-color: #87CEEB;
             -webkit-user-select: none;
             user-select: none;
@@ -1294,6 +1294,7 @@
         const finalScoreDisplay = document.getElementById('finalScoreDisplay');
         const modalRestartBtn = document.getElementById('modalRestartBtn');
         const rankingList = document.getElementById('rankingList');
+        
         async function fetchRankingToCache() {
             if (!_supabase) return;
             try {
@@ -1301,7 +1302,6 @@
                     .from(activeTable)
                     .select('nome, pontos')
                     .order('pontos', { ascending: false })
-
                     .limit(10);
                 if (!error && data) {
                     cachedRanking = data;
@@ -1313,11 +1313,37 @@
 
         async function salvarPontuacao(nome, pontos) {
             if (!_supabase) return;
+
+            // --- PROTEÇÃO DE TRÁFEGO (BARREIRA DE ENTRADA) ---
+            // Verifica se o ranking já tem 10 pessoas (os bots)
+            if (cachedRanking && cachedRanking.length >= 10) {
+                // Pega a pontuação do 10º colocado (o porteiro)
+                const corte = cachedRanking[cachedRanking.length - 1].pontos;
+                
+                // Se o jogador não superou o porteiro, não salva no banco
+                if (pontos <= corte) {
+                    console.log(`Pontuação ${pontos} insuficiente para o Top 10 (Corte: ${corte}).`);
+                    return; // Bloqueia a chamada ao banco
+                }
+            }
+            // --------------------------------------------------
+
             try {
+                // Sanitização básica do nome
+                const nomeSanitizado = nome.replace(/[^a-zA-Z0-9 ]/g, "").trim().substring(0, 12) || "Jogador";
+
                 const { error } = await _supabase
                     .from(activeTable) 
-                    .insert([{ nome: nome, pontos: pontos }]);
-                if (error) console.error('Erro salvar:', error);
+                    .insert([{ nome: nomeSanitizado, pontos: pontos }]);
+                
+                if (error) { 
+                    console.error('Erro salvar:', error);
+                } else {
+                    // Atualiza cache local para refletir a nova pontuação imediatamente
+                    cachedRanking.push({ nome: nomeSanitizado, pontos: pontos });
+                    cachedRanking.sort((a, b) => b.pontos - a.pontos);
+                    if (cachedRanking.length > 10) cachedRanking.pop();
+                }
             } catch (err) {
                 console.error('Erro conexão:', err);
             }
