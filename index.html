@@ -395,6 +395,18 @@
         #playerNameInput:focus {
             border-color: #FFA500;
         }
+        
+        /* NOVO ESTILO PARA MENSAGEM DE ERRO/AVISO */
+        #rankingStatusMessage {
+            font-size: 14px;
+            color: #FFD700;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: -10px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            background: rgba(255, 215, 0, 0.1);
+        }
 
         .game-over-layout {
             display: flex;
@@ -544,7 +556,7 @@
             animation: shimmer 5.5s infinite linear; z-index: 1;
         }
         
-        /* CORREÇÃO 1: CLASSE PARA FORÇAR O RESET DA ANIMAÇÃO */
+        /* CORREÇÃO 1: CLASSE PARA FORÇAR o RESET DA ANIMAÇÃO */
         /* Quando essa classe é adicionada, remove a animação. Ao remover a classe, a animação reinicia. */
         #introWrapper.anim-reset::after,
         #introWrapper.anim-reset .neo-pop-tilted-button::before,
@@ -903,6 +915,9 @@
                     <h2 style="color: #FF4500;
                     margin-bottom: -25px; border-bottom: -1px solid #444; padding-bottom: 10px;">FIM DE JOGO</h2>
                     
+                    <!-- NOVO ELEMENTO DE FEEDBACK DE RANKING -->
+                    <div id="rankingStatusMessage" style="display: none;"></div>
+
                     <div class="game-over-layout">
                         <div class="result-column">
                          
@@ -1211,6 +1226,10 @@
         
         const TABLE_RUNNER = 'ranking';
         const TABLE_FLAPPY = 'ranking_flappy';
+        
+        // CHAVE DO LOCALSTORAGE PARA A FILA DE PONTUAÇÕES
+        const SYNC_QUEUE_KEY = 'pending_scores_queue';
+
         let selectedGameMode = MODE_RUNNER; 
         let activeTable = TABLE_RUNNER;
 
@@ -1285,9 +1304,104 @@
         const finalScoreDisplay = document.getElementById('finalScoreDisplay');
         const modalRestartBtn = document.getElementById('modalRestartBtn');
         const rankingList = document.getElementById('rankingList');
+        const rankingStatusMessage = document.getElementById('rankingStatusMessage');
+
+        // =========================================================================
+        // FUNÇÕES DE FILA DE SINCRONIZAÇÃO (LOCALSTORAGE)
+        // =========================================================================
+
+        /** Obtém a fila de pontuações pendentes do localStorage. */
+        function getPendingScores() {
+            const queueJson = localStorage.getItem(SYNC_QUEUE_KEY);
+            try {
+                return queueJson ? JSON.parse(queueJson) : [];
+            } catch (e) {
+                console.error("Erro ao ler fila de sincronização:", e);
+                // Retorna uma fila vazia em caso de JSON inválido
+                return []; 
+            }
+        }
+
+        /** Salva uma nova pontuação na fila local. */
+        function addScoreToQueue(nome, pontos, modo) {
+            const queue = getPendingScores();
+            const newEntry = { nome, pontos, modo, timestamp: Date.now() };
+            queue.push(newEntry);
+            localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
+            console.log(`Pontuação (${pontos}) adicionada à fila de sincronização.`);
+        }
+
+        /** Remove uma pontuação da fila local. */
+        function removeScoreFromQueue(timestamp) {
+            let queue = getPendingScores();
+            const initialLength = queue.length;
+            
+            // Filtra a fila, mantendo apenas as pontuações que NÃO correspondem ao timestamp
+            queue = queue.filter(entry => entry.timestamp !== timestamp);
+
+            if (queue.length < initialLength) {
+                localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
+                console.log(`Pontuação pendente removida da fila.`);
+                return true;
+            }
+            return false;
+        }
+
+        /** Tenta enviar todas as pontuações pendentes. */
+        async function monitorarFilaDeSincronizacao() {
+            const queue = getPendingScores();
+            if (queue.length === 0) {
+                // Se houver mensagem de fila na modal de game over, limpa ao iniciar
+                if (rankingStatusMessage && rankingStatusMessage.textContent.includes('pendente')) {
+                    rankingStatusMessage.style.display = 'none';
+                    rankingStatusMessage.textContent = '';
+                }
+                return;
+            }
+
+            console.log(`Iniciando tentativa de sincronizar ${queue.length} pontuação(ões) pendente(s)...`);
+            
+            // Processa a fila, mantendo o controle de quais foram salvas com sucesso
+            for (const entry of queue) {
+                try {
+                    // Determina a tabela correta para o item da fila
+                    const targetTable = entry.modo === MODE_FLAPPY ? TABLE_FLAPPY : TABLE_RUNNER;
+                    
+                    const { error } = await _supabase
+                        .from(targetTable) 
+                        .insert([{ nome: entry.nome, pontos: entry.pontos }]);
+                    
+                    if (error) {
+                        console.warn(`Falha ao sincronizar item da fila (${entry.pontos}):`, error.message);
+                        // Se houver erro, para o processamento, pois a conexão pode ter caído novamente
+                        break; 
+                    } else {
+                        console.log(`Pontuação sincronizada com sucesso: ${entry.pontos}`);
+                        // Remove o item da fila após o sucesso
+                        removeScoreFromQueue(entry.timestamp); 
+                    }
+                } catch (err) {
+                    console.error('Erro de conexão ao tentar sincronizar fila:', err);
+                    break; // Sai do loop em caso de erro de rede/conexão
+                }
+            }
+            // Após tentar processar, verifica se ainda há itens (em caso de falha de conexão)
+            const remaining = getPendingScores().length;
+            if (remaining > 0) {
+                 console.log(`Sincronização adiada. ${remaining} item(ns) permanece(m) na fila.`);
+            } else {
+                console.log("Fila de sincronização concluída.");
+            }
+        }
+        
+        // =========================================================================
+
         async function fetchRankingToCache() {
             if (!_supabase) return;
             try {
+                // Tenta sincronizar a fila antes de buscar o ranking mais recente
+                await monitorarFilaDeSincronizacao();
+
                 const { data, error } = await _supabase
                     .from(activeTable)
                     .select('nome, pontos')
@@ -1302,16 +1416,33 @@
             }
         }
 
-        async function salvarPontuacao(nome, pontos) {
-            if (!_supabase) return;
-            try {
-                const { error } = await _supabase
-                    .from(activeTable) 
-                    .insert([{ nome: nome, pontos: pontos }]);
-                if (error) console.error('Erro salvar:', error);
-            } catch (err) {
-                console.error('Erro conexão:', err);
+        /**
+         * Tenta salvar a pontuação no banco de dados e gerencia a fila em caso de falha.
+         */
+        async function salvarPontuacao(nome, pontos, modo) {
+            if (!_supabase) {
+                // Se o Supabase não estiver pronto, adiciona à fila diretamente
+                addScoreToQueue(nome, pontos, modo);
+                return;
             }
+            let success = false;
+            try {
+                const targetTable = modo === MODE_FLAPPY ? TABLE_FLAPPY : TABLE_RUNNER;
+                const { error } = await _supabase
+                    .from(targetTable) 
+                    .insert([{ nome: nome, pontos: pontos }]);
+                
+                if (error) {
+                    console.warn('Erro ao salvar no Supabase (Tentativa 1):', error.message);
+                    throw new Error("Erro no Supabase"); // Força a ida para o catch
+                }
+                success = true;
+                console.log('Pontuação salva no Supabase com sucesso.');
+            } catch (err) {
+                console.error('Erro de conexão/salvamento. Adicionando à fila:', err);
+                addScoreToQueue(nome, pontos, modo);
+            }
+            return success;
         }
         
         function showInstantMixedRanking(currentScore, currentPlayerName) {
@@ -1658,6 +1789,9 @@
             for (let i = 0; i < 5; i++) createCloud();
             playMusicSafe();
             fetchRankingToCache(); 
+            
+            // Monitora e tenta sincronizar a fila na inicialização de cada jogo
+            monitorarFilaDeSincronizacao();
         }
         
         function createCloud() {
@@ -2353,7 +2487,10 @@
             }
         }
         
-        function gameOver() {
+        /**
+         * Lógica de Fim de Jogo. Responsável por salvar a pontuação e exibir o modal.
+         */
+        async function gameOver() {
             gameRunning = false;
             gameState = 'GAME_OVER';
             cancelAnimationFrame(gameLoopId);
@@ -2362,30 +2499,72 @@
             if (bgMusic && !bgMusic.paused) bgMusic.pause();
             
             let finalScore = Math.floor(score);
-            if (selectedGameMode === MODE_FLAPPY) {
+            const currentMode = selectedGameMode;
+            
+            // 1. ATUALIZA HIGHSCORE LOCAL
+            if (currentMode === MODE_FLAPPY) {
                 if (finalScore > highScore) {
                     highScore = finalScore;
                     localStorage.setItem('pentecaHighScoreFlappy', highScore);
-                    highScoreDisplay.textContent = highScore;
                 }
             } else {
                 if (finalScore > highScore) {
                     highScore = finalScore;
                     localStorage.setItem('pentecaHighScore', highScore);
-                    highScoreDisplay.textContent = highScore;
                 }
             }
+            highScoreDisplay.textContent = highScore;
             
+            // 2. TENTA SALVAR NO RANKING E GERENCIA A FILA
+            let rankingSavedSuccessfully = false;
+            if (_supabase) {
+                // Tenta salvar e retorna TRUE se foi bem-sucedido
+                rankingSavedSuccessfully = await salvarPontuacao(playerName, finalScore, currentMode);
+            } else {
+                // Se Supabase não foi inicializado, joga diretamente na fila (offline mode)
+                addScoreToQueue(playerName, finalScore, currentMode);
+            }
+
+            // 3. ATUALIZA A MENSAGEM DE STATUS DO RANKING NO MODAL
+            if (rankingStatusMessage) {
+                const pendingCount = getPendingScores().length;
+
+                if (rankingSavedSuccessfully) {
+                    rankingStatusMessage.textContent = '✅ Pontuação enviada ao Ranking Global!';
+                    rankingStatusMessage.style.backgroundColor = 'rgba(60, 179, 113, 0.1)'; // Verde suave
+                    rankingStatusMessage.style.color = '#3CB371';
+                } else if (pendingCount > 0) {
+                    // Há scores pendentes na fila (falha na conexão)
+                    rankingStatusMessage.textContent = `⚠️ Falha de conexão. Pontuação salva localmente. Sincronizando... (${pendingCount} pendente(s)).`;
+                    rankingStatusMessage.style.backgroundColor = 'rgba(255, 165, 0, 0.1)'; // Laranja suave
+                    rankingStatusMessage.style.color = '#FFA500';
+                    // Tenta forçar a sincronização para o caso de ter sido um erro momentâneo
+                    monitorarFilaDeSincronizacao();
+                } else {
+                    // Supabase não está pronto e não conseguiu adicionar à fila por algum motivo
+                    rankingStatusMessage.textContent = '❌ Ranking indisponível. Tente novamente mais tarde.';
+                    rankingStatusMessage.style.backgroundColor = 'rgba(255, 69, 0, 0.1)'; // Vermelho suave
+                    rankingStatusMessage.style.color = '#FF4500';
+                }
+                rankingStatusMessage.style.display = 'block';
+            }
+
+            // 4. EXIBE O MODAL
             gameMessage.style.display = 'none';
             finalPlayerName.textContent = playerName || "JOGADOR";
             finalScoreDisplay.textContent = finalScore.toLocaleString('pt-BR');
             
             if (newGameOverModal) newGameOverModal.style.display = 'flex';
+            
+            // 5. ATUALIZA O RANKING VISUAL (incluindo o score atual na lista)
             try {
+                // Rebusca o ranking após a tentativa de salvar
+                await fetchRankingToCache(); 
                 showInstantMixedRanking(finalScore, playerName);
-                salvarPontuacao(playerName, finalScore);
             } catch (e) {
-                console.error("Erro ao processar ranking:", e);
+                console.error("Erro ao processar ranking/UI:", e);
+                // Mesmo se falhar a busca, mostra a pontuação final
+                showInstantMixedRanking(finalScore, playerName);
             }
         }
         
