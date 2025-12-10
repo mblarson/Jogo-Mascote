@@ -1055,7 +1055,7 @@
     <script>
     (function() {
         // =========================================================================
-        // SCRIPTS DO WORKER E RPC (CORRIGIDO PARA O AMBIENTE DE COPIAR/COLAR)
+        // SCRIPTS DO WORKER E RPC (CORRIGIDO O ERRO DE SINTAXE)
         // =========================================================================
 
         const workerScript = `
@@ -2014,52 +2014,61 @@
             }
         }
 
+        // FUNÇÕES DE TRANSIÇÃO (CORRIGIDAS)
+        const iniciarRunner = () => {
+            console.log("Iniciando RunnerMats");
+            initAudio();
+            playSound('ui-click'); 
+            resetGameAssets();
+            introDismissed = true; 
+            selectedGameMode = MODE_RUNNER;
+            
+            // Garante que a tela de intro suma e a tela de start apareça
+            introScreen.style.display = 'none';
+            startScreenFlappy.style.display = 'none';
+            if (startScreen) startScreen.style.display = 'flex';
+        };
+
+        const iniciarFlappy = () => {
+            console.log("Iniciando FlappyMats");
+            initAudio();
+            playSound('ui-click'); 
+            resetGameAssets();
+            introDismissed = true;
+            selectedGameMode = MODE_FLAPPY;
+            
+            // Garante que a tela de intro suma e a tela de start apareça
+            introScreen.style.display = 'none';
+            startScreen.style.display = 'none';
+            if (startScreenFlappy) startScreenFlappy.style.display = 'flex';
+        };
+
+
         document.addEventListener('DOMContentLoaded', () => {
+            
+            // REFERÊNCIAS DE BOTÕES
+            const introStartBtn = document.getElementById('introStartBtn'); 
+            const introFlappyBtn = document.getElementById('introFlappyBtn');
+            const introClickZoneLeft = document.getElementById('introClickZoneLeft');
+            const introClickZoneRight = document.getElementById('introClickZoneRight');
+            
+            // Anexa listeners (CORREÇÃO DE BUG: GARANTE QUE AS REFERÊNCIAS EXISTEM)
+            if (introStartBtn) addBtnListener(introStartBtn, iniciarRunner);
+            if (introFlappyBtn) addBtnListener(introFlappyBtn, iniciarFlappy);
+            if (introClickZoneLeft) addBtnListener(introClickZoneLeft, iniciarRunner);
+            if (introClickZoneRight) addBtnListener(introClickZoneRight, iniciarFlappy);
+            
+            // Lógica de telas iniciais
             checkScreenSizeAndInit();
             activeTable = TABLE_RUNNER;
             fetchRankingToCache(); 
             
             if (introScreen) {
                 addBtnListener(introScreen, () => {
-     
                        initAudio();
                 });
             }
 
-            // --- LÓGICA DE INÍCIO DOS JOGOS (Reutilizada para Botões e Placas) ---
-            
-            const iniciarRunner = () => {
-                initAudio();
-                playSound('ui-click'); 
-                resetGameAssets();
-                introDismissed = true; 
-                selectedGameMode = MODE_RUNNER;
-                
-                introScreen.style.display = 'none';
-                startScreenFlappy.style.display = 'none';
-                if (startScreen) startScreen.style.display = 'flex';
-            };
-
-            const iniciarFlappy = () => {
-                initAudio();
-                playSound('ui-click'); 
-                resetGameAssets();
-                introDismissed = true;
-                selectedGameMode = MODE_FLAPPY;
-                
-                introScreen.style.display = 'none';
-                startScreen.style.display = 'none';
-                if (startScreenFlappy) startScreenFlappy.style.display = 'flex';
-            };
-
-            // BOTÕES VISÍVEIS
-            addBtnListener(introStartBtn, iniciarRunner);
-            addBtnListener(introFlappyBtn, iniciarFlappy);
-
-            // PLACAS INVISÍVEIS (Zonas de Clique do Fondo)
-            if(introClickZoneLeft) addBtnListener(introClickZoneLeft, iniciarRunner);
-            if(introClickZoneRight) addBtnListener(introClickZoneRight, iniciarFlappy);
-            
             // ---------------------------------------------------------------------
 
             addBtnListener(startBtn, () => {
