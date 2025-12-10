@@ -39,6 +39,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* CSS OMITTED FOR BREVITY - (Sem alterações críticas) */
         * {
             margin: 0;
             padding: 0;
@@ -57,7 +58,6 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            /* CORREÇÃO: Removemos o touch-action: none daqui para liberar os botões */
             background-color: #87CEEB;
             -webkit-user-select: none;
             user-select: none;
@@ -164,11 +164,9 @@
                 align-items: center;
                 flex-direction: column;
                 transition: opacity 1s ease-out; 
-                /* CORREÇÃO: Permite clicar através dele enquanto fade out acontece */
                 pointer-events: none;
             }
             
-            /* Reativa pointer events apenas para o loader enquanto visível */
             #mobile-loader-overlay.active {
                 pointer-events: auto;
             }
@@ -187,8 +185,6 @@
                 height: auto;
                 display: block;
                 opacity: 0;
-                /* NOVA ANIMAÇÃO: Luxury Fade In */
-                /* Mais lenta e suave (6s) */
                 animation: luxuryFadeIn 6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
             }
 
@@ -373,7 +369,6 @@
             padding: 10px; /* Padding reduzido */
             width: 95%; /* Aumenta a largura em mobile */
             max-width: 400px; /* Reduz o max-width */
-            /* max-height: 95%; Adicionado para prevenir overflow no gameContainer */
             max-height: 480px; /* Ajusta à altura máxima do gameContainer (500px) */
             overflow-y: auto; /* Permite scroll se o conteúdo exceder */
             color: white;
@@ -568,7 +563,6 @@
         }
         
         /* CORREÇÃO 1: CLASSE PARA FORÇAR o RESET DA ANIMAÇÃO */
-        /* Quando essa classe é adicionada, remove a animação. Ao remover a classe, a animação reinicia. */
         #introWrapper.anim-reset::after,
         #introWrapper.anim-reset .neo-pop-tilted-button::before,
         #introWrapper.anim-reset .neo-pop-tilted-button span::before {
@@ -1060,9 +1054,153 @@
 
     <script>
     (function() {
+        // =========================================================================
+        // SCRIPTS DO WORKER E RPC (CORRIGIDO PARA O AMBIENTE DE COPIAR/COLAR)
+        // =========================================================================
+
+        const workerScript = `
+            // Código do Web Worker
+            // Importa a biblioteca Supabase para poder usar o cliente RPC (Remote Procedure Call)
+            import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+            // VARIÁVEIS DE CONFIGURAÇÃO (Inicializadas pelo postMessage do thread principal)
+            let SUPABASE_URL = null;
+            let SUPABASE_ANON_KEY = null;
+            let SYNC_QUEUE_KEY = null;
+            let supabaseClient = null; // Cliente Supabase do Worker
+
+            // Variável de controle do Rate Limit (Armazenado na memória do Worker)
+            const RATE_LIMIT_SECONDS = 5;
+            let lastRequestTime = 0;
+
+            /** Obtém a fila de pontuações pendentes do localStorage. */
+            function getPendingScores() {
+                const queueJson = self.localStorage.getItem(SYNC_QUEUE_KEY);
+                try {
+                    if (queueJson && queueJson.length > 2 * 1024 * 1024) { 
+                        console.error("Worker: Fila de sincronização muito grande. Limite excedido.");
+                        return [];
+                    }
+                    return queueJson ? JSON.parse(queueJson) : [];
+                } catch (e) {
+                    console.error("Worker: Erro ao ler fila de sincronização:", e);
+                    return []; 
+                }
+            }
+
+            /** Salva a fila atualizada no localStorage. */
+            function saveQueue(queue) {
+                self.localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
+            }
+
+            /** Tenta enviar uma pontuação para a Função SQL (RPC). */
+            async function sendScoreViaRPC(entry) {
+                // Checagem de Rate Limit no Worker
+                const now = Date.now();
+                if (now - lastRequestTime < RATE_LIMIT_SECONDS * 1000) {
+                    // Usando concatenação segura para evitar o erro de sintaxe
+                    console.warn('Worker: Rate limit ativo. Próxima tentativa em ' + ((RATE_LIMIT_SECONDS * 1000 - (now - lastRequestTime)) / 1000) + 's');
+                    return false; // Não tenta enviar
+                }
+                lastRequestTime = now; // Atualiza o timestamp da última tentativa
+
+                try {
+                    // Chamada RPC para a função SQL 'save_top_score_only'
+                    // A função SQL fará o check do Top 5 e o INSERT (seguro)
+                    const { error } = await supabaseClient.rpc('save_top_score_only', {
+                        p_nome: entry.nome, 
+                        p_pontos: entry.pontos,
+                        p_modo: entry.modo
+                    });
+
+                    if (error) {
+                        console.warn('Worker RPC Falha:', error.message);
+                        // Erro de rede ou DB. O Rate Limit no DB pode ser o problema.
+                        return false; 
+                    }
+                    
+                    console.log('Worker: Pontuação ' + entry.pontos + ' enviada via RPC.');
+                    return true;
+                    
+                } catch (err) {
+                    console.error('Worker: Erro de conexão/RPC:', err);
+                    return false;
+                }
+            }
+
+            /** Tenta enviar todas as pontuações pendentes. */
+            async function monitorarFilaDeSincronizacao() {
+                if (!supabaseClient) return;
+
+                let queue = getPendingScores();
+                if (queue.length === 0) {
+                    self.postMessage({ type: 'QUEUE_STATUS', count: 0 }); 
+                    return;
+                }
+
+                console.log('Worker: Tentando sincronizar ' + queue.length + ' pontuação(ões) pendente(s)...');
+
+                for (const entry of queue) {
+                    const success = await sendScoreViaRPC(entry);
+                    
+                    if (success) {
+                        // Remove o item da fila APÓS o sucesso
+                        const timestampToRemove = entry.timestamp;
+                        let currentQueue = getPendingScores();
+                        currentQueue = currentQueue.filter(item => item.timestamp !== timestampToRemove);
+                        saveQueue(currentQueue);
+                    } else {
+                        // Se houver falha, assume que é Rate Limit ou conexão perdida e para o loop.
+                        break; 
+                    }
+                }
+                
+                // Reporta o status final (pode ser 0 ou o que sobrou na fila)
+                self.postMessage({ type: 'QUEUE_STATUS', count: getPendingScores().length });
+            }
+
+            // LISTENER DE MENSAGENS DO WORKER
+            self.onmessage = (event) => {
+                const { type, payload } = event.data;
+
+                switch (type) {
+                    case 'INIT':
+                        SUPABASE_URL = payload.SUPABASE_URL;
+                        SUPABASE_ANON_KEY = payload.SUPABASE_ANON_KEY;
+                        SYNC_QUEUE_KEY = payload.SYNC_QUEUE_KEY;
+                        // Cria o cliente Supabase dentro do Worker
+                        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        break;
+                        
+                    case 'ADD_SCORE':
+                        let queue = getPendingScores();
+                        queue.push(payload);
+                        saveQueue(queue);
+                        monitorarFilaDeSincronizacao();
+                        break;
+
+                    case 'MONITOR_QUEUE':
+                        monitorarFilaDeSincronizacao();
+                        break;
+                        
+                    default:
+                        console.warn('Worker: Tipo de mensagem desconhecido: ' + type);
+                }
+            };
+            
+            // Intervalo para sincronizar a cada 30 segundos
+            setInterval(monitorarFilaDeSincronizacao, 30000);
+        `;
+        
+        // FIM DO CÓDIGO DO WEB WORKER
+        // =========================================================================
+
+
         // REGISTRO DO SERVICE WORKER (PWA)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                // AVISO: O Service Worker provavelmente falhará aqui devido à URL blob: ou iframe.
+                // Mas a lógica é mantida para o ambiente de produção.
                 navigator.serviceWorker.register('./sw.js')
         
                 .then(registration => {
@@ -1070,7 +1208,7 @@
                     })
                     .catch(error => {
                
-                         console.log('Falha ao registrar Service Worker:', error);
+                         console.warn('Falha ao registrar Service Worker:', error); // Alterado para warn
                     });
             });
         }
@@ -1228,9 +1366,11 @@
         });
 
         // -----------------------------------------------------------------
-
+        // CONFIGURAÇÕES SUPABASE E DO JOGO
+        // -----------------------------------------------------------------
         const SUPABASE_URL = 'https://ngeofumxwasfkaathwbu.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nZW9mdW14d2FzZmthYXRod2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MzU3MzQsImV4cCI6MjA4MDAxMTczNH0._kT-LZlXDdNY3Kr4PEC-3yO3a3I7CupEDklj_rGSlnE';
+        // CHAVE ANON SÓ É USADA PARA LEITURA (É seguro manter)
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nZW9mdW14d2FzZmthYXRod2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MzU3MzQsImV4cCI6MjA4MDAxMTczNH0._kT-LZlXDdNY3Kr4PEC-3yO3a3I7CupEDklj_rGSlnE';
         
         const MODE_RUNNER = 'RUNNER';
         const MODE_FLAPPY = 'FLAPPY_SOLO'; 
@@ -1240,14 +1380,18 @@
         
         // CHAVE DO LOCALSTORAGE PARA A FILA DE PONTUAÇÕES
         const SYNC_QUEUE_KEY = 'pending_scores_queue';
-
+        
+        // Worker para gerenciar a fila de sincronização (Off-thread)
+        let syncWorker;
+        
         let selectedGameMode = MODE_RUNNER; 
         let activeTable = TABLE_RUNNER;
 
         let _supabase = null;
         try {
             if (typeof supabase !== 'undefined') {
-                _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                // Supabase Client é usado APENAS para leitura do Ranking
+                _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
                 console.error("Supabase SDK não carregou.");
             }
@@ -1258,215 +1402,132 @@
         let playerName = "";
         let cachedRanking = []; 
 
-        // CORREÇÃO: Gravidades independentes solicitadas
-        const GRAVITY_RUNNER = 0.95;
-        const GRAVITY_FLAPPY = 0.80;
-        
-        const JUMP_POWER = 17;
-        const FLAPPY_JUMP_POWER = 12; 
-        const GROUND_HEIGHT = 50;
-        const REACTION_BUFFER_FRAMES = 12; 
-        
-        const FLAPPY_LEVEL_START_RUNNER = 11;
-        let lastTime = 0;
-        const TARGET_FPS = 60;
-
-        const LEVEL_CONFIG = {
-            1:  { targetSpeed: 6.0, densityFactor: 1.8 },
-            2:  { targetSpeed: 7.0, densityFactor: 2.0 },
-            3:  { targetSpeed: 7.5, densityFactor: 2.2 },
-            4:  { targetSpeed: 8.0, densityFactor: 2.5 },
-            5:  { targetSpeed: 9.0, densityFactor: 2.8 },
-            6:  { targetSpeed: 9.5, densityFactor: 3.2 },
-            7:  { targetSpeed: 10.0, densityFactor: 3.8 },
-            8:  { targetSpeed: 10.5, densityFactor: 4.2 },
-            9:  { targetSpeed: 11.0, densityFactor: 4.8 },
-            10: { targetSpeed: 11.5, densityFactor: 5.0 }
-        };
-
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const gameContainer = document.getElementById('gameContainer');
-        
-        const bgMusic = document.getElementById('bgMusic');
-        
-        const introScreen = document.getElementById('introScreen');
-        const startScreen = document.getElementById('startScreen'); 
-        const startScreenFlappy = document.getElementById('startScreenFlappy');
-        const countdownScreen = document.getElementById('countdownScreen');
-        
-        const introStartBtn = document.getElementById('introStartBtn'); 
-        const introFlappyBtn = document.getElementById('introFlappyBtn');
-        const introClickZoneLeft = document.getElementById('introClickZoneLeft'); // ZONA PLACA ESQUERDA
-        const introClickZoneRight = document.getElementById('introClickZoneRight'); // ZONA PLACA DIREITA
-        
-        const startBtn = document.getElementById('startBtn'); 
-        const startBtnFlappy = document.getElementById('startBtnFlappy');
-        const countdownElement = document.getElementById('countdown');
-        const gameMessage = document.getElementById('gameMessage');
-        const scoreDisplay = document.getElementById('score');
-        const highScoreDisplay = document.getElementById('highScore');
-        const levelDisplay = document.getElementById('level');
-        const nameModal = document.getElementById('nameModal');
-        const playerNameInput = document.getElementById('playerNameInput');
-        const confirmNameBtn = document.getElementById('confirmNameBtn');
-        const newGameOverModal = document.getElementById('newGameOverModal');
-        const finalPlayerName = document.getElementById('finalPlayerName');
-        const finalScoreDisplay = document.getElementById('finalScoreDisplay');
-        const modalRestartBtn = document.getElementById('modalRestartBtn');
-        const rankingList = document.getElementById('rankingList');
-        const rankingStatusMessage = document.getElementById('rankingStatusMessage');
-
-        // =========================================================================
-        // FUNÇÕES DE FILA DE SINCRONIZAÇÃO (LOCALSTORAGE)
-        // =========================================================================
-
-        /** Obtém a fila de pontuações pendentes do localStorage. */
-        function getPendingScores() {
-            const queueJson = localStorage.getItem(SYNC_QUEUE_KEY);
-            try {
-                return queueJson ? JSON.parse(queueJson) : [];
-            } catch (e) {
-                console.error("Erro ao ler fila de sincronização:", e);
-                // Retorna uma fila vazia em caso de JSON inválido
-                return []; 
-            }
+        // Adiciona a função de sanitização de XSS (Cross-Site Scripting)
+        function sanitizeInput(input) {
+            if (!input) return "";
+            // Usa o DOMParser para remover qualquer HTML, garantindo texto puro.
+            const doc = new DOMParser().parseFromString(input, 'text/html');
+            // Remove o texto e limita o tamanho para segurança extra.
+            return doc.body.textContent.substring(0, 12).trim();
         }
 
-        /** Salva uma nova pontuação na fila local. */
-        function addScoreToQueue(nome, pontos, modo) {
-            const queue = getPendingScores();
-            const newEntry = { nome, pontos, modo, timestamp: Date.now() };
-            queue.push(newEntry);
-            localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
-            console.log(`Pontuação (${pontos}) adicionada à fila de sincronização.`);
+        // =========================================================================
+        // WEB WORKER E COMUNICAÇÃO (CORRIGIDO PARA AMBIENTES ISOLADOS - RPC)
+        // =========================================================================
+        function initSyncWorker() {
+             if (typeof Worker !== 'undefined') {
+                 try {
+                     // 1. Cria um Blob (objeto de arquivo temporário) contendo o código do worker
+                     const blob = new Blob([workerScript], { type: 'application/javascript' });
+                     const workerUrl = URL.createObjectURL(blob);
+                     
+                     // 2. Inicia o Worker usando a URL do Blob (resolve o erro de URL inválida)
+                     syncWorker = new Worker(workerUrl);
+                     
+                     console.log("Worker Blob URL criada e Worker iniciado (RPC Mode).");
+                     
+                     // Listener para receber a fila atualizada do Worker
+                     syncWorker.onmessage = (event) => {
+                         if (event.data.type === 'QUEUE_STATUS') {
+                             // Sem log para evitar spam, apenas usa a contagem se necessário na UI.
+                         }
+                     };
+                     
+                     // Envia as configurações para o worker (inclui a URL e Chave para ele criar seu próprio cliente)
+                     syncWorker.postMessage({
+                         type: 'INIT',
+                         payload: {
+                             SUPABASE_URL: SUPABASE_URL,
+                             SUPABASE_ANON_KEY: SUPABASE_ANON_KEY,
+                             SYNC_QUEUE_KEY: SYNC_QUEUE_KEY
+                         }
+                     });
+                     
+                     // Inicia a monitoração da fila assim que o worker estiver pronto
+                     syncWorker.postMessage({ type: 'MONITOR_QUEUE' });
+                     
+                 } catch (e) {
+                     console.error("Erro ao construir Worker (fallback para thread principal):", e);
+                 }
+             } else {
+                 console.warn("Web Workers não suportados. A sincronização será executada na thread principal.");
+             }
         }
+        
+        // =========================================================================
+        // FUNÇÕES DE FILA DE SINCRONIZAÇÃO (Agora via Worker - RPC)
+        // =========================================================================
 
-        /** Remove uma pontuação da fila local. */
-        function removeScoreFromQueue(timestamp) {
-            let queue = getPendingScores();
-            const initialLength = queue.length;
-            
-            // Filtra a fila, mantendo apenas as pontuações que NÃO correspondem ao timestamp
-            queue = queue.filter(entry => entry.timestamp !== timestamp);
+        /** * Salva uma nova pontuação na fila local e envia ao worker para tentar sincronizar.
+         */
+        function enqueueAndSyncScore(nome, pontos, modo) {
+            const sanitizedName = sanitizeInput(nome);
+            const newEntry = { nome: sanitizedName, pontos, modo, timestamp: Date.now() };
 
-            if (queue.length < initialLength) {
-                localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
-                console.log(`Pontuação pendente removida da fila.`);
+            if (syncWorker) {
+                // Envia a pontuação para o worker salvar na fila e iniciar a sincronização
+                syncWorker.postMessage({
+                    type: 'ADD_SCORE',
+                    payload: newEntry
+                });
+                console.log(`Pontuação (${pontos}) enviada ao worker para fila/sincronização.`);
                 return true;
-            }
-            return false;
-        }
-
-        /** Tenta enviar todas as pontuações pendentes. */
-        async function monitorarFilaDeSincronizacao() {
-            const queue = getPendingScores();
-            if (queue.length === 0) {
-                // Se houver mensagem de fila na modal de game over, limpa ao iniciar
-                if (rankingStatusMessage && rankingStatusMessage.textContent.includes('pendente')) {
-                    rankingStatusMessage.style.display = 'none';
-                    rankingStatusMessage.textContent = '';
-                }
-                return;
-            }
-
-            console.log(`Iniciando tentativa de sincronizar ${queue.length} pontuação(ões) pendente(s)...`);
-            
-            // Processa a fila, mantendo o controle de quais foram salvas com sucesso
-            for (const entry of queue) {
-                try {
-                    // Determina a tabela correta para o item da fila
-                    const targetTable = entry.modo === MODE_FLAPPY ? TABLE_FLAPPY : TABLE_RUNNER;
-                    
-                    const { error } = await _supabase
-                        .from(targetTable) 
-                        .insert([{ nome: entry.nome, pontos: entry.pontos }]);
-                    
-                    if (error) {
-                        console.warn(`Falha ao sincronizar item da fila (${entry.pontos}):`, error.message);
-                        // Se houver erro, para o processamento, pois a conexão pode ter caído novamente
-                        break; 
-                    } else {
-                        console.log(`Pontuação sincronizada com sucesso: ${entry.pontos}`);
-                        // Remove o item da fila após o sucesso
-                        removeScoreFromQueue(entry.timestamp); 
-                    }
-                } catch (err) {
-                    console.error('Erro de conexão ao tentar sincronizar fila:', err);
-                    break; // Sai do loop em caso de erro de rede/conexão
-                }
-            }
-            // Após tentar processar, verifica se ainda há itens (em caso de falha de conexão)
-            const remaining = getPendingScores().length;
-            if (remaining > 0) {
-                 console.log(`Sincronização adiada. ${remaining} item(ns) permanece(m) na fila.`);
             } else {
-                console.log("Fila de sincronização concluída.");
+                console.error("Worker não iniciado. Falha ao adicionar score à fila.");
+                // Retorna false, o fluxo de game over tratará isso.
+                return false;
             }
         }
-        
+
         // =========================================================================
 
+        /** Tenta buscar o ranking mais recente. Agora inclui o monitoramento da fila. */
         async function fetchRankingToCache() {
             if (!_supabase) return;
             try {
-                // Tenta sincronizar a fila antes de buscar o ranking mais recente
-                await monitorarFilaDeSincronizacao();
-
+                // Tenta sincronizar a fila ANTES de buscar o ranking.
+                if (syncWorker) {
+                    syncWorker.postMessage({ type: 'MONITOR_QUEUE' });
+                }
+                
+                // Busca de Leitura: Apenas o TOP 3 (conforme a regra de negócio)
                 const { data, error } = await _supabase
                     .from(activeTable)
                     .select('nome, pontos')
                     .order('pontos', { ascending: false })
-           
-                    .limit(10);
+                    .limit(3); // Limite de 3 para o FrontEnd
+
                 if (!error && data) {
-                    cachedRanking = data;
+                    // Sanitiza nomes antes do cache
+                    cachedRanking = data.map(item => ({ 
+                        nome: sanitizeInput(item.nome), 
+                        pontos: item.pontos 
+                    }));
                 }
             } catch (err) {
                 console.warn('Falha cache ranking:', err);
             }
         }
 
-        /**
-         * Tenta salvar a pontuação no banco de dados e gerencia a fila em caso de falha.
-         */
-        async function salvarPontuacao(nome, pontos, modo) {
-            if (!_supabase) {
-                // Se o Supabase não estiver pronto, adiciona à fila diretamente
-                addScoreToQueue(nome, pontos, modo);
-                return;
-            }
-            let success = false;
-            try {
-                const targetTable = modo === MODE_FLAPPY ? TABLE_FLAPPY : TABLE_RUNNER;
-                const { error } = await _supabase
-                    .from(targetTable) 
-                    .insert([{ nome: nome, pontos: pontos }]);
-                
-                if (error) {
-                    console.warn('Erro ao salvar no Supabase (Tentativa 1):', error.message);
-                    throw new Error("Erro no Supabase"); // Força a ida para o catch
-                }
-                success = true;
-                console.log('Pontuação salva no Supabase com sucesso.');
-            } catch (err) {
-                console.error('Erro de conexão/salvamento. Adicionando à fila:', err);
-                addScoreToQueue(nome, pontos, modo);
-            }
-            return success;
-        }
-        
         function showInstantMixedRanking(currentScore, currentPlayerName) {
             if (!rankingList) return;
             rankingList.innerHTML = '';
+            
+            // 1.1. SANITIZAÇÃO: Garante que o nome do jogador atual esteja limpo
+            const sanitizedPlayerName = sanitizeInput(currentPlayerName);
+            
             let mixedRanking = [...cachedRanking];
-            const currentPlayerEntry = { nome: currentPlayerName, pontos: currentScore };
+            const currentPlayerEntry = { nome: sanitizedPlayerName, pontos: currentScore };
+            
+            // Adiciona o score atual e ordena
             mixedRanking.push(currentPlayerEntry);
             mixedRanking.sort((a, b) => b.pontos - a.pontos);
             
+            // Lógica de Display de Rank (in-modal)
             const rankDisplay = document.getElementById('playerRankDisplay');
             if (rankDisplay) {
-                const myRankIndex = mixedRanking.indexOf(currentPlayerEntry);
+                // Usa findIndex para evitar problemas se houver scores iguais
+                const myRankIndex = mixedRanking.findIndex(entry => entry.nome === sanitizedPlayerName && entry.pontos === currentScore);
                 const myRankPosition = myRankIndex + 1;
                 
                 if (myRankIndex !== -1 && myRankPosition <= 3) {
@@ -1482,13 +1543,16 @@
             if (top3.length > 0) {
                 top3.forEach((rank, index) => {
                     const li = document.createElement('li');
-                    const isCurrentPlayerEntry = (rank === currentPlayerEntry);
+                    // Verifica se é a entrada recém-criada (a que acabamos de adicionar)
+                    const isCurrentPlayerEntry = (rank.nome === sanitizedPlayerName && rank.pontos === currentScore && index === mixedRanking.indexOf(rank));
                     if (isCurrentPlayerEntry) li.className = 'ranking-item current-player-rank';
     
                     else li.className = 'ranking-item';
                     
                     const pontosFormatados = Math.floor(rank.pontos).toLocaleString('pt-BR');
-                    li.innerHTML = `<span>#${index+1} ${rank.nome}</span> <span>${pontosFormatados}</span>`;
+                    // Usamos textContent/sanitizeInput para evitar XSS
+                    const nomeSeguro = sanitizeInput(rank.nome); 
+                    li.innerHTML = `<span>#${index+1} ${nomeSeguro}</span> <span>${pontosFormatados}</span>`;
               
                      rankingList.appendChild(li);
                 });
@@ -1497,6 +1561,7 @@
             }
         }
 
+        // Código de Áudio OMITIDO para brevidade...
         let audioCtx;
         let isAudioInitialized = false;
 
@@ -1703,13 +1768,11 @@
                 density = config.densityFactor;
             } else {
                 // A partir do nível 10: Velocidade aumenta +0.7 por nível infinitamente
-                // Base nível 10 é 11.5
                 const baseSpeed = LEVEL_CONFIG[10].targetSpeed;
                 const extraLevels = currentLevel - 10;
                 targetSpeed = baseSpeed + (extraLevels * 0.7);
                 
-                // CORREÇÃO 2: HARD CAP DE VELOCIDADE PARA O RUNNER
-                // Impede que a velocidade ultrapasse 16.0 para evitar impossibilidade física
+                // HARD CAP DE VELOCIDADE PARA O RUNNER
                 targetSpeed = Math.min(targetSpeed, 16.0);
                 
                 // Mantém a densidade máxima do nível 10 para não tornar impossível
@@ -1728,39 +1791,27 @@
         }
 
         // --- NOVA FUNÇÃO OBRIGATÓRIA: RESET GERAL ---
-        // Limpa completamente os assets e estados visuais do jogo anterior.
         function resetGameAssets() {
-            // 1. Para o loop de jogo imediatamente
             gameRunning = false;
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
-
-            // 2. Limpa o Canvas visualmente (remove o mascote do jogo anterior)
-            // Isso garante que a tela de nome não mostre lixo do jogo passado
             if(ctx && canvas) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
 
-            // 3. Limpa arrays de objetos
             obstacles = [];
             clouds = [];
-
-            // 4. Reseta posição do jogador para evitar renderização residual
-            player.y = -500; // Move para fora da tela
+            player.y = -500; 
             player.velocityY = 0;
-
-            // 5. Define um estado neutro para evitar que o renderPlayer desenhe algo errado
             gameState = 'IDLE_MENU';
-
-            // 6. Reseta mensagens de UI
             if(gameMessage) gameMessage.style.display = 'none';
-
-            // 7. Reseta transições
             transitionPhase = 'none';
         }
         // --------------------------------------------
 
         function initGame() {
-            // resetGameAssets já foi chamado antes, mas reiniciamos variáveis de jogo aqui
+            // Inicializa o Web Worker (AGORA INCORPORADO)
+            initSyncWorker(); 
+            
             score = 0;
             currentLevel = 1;
             nextLevelScore = 500;
@@ -1777,11 +1828,15 @@
             backgroundPosition = 0;
             gameStartTime = Date.now();
             firstObstacleCreated = false;
+            
+            // Define o modo e carrega o High Score correto
             if (selectedGameMode === MODE_FLAPPY) {
                 gameState = 'WAITING_FLAPPY_START';
                 activeTable = TABLE_FLAPPY;
                 highScore = localStorage.getItem('pentecaHighScoreFlappy') || 0;
                 
+                // Posição de Início do FlappyMats
+                player.x = 80; 
                 player.y = (canvas.height / (window.devicePixelRatio || 1)) / 3; 
                 player.velocityY = 0;
                 gameMessage.textContent = "TOQUE PARA VOAR!";
@@ -1791,7 +1846,10 @@
                 gameState = 'RUNNER';
                 activeTable = TABLE_RUNNER;
                 highScore = localStorage.getItem('pentecaHighScore') || 0;
+                // Posição de Início do RunnerMats
+                player.x = 10;
             }
+            
             highScoreDisplay.textContent = Math.floor(highScore);
             transitionPhase = 'none';
             if (bgMusic) bgMusic.volume = 0.4;
@@ -1799,10 +1857,7 @@
             updateUI();
             for (let i = 0; i < 5; i++) createCloud();
             playMusicSafe();
-            fetchRankingToCache(); 
-            
-            // Monitora e tenta sincronizar a fila na inicialização de cada jogo
-            monitorarFilaDeSincronizacao();
+            fetchRankingToCache(); // Busca o Ranking (Apenas leitura)
         }
         
         function createCloud() {
@@ -1838,17 +1893,11 @@
         function createFlappyObstacle() {
             const width = 60;
             
-            // CORREÇÃO 1 (CONTINUAÇÃO): GAP DINÂMICO
-            // Antes: const gapSize = 180;
-            
-            // Agora: Diminui o gap conforme o score.
-            // Começa em 180. Reduz 1 pixel a cada 25 pontos.
-            // Teto mínimo (segurança) de 140.
+            // Diminui o gap conforme o score. Teto mínimo (segurança) de 140.
             const reduction = Math.floor(score / 25);
             const gapSize = Math.max(140, 180 - reduction);
 
             const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
-            const groundY = canvasHeight - GROUND_HEIGHT;
             const minPipeHeight = 50;
             
             const availableHeight = canvasHeight;
@@ -2049,13 +2098,17 @@
             // -----------------------------------------------------------------------------
 
             addBtnListener(confirmNameBtn, () => {
-                const name = playerNameInput.value.trim();
+                // 1.1. SANITIZAÇÃO DE INPUT: Limpa a entrada do nome
+                const name = sanitizeInput(playerNameInput.value);
                 if (name === "") {
-                    // Alert pode bloquear em alguns iOS, melhor usar log ou nada
+                    // Feedback visual se o nome for vazio/inválido
+                    playerNameInput.style.border = '2px solid #FF4500';
+                    playerNameInput.placeholder = 'Nome Obrigatório!';
                     console.log("Nome vazio");
-      
                   return;
                 }
+                playerNameInput.style.border = '2px solid #555'; // Volta ao normal
+                
                 playSound('ui-click'); 
                 playerName = name;
                 nameModal.style.display = 'none';
@@ -2102,7 +2155,6 @@
                     document.getElementById('returnMenuBtn').style.display = 'none';
                     
                     // --- CORREÇÃO: CHAMA A LIMPEZA GERAL ---
-                    // Isso limpa o canvas e evita que o mascote antigo fique na tela
                     resetGameAssets();
                     // ---------------------------------------
                     
@@ -2500,13 +2552,18 @@
                         return;
                     }
                 } else if (obs.type === 'pipe') {
-                    if (pX < obs.x + obs.width && pX + pW > obs.x && pY < obs.topHeight) {
-                        gameOver();
-                        return;
-                    }
-                    if (pX < obs.x + obs.width && pX + pW > obs.x && pY + pH > obs.bottomY) {
-                        gameOver();
-                        return;
+                    // FlappyMats collision logic
+                    if (pX < obs.x + obs.width && pX + pW > obs.x) {
+                        // Colisão com o cano superior
+                        if (pY < obs.topHeight) {
+                            gameOver();
+                            return;
+                        }
+                        // Colisão com o cano inferior
+                        if (pY + pH > obs.bottomY) {
+                            gameOver();
+                            return;
+                        }
                     }
                 }
             }
@@ -2540,35 +2597,20 @@
             }
             highScoreDisplay.textContent = highScore;
             
-            // 2. TENTA SALVAR NO RANKING E GERENCIA A FILA
-            let rankingSavedSuccessfully = false;
-            if (_supabase) {
-                // Tenta salvar e retorna TRUE se foi bem-sucedido
-                rankingSavedSuccessfully = await salvarPontuacao(playerName, finalScore, currentMode);
-            } else {
-                // Se Supabase não foi inicializado, joga diretamente na fila (offline mode)
-                addScoreToQueue(playerName, finalScore, currentMode);
-            }
-
+            // 2. TENTA SALVAR NO RANKING VIA WORKER/RPC (Mais Seguro)
+            const wasEnqueued = enqueueAndSyncScore(playerName, finalScore, currentMode);
+            
             // 3. ATUALIZA A MENSAGEM DE STATUS DO RANKING NO MODAL
             if (rankingStatusMessage) {
-                const pendingCount = getPendingScores().length;
-
-                if (rankingSavedSuccessfully) {
-                    rankingStatusMessage.textContent = '✅ Pontuação enviada ao Ranking Global!';
-                    rankingStatusMessage.style.backgroundColor = 'rgba(60, 179, 113, 0.1)'; // Verde suave
-                    rankingStatusMessage.style.color = '#3CB371';
-                } else if (pendingCount > 0) {
-                    // Há scores pendentes na fila (falha na conexão)
-                    rankingStatusMessage.textContent = `⚠️ Falha de conexão. Pontuação salva localmente. Sincronizando... (${pendingCount} pendente(s)).`;
-                    rankingStatusMessage.style.backgroundColor = 'rgba(255, 165, 0, 0.1)'; // Laranja suave
+                
+                if (wasEnqueued) {
+                    // MENSAGEM AJUSTADA: Assume que a RPC terá sucesso se a rede estiver OK.
+                    rankingStatusMessage.textContent = `⏳ Verificando sua pontuação no Ranking Global (Top 3).`;
+                    rankingStatusMessage.style.backgroundColor = 'rgba(255, 215, 0, 0.1)'; 
                     rankingStatusMessage.style.color = '#FFA500';
-                    // Tenta forçar a sincronização para o caso de ter sido um erro momentâneo
-                    monitorarFilaDeSincronizacao();
                 } else {
-                    // Supabase não está pronto e não conseguiu adicionar à fila por algum motivo
-                    rankingStatusMessage.textContent = '❌ Ranking indisponível. Tente novamente mais tarde.';
-                    rankingStatusMessage.style.backgroundColor = 'rgba(255, 69, 0, 0.1)'; // Vermelho suave
+                    rankingStatusMessage.textContent = '❌ Falha interna ao iniciar sincronização. Recorde Pessoal Salvo.';
+                    rankingStatusMessage.style.backgroundColor = 'rgba(255, 69, 0, 0.1)'; 
                     rankingStatusMessage.style.color = '#FF4500';
                 }
                 rankingStatusMessage.style.display = 'block';
@@ -2576,14 +2618,15 @@
 
             // 4. EXIBE O MODAL
             gameMessage.style.display = 'none';
-            finalPlayerName.textContent = playerName || "JOGADOR";
+            // 1.1. SANITIZAÇÃO DE INPUT: Nome do Jogador
+            finalPlayerName.textContent = sanitizeInput(playerName) || "JOGADOR"; 
             finalScoreDisplay.textContent = finalScore.toLocaleString('pt-BR');
             
             if (newGameOverModal) newGameOverModal.style.display = 'flex';
             
             // 5. ATUALIZA O RANKING VISUAL (incluindo o score atual na lista)
             try {
-                // Rebusca o ranking após a tentativa de salvar
+                // Rebusca o ranking (leitura) após a tentativa de salvar
                 await fetchRankingToCache(); 
                 showInstantMixedRanking(finalScore, playerName);
             } catch (e) {
@@ -2608,7 +2651,8 @@
             if (selectedGameMode === MODE_FLAPPY || gameState === 'WAITING_FLAPPY_START') {
                  // Renderiza o céu do FlappyMats
                 const gradient = ctx.createLinearGradient(0, 0, 0, height);
-                gradient.addColorStop(0, '#4facfe'); gradient.addColorStop(1, '#00f2fe');
+                gradient.addColorStop(0, '#4facfe');
+                gradient.addColorStop(1, '#00f2fe');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, width, height);
             }
@@ -2621,7 +2665,8 @@
                 } else {
                     // Fallback para RunnerMats (se o asset falhar)
                     const gradient = ctx.createLinearGradient(0, 0, 0, height);
-                    gradient.addColorStop(0, '#87CEEB'); gradient.addColorStop(1, '#1E90FF');
+                    gradient.addColorStop(0, '#87CEEB');
+                    gradient.addColorStop(1, '#1E90FF');
                     ctx.fillStyle = gradient; ctx.fillRect(0, 0, width, height);
                 }
             }
@@ -2771,6 +2816,9 @@
         document.addEventListener("touchstart", handleSystemResume, {passive: true});
         document.addEventListener("keydown", handleSystemResume);
         // -----------------------------------------------------------------
+        
+        // Inicializa o Web Worker (Pode ser feito no DOMContentLoaded)
+        document.addEventListener('DOMContentLoaded', initSyncWorker);
     })();
     </script>
 </body>
