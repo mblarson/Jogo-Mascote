@@ -2007,7 +2007,7 @@
             addBtnListener(introStartBtn, iniciarRunner);
             addBtnListener(introFlappyBtn, iniciarFlappy);
 
-            // PLACAS INVISÍVEIS (Zonas de Clique do Fundo)
+            // PLACAS INVISÍVEIS (Zonas de Clique do Fondo)
             if(introClickZoneLeft) addBtnListener(introClickZoneLeft, iniciarRunner);
             if(introClickZoneRight) addBtnListener(introClickZoneRight, iniciarFlappy);
             
@@ -2304,8 +2304,11 @@
             const deltaFactor = safeDeltaTime * TARGET_FPS;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Renderização da Transição
             if (gameState === 'TRANSITION') {
                 updateTransition(deltaFactor);
+                // A renderização do fundo durante o fade-out/in está correta abaixo
                 if (transitionAlpha > 0.9) { 
                 } else if (transitionPhase === 'fade-out') {
                     renderBackground();
@@ -2319,40 +2322,51 @@
                 }
                 
                 renderTransition();
-            } else if (gameState === 'WAITING_FLAPPY_START') {
+            } 
+            // Estado de espera do FlappyMats
+            else if (gameState === 'WAITING_FLAPPY_START') {
                 renderSkyBackground();
                 updateClouds(deltaFactor * 0.2); 
                 renderClouds();
                 renderPlayer(); 
-                
-            } else {
+            } 
+            // Jogo Rodando ou Jogo Parado (GAME_OVER)
+            else {
                 
                 calculateDifficultyParams(deltaFactor);
-                updatePlayer(deltaFactor);
-                updateObstacles(deltaFactor); 
-                updateClouds(deltaFactor);
-                
-                if (gameState === 'RUNNER') {
-                    updateGround(deltaFactor);
-                    updateBackground(deltaFactor);
-                    checkLevelProgression(); 
+                // Apenas atualiza o jogador e obstáculos se o jogo não estiver em GAME_OVER
+                if (gameState !== 'GAME_OVER') {
+                    updatePlayer(deltaFactor);
+                    updateObstacles(deltaFactor); 
+                    updateClouds(deltaFactor);
                 }
-                
-                checkCollisions();
-                if (gameState === 'RUNNER') {
+
+                if (selectedGameMode === MODE_RUNNER) { // Modos RUNNER e GAME_OVER do RUNNER
+                    // Apenas move o chão e o fundo se o jogo não estiver parado
+                    if (gameState !== 'GAME_OVER') {
+                        updateGround(deltaFactor);
+                        updateBackground(deltaFactor);
+                        checkLevelProgression(); 
+                    }
+
                     renderBackground();
                     renderClouds();
                     renderGround();
                     renderPlayer();
                     renderObstacles();
-                } else {
+                } else { // Modos FLAPPY e GAME_OVER do FLAPPY
                     renderSkyBackground();
                     renderClouds();
                     renderPlayer();
                     renderObstacles();
                 }
                 
-                score += 1 * deltaFactor;
+                checkCollisions();
+
+                // A pontuação só aumenta se o jogo estiver rodando
+                if (gameState !== 'GAME_OVER') {
+                    score += 1 * deltaFactor;
+                }
             }
             
             updateUI();
