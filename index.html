@@ -365,25 +365,35 @@
             flex-direction: column;
         }
 
+        /* AJUSTE TEMA 1: REDUÇÃO GERAL DO MODAL */
         .modal-content {
             background: #1a1a1a;
             border: 3px solid #FFA500;
-            border-radius: 15px;
-            padding: 20px;
-            width: 85%;
-            max-width: 500px;
+            border-radius: 10px; /* Borda levemente reduzida */
+            padding: 10px; /* Padding reduzido */
+            width: 95%; /* Aumenta a largura em mobile */
+            max-width: 400px; /* Reduz o max-width */
+            /* max-height: 95%; Adicionado para prevenir overflow no gameContainer */
+            max-height: 480px; /* Ajusta à altura máxima do gameContainer (500px) */
+            overflow-y: auto; /* Permite scroll se o conteúdo exceder */
             color: white;
             text-align: center;
-            box-shadow: 0 0 25px rgba(255, 165, 0, 0.4);
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.4); /* Sombra reduzida */
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px; /* Espaçamento reduzido */
+            
+            /* Garante que o modal se encaixe perfeitamente no #gameContainer */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         #playerNameInput {
-            padding: 12px;
-            font-size: 18px;
-            border-radius: 8px;
+            padding: 10px; /* Reduzido */
+            font-size: 16px; /* Reduzido */
+            border-radius: 6px; /* Reduzido */
             border: 2px solid #555;
             background: #333;
             color: white;
@@ -398,11 +408,11 @@
         
         /* NOVO ESTILO PARA MENSAGEM DE ERRO/AVISO */
         #rankingStatusMessage {
-            font-size: 14px;
+            font-size: 13px; /* Reduzido */
             color: #FFD700;
-            padding: 8px;
-            border-radius: 5px;
-            margin-top: -10px;
+            padding: 6px; /* Reduzido */
+            border-radius: 4px; /* Reduzido */
+            margin-top: -5px; /* Ajuste */
             margin-bottom: 5px;
             font-weight: bold;
             background: rgba(255, 215, 0, 0.1);
@@ -411,8 +421,8 @@
         .game-over-layout {
             display: flex;
             flex-direction: row;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 10px; /* Reduzido */
+            margin-bottom: 5px; /* Reduzido */
             justify-content: space-between;
             align-items: flex-start;
             text-align: left;
@@ -425,7 +435,7 @@
             justify-content: center;
             align-items: center;
             border-right: 1px solid #444;
-            padding-right: 10px;
+            padding-right: 8px; /* Reduzido */
         }
 
         .ranking-column {
@@ -435,30 +445,30 @@
         }
 
         .ranking-title {
-            font-size: 14px;
+            font-size: 13px; /* Reduzido */
             color: #FFD700;
-            margin-bottom: 8px;
+            margin-bottom: 5px; /* Reduzido */
             text-transform: uppercase;
             text-align: center;
             border-bottom: 1px solid #444;
-            padding-bottom: 5px;
+            padding-bottom: 3px; /* Reduzido */
         }
 
         .ranking-list {
             list-style: none;
             padding: 0;
-            font-size: 13px;
-            max-height: 120px;
+            font-size: 12px; /* Reduzido */
+            max-height: 100px; /* Reduzido */
             overflow-y: hidden; 
         }
 
         .ranking-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            padding: 3px 0; /* Reduzido */
             border-bottom: 1px solid #333;
         }
-        .ranking-item:nth-child(1) { color: #FFD700; font-weight: bold; font-size: 1.1em; } 
+        .ranking-item:nth-child(1) { color: #FFD700; font-weight: bold; font-size: 1em; } /* Reduzido */
         .ranking-item:nth-child(2) { color: #C0C0C0; } 
         .ranking-item:nth-child(3) { color: #CD7F32; } 
         
@@ -466,24 +476,25 @@
             background: rgba(255, 215, 0, 0.15);
             border: 1px solid #FFD700;
             border-radius: 4px;
-            padding: 2px 5px !important;
-            margin: 2px 0;
+            padding: 2px 4px !important; /* Reduzido */
+            margin: 1px 0; /* Reduzido */
         }
 
         .score-display-big {
-            font-size: 28px;
+            font-size: 24px; /* Reduzido */
             font-weight: bold;
             color: #FFA500;
         }
         .player-name-display {
-            font-size: 18px;
+            font-size: 16px; /* Reduzido */
             color: #FFF;
-            margin-bottom: 5px;
+            margin-bottom: 3px; /* Reduzido */
             max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+        /* Fim dos ajustes do Modal */
 
         .modal-footer {
             margin-top: 5px;
@@ -2578,17 +2589,34 @@
         function renderBackground() {
             const width = canvas.width / (window.devicePixelRatio || 1);
             const height = canvas.height / (window.devicePixelRatio || 1);
-            if (backgroundImage.loaded) {
-                ctx.drawImage(backgroundImage, backgroundPosition, 0, width, height);
-                ctx.drawImage(backgroundImage, backgroundPosition + width, 0, width, height);
-            } else {
+            
+            // CORREÇÃO TEMA 3: APLICAÇÃO CONDICIONAL DO CÉU AZUL
+            if (selectedGameMode === MODE_FLAPPY || gameState === 'WAITING_FLAPPY_START') {
+                 // Renderiza o céu do FlappyMats
                 const gradient = ctx.createLinearGradient(0, 0, 0, height);
-                gradient.addColorStop(0, '#87CEEB'); gradient.addColorStop(1, '#1E90FF');
-                ctx.fillStyle = gradient; ctx.fillRect(0, 0, width, height);
+                gradient.addColorStop(0, '#4facfe'); gradient.addColorStop(1, '#00f2fe');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+            }
+            
+            else {
+                // Renderiza o cenário urbano do RunnerMats
+                if (backgroundImage.loaded) {
+                    ctx.drawImage(backgroundImage, backgroundPosition, 0, width, height);
+                    ctx.drawImage(backgroundImage, backgroundPosition + width, 0, width, height);
+                } else {
+                    // Fallback para RunnerMats (se o asset falhar)
+                    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                    gradient.addColorStop(0, '#87CEEB'); gradient.addColorStop(1, '#1E90FF');
+                    ctx.fillStyle = gradient; ctx.fillRect(0, 0, width, height);
+                }
             }
         }
         
         function renderGround() {
+            // Renderiza o chão do RunnerMats (Apenas no modo Runner)
+            if (selectedGameMode !== MODE_RUNNER) return;
+            
             const height = canvas.height / (window.devicePixelRatio || 1);
             const width = canvas.width / (window.devicePixelRatio || 1);
             ctx.fillStyle = '#333333'; ctx.fillRect(0, height - GROUND_HEIGHT, width, GROUND_HEIGHT);
@@ -2622,18 +2650,22 @@
 
             ctx.save();
             ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-            // REMOVED SHADOW BLUR FOR PERFORMANCE
-            if (gameState === 'FLAPPY' || gameState === 'WAITING_FLAPPY_START' || (gameState === 'TRANSITION' && transitionPhase !== 'fade-out')) {
+            
+            // CORREÇÃO TEMA 2: Garante o sprite correto
+            const isFlappyMode = (selectedGameMode === MODE_FLAPPY);
+
+            if (isFlappyMode) {
                 const flappyWidth = 90;
                 const flappyHeight = 100;
 
                 if (flappyPlayerImage.loaded) { 
                     ctx.drawImage(flappyPlayerImage, player.x, player.y, flappyWidth, flappyHeight);
                 } else {
-                    ctx.fillStyle = '#FF4500';
+                    ctx.fillStyle = '#00FFFF';
                     ctx.fillRect(player.x, player.y, flappyWidth, flappyHeight);
                 }
             } else {
+                // Modo Runner
                 if (player.loaded) {
                     ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
                 } else {
